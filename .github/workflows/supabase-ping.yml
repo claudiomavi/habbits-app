@@ -1,0 +1,32 @@
+name: Ping Supabase para mantener activo
+
+on:
+  schedule:
+    - cron: '0 */12 * * *' # Cada 12 horas
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Doble ping a Supabase (con reintentos)
+        run: |
+          for i in {1..3}; do
+            echo "Intento $i..."
+            
+            # Primer ping: para "despertar" Supabase si está pausado
+            curl -s -o /dev/null -w "%{http_code}\n" \
+              -H "apikey: ${{ secrets.SUPABASE_API_KEY }}" \
+              "https://esmrrrqdyoozsrklslzk.supabase.co/rest/v1/modulos?select=id&limit=1"
+            
+            # Espera un poco para dejar que el proyecto despierte
+            sleep 15
+            
+            # Segundo ping: tráfico real a la misma tabla
+            curl -i -X GET "https://esmrrrqdyoozsrklslzk.supabase.co/rest/v1/modulos?select=id&limit=1" \
+              -H "apikey: ${{ secrets.SUPABASE_API_KEY }}" \
+              && echo "✅ Supabase activo" && break
+
+            echo "❌ Falló el intento $i, reintentando en 30 segundos..."
+            sleep 30
+          done
