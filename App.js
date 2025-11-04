@@ -1,11 +1,15 @@
-import { AuthProvider } from './src/context/AuthContext'
-import AppRouter from './src/routers/AppRouter'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { AppRouter, AuthProvider } from './src/autoBarrell'
 import './src/styles/global.css'
+
+const queryClient = new QueryClient()
 
 export default function App() {
 	return (
-		<AuthProvider>
-			<AppRouter />
-		</AuthProvider>
+		<QueryClientProvider client={queryClient}>
+			<AuthProvider>
+				<AppRouter />
+			</AuthProvider>
+		</QueryClientProvider>
 	)
 }

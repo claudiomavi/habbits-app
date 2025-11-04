@@ -1,0 +1,39 @@
+import { create } from 'zustand'
+import { supabase } from '../autoBarrell'
+
+export const useAuthStore = create((set) => ({
+	user: null,
+	session: null,
+	loading: true,
+
+	initAuth: async () => {
+		const { data } = await supabase.auth.getSession()
+		set({
+			session: data.session,
+			user: data.session?.user ?? null,
+			loading: false,
+		})
+
+		supabase.auth.onAuthStateChange((_event, session) => {
+			set({ session, user: session?.user ?? null })
+		})
+	},
+
+	signIn: async (email, password) => {
+		const { error } = await supabase.auth.signInWithPassword({
+			email,
+			password,
+		})
+		if (error) throw error
+	},
+
+	signUp: async (email, password) => {
+		const { error } = await supabase.auth.signUp({ email, password })
+		if (error) throw error
+	},
+
+	signOut: async () => {
+		await supabase.auth.signOut()
+		set({ session: null, user: null })
+	},
+}))
