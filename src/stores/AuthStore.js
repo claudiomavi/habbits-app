@@ -7,20 +7,20 @@ export const useAuthStore = create((set) => ({
 	loading: true,
 
 	initAuth: async () => {
-		const { data } = await supabase.auth.getSession()
+		const { data } = await supabase?.auth.getSession()
 		set({
 			session: data.session,
 			user: data.session?.user ?? null,
 			loading: false,
 		})
 
-		supabase.auth.onAuthStateChange((_event, session) => {
+		supabase?.auth.onAuthStateChange((_event, session) => {
 			set({ session, user: session?.user ?? null })
 		})
 	},
 
 	signIn: async (email, password) => {
-		const { error } = await supabase.auth.signInWithPassword({
+		const { error } = await supabase?.auth.signInWithPassword({
 			email,
 			password,
 		})
@@ -28,12 +28,13 @@ export const useAuthStore = create((set) => ({
 	},
 
 	signUp: async (email, password) => {
-		const { error } = await supabase.auth.signUp({ email, password })
+		const { data, error } = await supabase?.auth.signUp({ email, password })
 		if (error) throw error
+		return data
 	},
 
 	signOut: async () => {
-		await supabase.auth.signOut()
+		await supabase?.auth.signOut()
 		set({ session: null, user: null })
 	},
 }))
