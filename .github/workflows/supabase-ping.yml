@@ -17,13 +17,13 @@ jobs:
             # Primer ping: para "despertar" Supabase si está pausado
             curl -s -o /dev/null -w "%{http_code}\n" \
               -H "apikey: ${{ secrets.SUPABASE_API_KEY }}" \
-              "https://esmrrrqdyoozsrklslzk.supabase.co/rest/v1/modulos?select=id&limit=1"
+              "https://ylfrrssnrrtwfqtlunjb.supabase.co/rest/v1/profiles?select=id&limit=1"
             
             # Espera un poco para dejar que el proyecto despierte
             sleep 15
             
             # Segundo ping: tráfico real a la misma tabla
-            curl -i -X GET "https://esmrrrqdyoozsrklslzk.supabase.co/rest/v1/modulos?select=id&limit=1" \
+            curl -i -X GET "https://ylfrrssnrrtwfqtlunjb.supabase.co/rest/v1/profiles?select=id&limit=1" \
               -H "apikey: ${{ secrets.SUPABASE_API_KEY }}" \
               && echo "✅ Supabase activo" && break
 
