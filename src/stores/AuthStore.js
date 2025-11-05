@@ -20,11 +20,24 @@ export const useAuthStore = create((set) => ({
 	},
 
 	signIn: async (email, password) => {
-		const { error } = await supabase?.auth.signInWithPassword({
+		const { data, error } = await supabase?.auth.signInWithPassword({
 			email,
 			password,
 		})
 		if (error) throw error
+
+		const user = data?.user
+
+		if (user) {
+			await supabase
+				.from('profiles')
+				.update({ id_auth: user.id })
+				.eq('mail', user.email)
+				.is('id_auth', null)
+		}
+
+		set({ session: data.session, user })
+		return data
 	},
 
 	signUp: async (email, password) => {
