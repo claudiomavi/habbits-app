@@ -101,18 +101,28 @@ export function Login() {
 			<TouchableOpacity
 				onPress={handleSubmit(onSubmit)}
 				disabled={loading}
-				className="bg-blue-600 p-4 rounded-lg items-center mb-3"
+				className="bg-blue-600 p-4 rounded-lg items-center mb-6"
 			>
 				{loading ?
 					<ActivityIndicator color="#fff" />
 				:	<Text className="text-white font-semibold">Entrar</Text>}
 			</TouchableOpacity>
 
-			<View className="flex-row justify-center">
-				<Text className="mr-2">¿No tienes cuenta?</Text>
-				<TouchableOpacity onPress={() => navigation.navigate('Register')}>
-					<Text className="text-blue-600 font-semibold">Registrarse</Text>
-				</TouchableOpacity>
+			<View className="gap-2">
+				<View className="flex-row justify-center">
+					<Text className="mr-2">¿No tienes cuenta?</Text>
+					<TouchableOpacity onPress={() => navigation.navigate('Register')}>
+						<Text className="text-blue-600 font-semibold">Registrarse</Text>
+					</TouchableOpacity>
+				</View>
+				<View className="flex-row justify-center">
+					<Text className="mr-2">¿Has olvidado la contraseña?</Text>
+					<TouchableOpacity
+						onPress={() => navigation.navigate('ForgotPassword')}
+					>
+						<Text className="text-blue-600 font-semibold">Recuperar</Text>
+					</TouchableOpacity>
+				</View>
 			</View>
 		</View>
 	)
