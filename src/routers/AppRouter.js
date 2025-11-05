@@ -2,6 +2,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import {
 	AppStack,
 	CreateProfile,
+	ForgotPassword,
 	Login,
 	Redirector,
 	Register,
@@ -26,6 +27,10 @@ export function AppRouter() {
 			<Stack.Screen
 				name="Register"
 				component={Register}
+			/>
+			<Stack.Screen
+				name="ForgotPassword"
+				component={ForgotPassword}
 			/>
 
 			{/* Pantalla para crear perfil */}
