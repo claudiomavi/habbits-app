@@ -1,30 +1,45 @@
 import { supabase } from '../autoBarrell'
 
-export const getUserProfile = async (userId) => {
+// Insertar perfil
+export const addProfile = async (data) => {
+	const { data: profile, error } = await supabase
+		.from('profiles')
+		.insert(data)
+		.select()
+		.single()
+	if (error) throw error
+	return profile
+}
+
+// Buscar perfil por email
+export async function getProfileByMail(email) {
 	const { data, error } = await supabase
 		.from('profiles')
 		.select('*')
-		.eq('id', userId)
-		.single()
+		.eq('email', email)
+		.maybeSingle()
+
+	if (error) throw error
+	return data // puede ser null si no hay perfil
+}
+
+// Buscar perfil por ID de usuario
+export const getProfileByUserId = async (userId) => {
+	const { data, error } = await supabase
+		.from('profiles')
+		.select('*')
+		.eq('user_id', userId)
+		.maybeSingle()
 	if (error) throw error
 	return data
 }
 
-export const createUserProfile = async ({ id, name, avatar }) => {
-	const { data, error } = await supabase
+// Actualizar id_auth cuando el usuario hace login por primera vez
+export async function updateIdAuth(email, id_auth) {
+	const { error } = await supabase
 		.from('profiles')
-		.insert([{ id, name, avatar }])
-		.single()
+		.update({ id_auth })
+		.eq('email', email)
+		.is('id_auth', null)
 	if (error) throw error
-	return data
-}
-
-export const updateUserProfile = async ({ id, name, avatar }) => {
-	const { data, error } = await supabase
-		.from('profiles')
-		.update({ name, avatar })
-		.eq('id', id)
-		.single()
-	if (error) throw error
-	return data
 }

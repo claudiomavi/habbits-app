@@ -1,25 +1,33 @@
 import { create } from 'zustand'
 import {
-	createUserProfile,
-	getUserProfile,
-	updateUserProfile,
+	addProfile,
+	getProfileByMail,
+	getProfileByUserId,
+	updateIdAuth,
 } from '../autoBarrell'
 
 export const useUsersStore = create((set) => ({
-	userProfile: null,
+	users: [],
+	profile: null,
+	loading: false,
 
-	fetchUserProfile: async (userId) => {
-		const profile = await getUserProfile(userId)
-		set({ userProfile: profile })
+	createProfile: async (data) => {
+		const newProfile = await addProfile(data)
+		set({ profile: newProfile })
+		return newProfile
 	},
 
-	createProfile: async (profileData) => {
-		const profile = await createUserProfile(profileData)
-		set({ userProfile: profile })
+	fetchProfile: async (userId) => {
+		const profile = await getProfileByUserId(userId)
+		set({ profile })
+		return profile
 	},
 
-	updateProfile: async (profileData) => {
-		const profile = await updateUserProfile(profileData)
-		set({ userProfile: profile })
+	profileByMail: async (email) => {
+		const profile = await getProfileByMail(email)
+		set({ profile })
+		return profile
 	},
+
+	updateIdAuth,
 }))
