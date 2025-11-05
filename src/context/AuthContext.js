@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import supabase from '../supabase/supabaseClient' // default import
+import { supabase } from '../autoBarrell'
 
 const AuthContext = createContext()
 
