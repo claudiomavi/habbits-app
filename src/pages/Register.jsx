@@ -1,6 +1,6 @@
 import { Controller, useForm } from 'react-hook-form'
-import { Text, TextInput, TouchableOpacity, View } from 'react-native'
-import { useAuthStore } from '../autoBarrell'
+import { Alert, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { supabase, useAuthStore } from '../autoBarrell'
 
 export function Register({ navigation }) {
 	const { signUp } = useAuthStore()
@@ -17,6 +17,34 @@ export function Register({ navigation }) {
 		}
 
 		try {
+			// 1️⃣ Intentar login para ver si el usuario ya existe
+			const { error: loginError } = await supabase.auth.signInWithPassword({
+				email,
+				password: 'dummyPassword', // cualquier valor, no importa
+			})
+
+			if (
+				loginError &&
+				loginError.message.includes('Invalid login credentials')
+			) {
+				Alert.alert(
+					'Cuenta existente',
+					'Correo ya registrado. Si olvidaste tu contraseña, puedes restablecerla.',
+					[
+						{
+							text: 'Ir al login',
+							onPress: () => navigation.replace('Login'),
+						},
+						{
+							text: 'Restablecer contraseña',
+							onPress: () => navigation.replace('ForgotPassword'),
+						},
+					]
+				)
+				return
+			}
+
+			// 2️⃣ Si no existe, registramos
 			const result = await signUp(email, password)
 			if (result.error) throw result.error
 
