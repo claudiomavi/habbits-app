@@ -122,6 +122,16 @@ export function Register({ navigation }) {
 				<Text className="text-white font-bold">Registrarse</Text>
 			</TouchableOpacity>
 
+			<View className="flex-row items-center justify-center gap-4">
+				<TouchableOpacity className="bg-white p-4 rounded-lg items-center mb-6 w-1/3">
+					<Text className="text-gray-800 font-semibold">Google</Text>
+				</TouchableOpacity>
+
+				<TouchableOpacity className="bg-black p-4 rounded-lg items-center mb-6 w-1/3">
+					<Text className="text-white font-semibold">Apple</Text>
+				</TouchableOpacity>
+			</View>
+
 			<TouchableOpacity
 				onPress={() => navigation.goBack()}
 				className="items-center"

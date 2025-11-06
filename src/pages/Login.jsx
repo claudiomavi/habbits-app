@@ -108,6 +108,28 @@ export function Login() {
 				:	<Text className="text-white font-semibold">Entrar</Text>}
 			</TouchableOpacity>
 
+			<View className="flex-row items-center justify-center gap-4">
+				<TouchableOpacity
+					onPress={handleSubmit(onSubmit)}
+					disabled={loading}
+					className="bg-white p-4 rounded-lg items-center mb-6 w-1/3"
+				>
+					{loading ?
+						<ActivityIndicator color="#fff" />
+					:	<Text className="text-gray-800 font-semibold">Google</Text>}
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					onPress={handleSubmit(onSubmit)}
+					disabled={loading}
+					className="bg-black p-4 rounded-lg items-center mb-6 w-1/3"
+				>
+					{loading ?
+						<ActivityIndicator color="#fff" />
+					:	<Text className="text-white font-semibold">Apple</Text>}
+				</TouchableOpacity>
+			</View>
+
 			<View className="gap-2">
 				<View className="flex-row justify-center">
 					<Text className="mr-2">¿No tienes cuenta?</Text>
