@@ -1,10 +1,11 @@
-// src/pages/Login.jsx
 import { useNavigation } from '@react-navigation/native'
+import { LinearGradient } from 'expo-linear-gradient'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import {
 	ActivityIndicator,
 	Alert,
+	StyleSheet,
 	Text,
 	TextInput,
 	TouchableOpacity,
@@ -35,7 +36,6 @@ export function Login() {
 				return
 			}
 
-			// Intentamos obtener el perfil por id_auth (si signIn ya vinculó id_auth) o por mail
 			let profile = null
 			try {
 				profile = await profileByMail(user.email)
@@ -44,12 +44,10 @@ export function Login() {
 				return err
 			}
 
-			// Si no existe perfil → enviar a CreateProfile para completar datos
 			if (!profile) {
 				navigation.navigate('CreateProfile', { email: user.email })
 			} else {
-				// perfil existe → ir a Home
-				navigation.navigate('Home')
+				navigation.navigate('AppStack')
 			}
 		} catch (err) {
 			console.error('Login error:', err)
@@ -60,92 +58,182 @@ export function Login() {
 	}
 
 	return (
-		<View className="flex-1 p-8 justify-center">
-			<Text className="text-3xl font-bold mb-8">Iniciar sesión</Text>
-
-			<Text>Email</Text>
-			<Controller
-				control={control}
-				name="email"
-				rules={{ required: true }}
-				defaultValue=""
-				render={({ field: { onChange, value } }) => (
-					<TextInput
-						value={value}
-						onChangeText={onChange}
-						keyboardType="email-address"
-						autoCapitalize="none"
-						placeholder="tu@email.com"
-						className="border border-gray-300 p-3 mb-4 rounded-lg"
+		<LinearGradient
+			colors={['#667eea', '#764ba2', '#f093fb', '#4facfe']}
+			style={styles.container}
+			start={{ x: 0, y: 0 }}
+			end={{ x: 1, y: 1 }}
+		>
+			<View className="bg-white w-full max-w-sm p-8 overflow-hidden rounded-3xl shadow-xl shadow-blue-500">
+				{/* Barra de progreso decorativa */}
+				<View className="absolute top-0 left-0 right-0 h-1 bg-gray-300">
+					<LinearGradient
+						colors={['#4facfe', '#00f2fe', '#43e97b']}
+						style={styles.progressFill}
+						start={{ x: 0, y: 0 }}
+						end={{ x: 1, y: 0 }}
 					/>
-				)}
-			/>
-
-			<Text>Contraseña</Text>
-			<Controller
-				control={control}
-				name="password"
-				rules={{ required: true }}
-				defaultValue=""
-				render={({ field: { onChange, value } }) => (
-					<TextInput
-						value={value}
-						onChangeText={onChange}
-						secureTextEntry
-						placeholder="********"
-						className="border border-gray-300 p-3 mb-5 rounded-lg"
-					/>
-				)}
-			/>
-
-			<TouchableOpacity
-				onPress={handleSubmit(onSubmit)}
-				disabled={loading}
-				className="bg-blue-600 p-4 rounded-lg items-center mb-6"
-			>
-				{loading ?
-					<ActivityIndicator color="#fff" />
-				:	<Text className="text-white font-semibold">Entrar</Text>}
-			</TouchableOpacity>
-
-			<View className="flex-row items-center justify-center gap-4">
-				<TouchableOpacity
-					onPress={handleSubmit(onSubmit)}
-					disabled={loading}
-					className="bg-white p-4 rounded-lg items-center mb-6 w-1/3"
-				>
-					{loading ?
-						<ActivityIndicator color="#fff" />
-					:	<Text className="text-gray-800 font-semibold">Google</Text>}
-				</TouchableOpacity>
-
-				<TouchableOpacity
-					onPress={handleSubmit(onSubmit)}
-					disabled={loading}
-					className="bg-black p-4 rounded-lg items-center mb-6 w-1/3"
-				>
-					{loading ?
-						<ActivityIndicator color="#fff" />
-					:	<Text className="text-white font-semibold">Apple</Text>}
-				</TouchableOpacity>
-			</View>
-
-			<View className="gap-2">
-				<View className="flex-row justify-center">
-					<Text className="mr-2">¿No tienes cuenta?</Text>
-					<TouchableOpacity onPress={() => navigation.navigate('Register')}>
-						<Text className="text-blue-600 font-semibold">Registrarse</Text>
-					</TouchableOpacity>
 				</View>
-				<View className="flex-row justify-center">
-					<Text className="mr-2">¿Has olvidado la contraseña?</Text>
+
+				{/* Logo */}
+				<View className="items-center mb-8 mt-2">
+					<LinearGradient
+						colors={['#4facfe', '#43e97b']}
+						style={styles.logo}
+						start={{ x: 0, y: 0 }}
+						end={{ x: 1, y: 1 }}
+					>
+						<View className="flex-row items-end gap-1">
+							<View className="w-2 bg-white rounded-md h-7" />
+							<View className="w-2 bg-white rounded-md h-5 mt-2" />
+							<View className="w-2 bg-white rounded-md h-9" />
+						</View>
+					</LinearGradient>
+					<Text className="text-4xl font-bold text-[#1F2937]">Habits</Text>
+					<Text className="mt-1 text-gray-600">
+						Convierte rutinas en victorias
+					</Text>
+				</View>
+
+				{/* Formulario */}
+				<View className="gap-5">
+					<View className="gap-3">
+						<Text className="font-semibold text-gray-500">Email</Text>
+						<Controller
+							control={control}
+							name="email"
+							rules={{ required: true }}
+							defaultValue=""
+							render={({ field: { onChange, value } }) => (
+								<TextInput
+									value={value}
+									onChangeText={onChange}
+									keyboardType="email-address"
+									autoCapitalize="none"
+									placeholder="tu@email.com"
+									placeholderTextColor="#9CA3AF"
+									className="bg-gray-50 border-2 border-gray-300 rounded-2xl p-4 text-gray-500"
+								/>
+							)}
+						/>
+					</View>
+
+					<View className="gap-2">
+						<Text className="font-semibold text-gray-500">Contraseña</Text>
+						<Controller
+							control={control}
+							name="password"
+							rules={{ required: true }}
+							defaultValue=""
+							render={({ field: { onChange, value } }) => (
+								<TextInput
+									value={value}
+									onChangeText={onChange}
+									secureTextEntry
+									placeholder="••••••••"
+									placeholderTextColor="#9CA3AF"
+									className="bg-gray-50 border-2 border-gray-300 rounded-2xl p-4 text-gray-500"
+								/>
+							)}
+						/>
+					</View>
+
+					{/* Botón principal */}
+					<TouchableOpacity
+						onPress={handleSubmit(onSubmit)}
+						disabled={loading}
+						className="mt-2 rounded-2xl overflow-hidden elevation-md"
+					>
+						<LinearGradient
+							colors={['#4facfe', '#43e97b']}
+							style={styles.gradientButton}
+							start={{ x: 0, y: 0 }}
+							end={{ x: 1, y: 0 }}
+						>
+							{loading ?
+								<ActivityIndicator color="#fff" />
+							:	<Text className="text-white text-lg font-bold">Entrar</Text>}
+						</LinearGradient>
+					</TouchableOpacity>
+
+					{/* Olvidaste tu contraseña */}
 					<TouchableOpacity
 						onPress={() => navigation.navigate('ForgotPassword')}
+						className="items-center mt-1"
 					>
-						<Text className="text-blue-600 font-semibold">Recuperar</Text>
+						<Text className="text-blue-400 font-medium">
+							¿Olvidaste tu contraseña?
+						</Text>
 					</TouchableOpacity>
+
+					{/* Divider */}
+					<View className="flex-row items-center my-2">
+						<View className="flex-1 h-1 bg-gray-200" />
+						<Text className="mx-4 text-sm text-gray-500">o continúa con</Text>
+						<View className="flex-1 h-1 bg-gray-200" />
+					</View>
+
+					{/* Botones sociales */}
+					<View className="flex-row gap-3">
+						<TouchableOpacity
+							onPress={() => Alert.alert('Google', 'Próximamente')}
+							disabled={loading}
+							className="flex-1 flex-row items-center justify-center py-3 rounded-xl gap-2 bg-white border-2 border-gray-300"
+						>
+							<Text className="text-lg font-bold text-blue-400">G</Text>
+							<Text className="font-semibold text-gray-900">Google</Text>
+						</TouchableOpacity>
+
+						<TouchableOpacity
+							onPress={() => Alert.alert('Apple', 'Próximamente')}
+							disabled={loading}
+							className="flex-1 flex-row items-center justify-center py-3 rounded-xl gap-2 bg-black"
+						>
+							<Text className="text-lg text-white">A</Text>
+							<Text className="font-semibold text-white">Apple</Text>
+						</TouchableOpacity>
+					</View>
+
+					{/* Registro */}
+					<View className="flex-row items-center justify-center mt-2">
+						<Text className="text-gray-500">¿No tienes cuenta? </Text>
+						<TouchableOpacity onPress={() => navigation.navigate('Register')}>
+							<Text className="font-semibold text-blue-400">Regístrate</Text>
+						</TouchableOpacity>
+					</View>
 				</View>
 			</View>
-		</View>
+		</LinearGradient>
 	)
 }
+
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		padding: 20,
+	},
+	progressFill: {
+		width: '40%',
+		height: '100%',
+	},
+	logo: {
+		width: 72,
+		height: 72,
+		borderRadius: 20,
+		justifyContent: 'center',
+		alignItems: 'center',
+		marginBottom: 16,
+		shadowColor: '#4facfe',
+		shadowOffset: { width: 0, height: 4 },
+		shadowOpacity: 0.3,
+		shadowRadius: 8,
+		elevation: 5,
+	},
+	gradientButton: {
+		paddingVertical: 16,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+})
