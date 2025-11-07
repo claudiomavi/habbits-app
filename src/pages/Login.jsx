@@ -70,7 +70,7 @@ export function Login() {
 				showsVerticalScrollIndicator={false}
 				bounces={false}
 			>
-				<View className="bg-white w-screen max-w-sm p-8 overflow-hidden rounded-3xl shadow-xl shadow-blue-500">
+				<View className="bg-white w-screen max-w-sm p-8 overflow-hidden rounded-3xl">
 					{/* Barra de progreso decorativa */}
 					<View className="absolute top-0 left-0 right-0 h-1 bg-gray-300">
 						<LinearGradient
@@ -96,7 +96,7 @@ export function Login() {
 							</View>
 						</LinearGradient>
 						<Text className="text-4xl font-bold text-[#1F2937]">Habits</Text>
-						<Text className="mt-1 text-gray-600">
+						<Text className="mt-1 text-gray-500">
 							Convierte rutinas en victorias
 						</Text>
 					</View>
