@@ -5,6 +5,7 @@ import { Controller, useForm } from 'react-hook-form'
 import {
 	ActivityIndicator,
 	Alert,
+	ScrollView,
 	StyleSheet,
 	Text,
 	TextInput,
@@ -64,145 +65,151 @@ export function Login() {
 			start={{ x: 0, y: 0 }}
 			end={{ x: 1, y: 1 }}
 		>
-			<View className="bg-white w-full max-w-sm p-8 overflow-hidden rounded-3xl shadow-xl shadow-blue-500">
-				{/* Barra de progreso decorativa */}
-				<View className="absolute top-0 left-0 right-0 h-1 bg-gray-300">
-					<LinearGradient
-						colors={['#4facfe', '#00f2fe', '#43e97b']}
-						style={styles.progressFill}
-						start={{ x: 0, y: 0 }}
-						end={{ x: 1, y: 0 }}
-					/>
-				</View>
-
-				{/* Logo */}
-				<View className="items-center mb-8 mt-2">
-					<LinearGradient
-						colors={['#4facfe', '#43e97b']}
-						style={styles.logo}
-						start={{ x: 0, y: 0 }}
-						end={{ x: 1, y: 1 }}
-					>
-						<View className="flex-row items-end gap-1">
-							<View className="w-2 bg-white rounded-md h-7" />
-							<View className="w-2 bg-white rounded-md h-5 mt-2" />
-							<View className="w-2 bg-white rounded-md h-9" />
-						</View>
-					</LinearGradient>
-					<Text className="text-4xl font-bold text-[#1F2937]">Habits</Text>
-					<Text className="mt-1 text-gray-600">
-						Convierte rutinas en victorias
-					</Text>
-				</View>
-
-				{/* Formulario */}
-				<View className="gap-5">
-					<View className="gap-3">
-						<Text className="font-semibold text-gray-500">Email</Text>
-						<Controller
-							control={control}
-							name="email"
-							rules={{ required: true }}
-							defaultValue=""
-							render={({ field: { onChange, value } }) => (
-								<TextInput
-									value={value}
-									onChangeText={onChange}
-									keyboardType="email-address"
-									autoCapitalize="none"
-									placeholder="tu@email.com"
-									placeholderTextColor="#9CA3AF"
-									className="bg-gray-50 border-2 border-gray-300 rounded-2xl p-4 text-gray-500"
-								/>
-							)}
-						/>
-					</View>
-
-					<View className="gap-2">
-						<Text className="font-semibold text-gray-500">Contraseña</Text>
-						<Controller
-							control={control}
-							name="password"
-							rules={{ required: true }}
-							defaultValue=""
-							render={({ field: { onChange, value } }) => (
-								<TextInput
-									value={value}
-									onChangeText={onChange}
-									secureTextEntry
-									placeholder="••••••••"
-									placeholderTextColor="#9CA3AF"
-									className="bg-gray-50 border-2 border-gray-300 rounded-2xl p-4 text-gray-500"
-								/>
-							)}
-						/>
-					</View>
-
-					{/* Botón principal */}
-					<TouchableOpacity
-						onPress={handleSubmit(onSubmit)}
-						disabled={loading}
-						className="mt-2 rounded-2xl overflow-hidden elevation-md"
-					>
+			<ScrollView
+				contentContainerStyle={styles.scrollContent}
+				showsVerticalScrollIndicator={false}
+				bounces={false}
+			>
+				<View className="bg-white w-screen max-w-sm p-8 overflow-hidden rounded-3xl shadow-xl shadow-blue-500">
+					{/* Barra de progreso decorativa */}
+					<View className="absolute top-0 left-0 right-0 h-1 bg-gray-300">
 						<LinearGradient
-							colors={['#4facfe', '#43e97b']}
-							style={styles.gradientButton}
+							colors={['#4facfe', '#00f2fe', '#43e97b']}
+							style={styles.progressFill}
 							start={{ x: 0, y: 0 }}
 							end={{ x: 1, y: 0 }}
+						/>
+					</View>
+
+					{/* Logo */}
+					<View className="items-center mb-8 mt-2">
+						<LinearGradient
+							colors={['#4facfe', '#43e97b']}
+							style={styles.logo}
+							start={{ x: 0, y: 0 }}
+							end={{ x: 1, y: 1 }}
 						>
-							{loading ?
-								<ActivityIndicator color="#fff" />
-							:	<Text className="text-white text-lg font-bold">Entrar</Text>}
+							<View className="flex-row items-end gap-1">
+								<View className="w-2 bg-white rounded-md h-7" />
+								<View className="w-2 bg-white rounded-md h-5 mt-2" />
+								<View className="w-2 bg-white rounded-md h-9" />
+							</View>
 						</LinearGradient>
-					</TouchableOpacity>
-
-					{/* Olvidaste tu contraseña */}
-					<TouchableOpacity
-						onPress={() => navigation.navigate('ForgotPassword')}
-						className="items-center mt-1"
-					>
-						<Text className="text-blue-400 font-medium">
-							¿Olvidaste tu contraseña?
+						<Text className="text-4xl font-bold text-[#1F2937]">Habits</Text>
+						<Text className="mt-1 text-gray-600">
+							Convierte rutinas en victorias
 						</Text>
-					</TouchableOpacity>
-
-					{/* Divider */}
-					<View className="flex-row items-center my-2">
-						<View className="flex-1 h-1 bg-gray-200" />
-						<Text className="mx-4 text-sm text-gray-500">o continúa con</Text>
-						<View className="flex-1 h-1 bg-gray-200" />
 					</View>
 
-					{/* Botones sociales */}
-					<View className="flex-row gap-3">
+					{/* Formulario */}
+					<View className="gap-5">
+						<View className="gap-3">
+							<Text className="font-semibold text-gray-500">Email</Text>
+							<Controller
+								control={control}
+								name="email"
+								rules={{ required: true }}
+								defaultValue=""
+								render={({ field: { onChange, value } }) => (
+									<TextInput
+										value={value}
+										onChangeText={onChange}
+										keyboardType="email-address"
+										autoCapitalize="none"
+										placeholder="tu@email.com"
+										placeholderTextColor="#9CA3AF"
+										className="bg-gray-50 border-2 border-gray-300 rounded-2xl p-4 text-gray-500"
+									/>
+								)}
+							/>
+						</View>
+
+						<View className="gap-2">
+							<Text className="font-semibold text-gray-500">Contraseña</Text>
+							<Controller
+								control={control}
+								name="password"
+								rules={{ required: true }}
+								defaultValue=""
+								render={({ field: { onChange, value } }) => (
+									<TextInput
+										value={value}
+										onChangeText={onChange}
+										secureTextEntry
+										placeholder="••••••••"
+										placeholderTextColor="#9CA3AF"
+										className="bg-gray-50 border-2 border-gray-300 rounded-2xl p-4 text-gray-500"
+									/>
+								)}
+							/>
+						</View>
+
+						{/* Botón principal */}
 						<TouchableOpacity
-							onPress={() => Alert.alert('Google', 'Próximamente')}
+							onPress={handleSubmit(onSubmit)}
 							disabled={loading}
-							className="flex-1 flex-row items-center justify-center py-3 rounded-xl gap-2 bg-white border-2 border-gray-300"
+							className="mt-2 rounded-2xl overflow-hidden elevation-md"
 						>
-							<Text className="text-lg font-bold text-blue-400">G</Text>
-							<Text className="font-semibold text-gray-900">Google</Text>
+							<LinearGradient
+								colors={['#4facfe', '#43e97b']}
+								style={styles.gradientButton}
+								start={{ x: 0, y: 0 }}
+								end={{ x: 1, y: 0 }}
+							>
+								{loading ?
+									<ActivityIndicator color="#fff" />
+								:	<Text className="text-white text-lg font-bold">Entrar</Text>}
+							</LinearGradient>
 						</TouchableOpacity>
 
+						{/* Olvidaste tu contraseña */}
 						<TouchableOpacity
-							onPress={() => Alert.alert('Apple', 'Próximamente')}
-							disabled={loading}
-							className="flex-1 flex-row items-center justify-center py-3 rounded-xl gap-2 bg-black"
+							onPress={() => navigation.navigate('ForgotPassword')}
+							className="items-center mt-1"
 						>
-							<Text className="text-lg text-white">A</Text>
-							<Text className="font-semibold text-white">Apple</Text>
+							<Text className="text-blue-400 font-medium">
+								¿Olvidaste tu contraseña?
+							</Text>
 						</TouchableOpacity>
-					</View>
 
-					{/* Registro */}
-					<View className="flex-row items-center justify-center mt-2">
-						<Text className="text-gray-500">¿No tienes cuenta? </Text>
-						<TouchableOpacity onPress={() => navigation.navigate('Register')}>
-							<Text className="font-semibold text-blue-400">Regístrate</Text>
-						</TouchableOpacity>
+						{/* Divider */}
+						<View className="flex-row items-center my-2">
+							<View className="flex-1 h-1 bg-gray-200" />
+							<Text className="mx-4 text-sm text-gray-500">o continúa con</Text>
+							<View className="flex-1 h-1 bg-gray-200" />
+						</View>
+
+						{/* Botones sociales */}
+						<View className="flex-row gap-3">
+							<TouchableOpacity
+								onPress={() => Alert.alert('Google', 'Próximamente')}
+								disabled={loading}
+								className="flex-1 flex-row items-center justify-center py-3 rounded-xl gap-2 bg-white border-2 border-gray-300"
+							>
+								<Text className="text-lg font-bold text-blue-400">G</Text>
+								<Text className="font-semibold text-gray-900">Google</Text>
+							</TouchableOpacity>
+
+							<TouchableOpacity
+								onPress={() => Alert.alert('Apple', 'Próximamente')}
+								disabled={loading}
+								className="flex-1 flex-row items-center justify-center py-3 rounded-xl gap-2 bg-black"
+							>
+								<Text className="text-lg text-white">A</Text>
+								<Text className="font-semibold text-white">Apple</Text>
+							</TouchableOpacity>
+						</View>
+
+						{/* Registro */}
+						<View className="flex-row items-center justify-center mt-2">
+							<Text className="text-gray-500">¿No tienes cuenta? </Text>
+							<TouchableOpacity onPress={() => navigation.navigate('Register')}>
+								<Text className="font-semibold text-blue-400">Regístrate</Text>
+							</TouchableOpacity>
+						</View>
 					</View>
 				</View>
-			</View>
+			</ScrollView>
 		</LinearGradient>
 	)
 }
@@ -212,7 +219,13 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		padding: 20,
+	},
+	scrollContent: {
+		flexGrow: 1,
+		width: '100%',
+		justifyContent: 'center',
+		paddingHorizontal: 20,
+		paddingVertical: 40,
 	},
 	progressFill: {
 		width: '40%',
