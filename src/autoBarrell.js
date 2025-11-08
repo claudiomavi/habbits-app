@@ -1,6 +1,3 @@
-export * from './autoBarrell'
-export * from './context/AuthContext'
-export * from './hooks/useAuth'
 export * from './pages/CreateProfile'
 export * from './pages/ForgotPassword'
 export * from './pages/Home'
