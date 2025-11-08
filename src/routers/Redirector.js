@@ -17,12 +17,12 @@ export function Redirector({ navigation }) {
 			}
 
 			// Si hay usuario → comprobar si tiene perfil
-			try {
-				await profileByMail(user.email)
-				navigation.replace('AppStack')
-			} catch {
+			const profile = await profileByMail(user.email)
+			if (!profile) {
 				navigation.replace('CreateProfile', { email: user.email })
+				return
 			}
+			navigation.replace('AppStack')
 		}
 
 		checkProfile()
