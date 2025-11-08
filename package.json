@@ -2,7 +2,7 @@
 	"name": "habbits-app",
 	"version": "1.0.0",
 	"private": true,
-	"main": "expo-router/entry",
+	"main": "app/index.js",
 	"scripts": {
 		"start": "expo start",
 		"android": "expo start --android",
@@ -27,7 +27,6 @@
 		"expo-linear-gradient": "^15.0.7",
 		"expo-linking": "~8.0.8",
 		"expo-notifications": "~0.32.12",
-		"expo-router": "^6.0.14",
 		"expo-splash-screen": "~31.0.10",
 		"expo-status-bar": "~3.0.8",
 		"expo-symbols": "~1.0.7",
