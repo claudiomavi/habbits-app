@@ -32,7 +32,7 @@ export const useAuthStore = create((set) => ({
 			await supabase
 				.from('profiles')
 				.update({ id_auth: user.id })
-				.eq('mail', user.email)
+				.eq('email', user.email)
 				.is('id_auth', null)
 		}
 
