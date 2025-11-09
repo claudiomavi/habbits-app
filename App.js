@@ -3,8 +3,6 @@ import { useEffect } from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { NavigationContainer } from '@react-navigation/native'
 import { AppRouter, useAuthStore } from './src/autoBarrell'
-import './src/styles/global.css'
-
 const queryClient = new QueryClient()
 
 export default function App() {
