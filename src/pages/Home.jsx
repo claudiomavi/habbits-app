@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native'
-import { Button, Text, View } from 'react-native'
+import { Button, StyleSheet, Text, View } from 'react-native'
 import { useAuthStore } from '../autoBarrell'
 
 export function Home() {
@@ -16,12 +16,27 @@ export function Home() {
 	}
 
 	return (
-		<View className="flex-1 justify-center items-center bg-blue-300">
+		<View style={styles.container}>
 			<Button
 				title="Cerrar sesión"
 				onPress={handleLogout}
 			/>
-			<Text className="text-7xl text-yellow-600 font-bold">Home</Text>
+			<Text style={styles.title}>Home</Text>
 		</View>
 	)
 }
+
+const styles = StyleSheet.create({
+	container: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: '#93c5fd',
+	},
+	title: {
+		fontSize: 48,
+		color: '#ca8a04',
+		fontWeight: 'bold',
+		marginTop: 12,
+	},
+})
