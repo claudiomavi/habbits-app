@@ -3,403 +3,424 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import {
-  ActivityIndicator,
-  Alert,
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+	ActivityIndicator,
+	Alert,
+	Image,
+	ScrollView,
+	StyleSheet,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	View,
 } from 'react-native'
 import { useAuthStore, useUsersStore } from '../autoBarrell'
 
 export function CreateProfile() {
-  const { control, handleSubmit } = useForm()
-  const { createProfile } = useUsersStore()
-  const { user } = useAuthStore()
-  const navigation = useNavigation()
+	const { control, handleSubmit } = useForm()
+	const { createProfile } = useUsersStore()
+	const { user } = useAuthStore()
+	const navigation = useNavigation()
 
-  const [selectedAvatar, setSelectedAvatar] = useState(null)
-  const [loading, setLoading] = useState(false)
+	const [selectedAvatar, setSelectedAvatar] = useState(null)
+	const [loading, setLoading] = useState(false)
 
-  // Avatares (puedes cambiar las URLs)
-  const avatars = [
-    { id: 'male', uri: 'https://imgur.com/dYYo70A.png', label: 'Hombre' },
-    { id: 'female', uri: 'https://imgur.com/0MyPvoE.png', label: 'Mujer' },
-  ]
+	// Avatares (puedes cambiar las URLs)
+	const avatars = [
+		{ id: 'male', uri: 'https://imgur.com/dYYo70A.png', label: 'Hombre' },
+		{ id: 'female', uri: 'https://imgur.com/0MyPvoE.png', label: 'Mujer' },
+	]
 
-  const onSubmit = async (data) => {
-    if (!selectedAvatar) {
-      Alert.alert('Avatar requerido', 'Selecciona un avatar para continuar')
-      return
-    }
+	const onSubmit = async (data) => {
+		if (!selectedAvatar) {
+			Alert.alert('Avatar requerido', 'Selecciona un avatar para continuar')
+			return
+		}
 
-    try {
-      setLoading(true)
-      await createProfile({
-        id_auth: user?.id,
-        email: user?.email,
-        display_name: data.display_name,
-        avatar: selectedAvatar,
-        xp: 0,
-        level: 1,
-      })
-      navigation.navigate('AppStack')
-    } catch (err) {
-      console.error('Error creando el perfil:', err)
-      Alert.alert('Error', err.message || 'Error al crear el perfil')
-    } finally {
-      setLoading(false)
-    }
-  }
+		try {
+			setLoading(true)
+			await createProfile({
+				id_auth: user?.id,
+				email: user?.email,
+				display_name: data.display_name,
+				avatar: selectedAvatar,
+				xp: 0,
+				level: 1,
+			})
+			navigation.navigate('AppStack')
+		} catch (err) {
+			console.error('Error creando el perfil:', err)
+			Alert.alert('Error', err.message || 'Error al crear el perfil')
+		} finally {
+			setLoading(false)
+		}
+	}
 
-  return (
-    <LinearGradient
-      colors={['#667eea', '#764ba2', '#f093fb', '#4facfe']}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
-      {/* Elementos decorativos flotantes */}
-      <View style={styles.decorativeContainer} pointerEvents="none">
-        <Text style={[styles.floatingEmoji, { top: 50, left: 30 }]}>🎮</Text>
-        <Text style={[styles.floatingEmoji, { top: 110, right: 30 }]}>🏅</Text>
-        <Text style={[styles.floatingEmoji, { bottom: 160, left: 40 }]}>👤</Text>
-        <Text style={[styles.floatingEmoji, { bottom: 90, right: 25 }]}>✨</Text>
-      </View>
+	return (
+		<LinearGradient
+			colors={['#667eea', '#764ba2', '#f093fb', '#4facfe']}
+			style={styles.container}
+			start={{ x: 0, y: 0 }}
+			end={{ x: 1, y: 1 }}
+		>
+			{/* Elementos decorativos flotantes */}
+			<View
+				style={styles.decorativeContainer}
+				pointerEvents="none"
+			>
+				<Text style={[styles.floatingEmoji, { top: 50, left: 30 }]}>🎮</Text>
+				<Text style={[styles.floatingEmoji, { top: 110, right: 30 }]}>🏅</Text>
+				<Text style={[styles.floatingEmoji, { bottom: 160, left: 40 }]}>
+					👤
+				</Text>
+				<Text style={[styles.floatingEmoji, { bottom: 90, right: 25 }]}>
+					✨
+				</Text>
+			</View>
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        bounces={false}
-      >
-        {/* Tarjeta principal */}
-        <View style={styles.card}>
-          {/* Barra de progreso decorativa - más llena que login */}
-          <View style={styles.progressBarContainer}>
-            <LinearGradient
-              colors={['#4facfe', '#00f2fe', '#43e97b']}
-              style={styles.progressFill}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-            />
-          </View>
+			<ScrollView
+				contentContainerStyle={styles.scrollContent}
+				showsVerticalScrollIndicator={false}
+				bounces={false}
+			>
+				{/* Tarjeta principal */}
+				<View style={styles.card}>
+					{/* Barra de progreso decorativa - más llena que login */}
+					<View style={styles.progressBarContainer}>
+						<LinearGradient
+							colors={['#4facfe', '#00f2fe', '#43e97b']}
+							style={styles.progressFill}
+							start={{ x: 0, y: 0 }}
+							end={{ x: 1, y: 0 }}
+						/>
+					</View>
 
-          {/* Logo y título */}
-          <View style={styles.logoContainer}>
-            <LinearGradient
-              colors={['#4facfe', '#43e97b']}
-              style={styles.logo}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-            >
-              <View style={styles.logoInner}>
-                <View style={styles.bar1} />
-                <View style={styles.bar2} />
-                <View style={styles.bar3} />
-              </View>
-            </LinearGradient>
-            <Text style={styles.title}>¡Bienvenido!</Text>
-            <Text style={styles.subtitle}>Crea tu perfil para empezar tu viaje</Text>
-          </View>
+					{/* Logo y título */}
+					<View style={styles.logoContainer}>
+						<LinearGradient
+							colors={['#4facfe', '#43e97b']}
+							style={styles.logo}
+							start={{ x: 0, y: 0 }}
+							end={{ x: 1, y: 1 }}
+						>
+							<View style={styles.logoInner}>
+								<View style={styles.bar1} />
+								<View style={styles.bar2} />
+								<View style={styles.bar3} />
+							</View>
+						</LinearGradient>
+						<Text style={styles.title}>¡Bienvenido!</Text>
+						<Text style={styles.subtitle}>
+							Crea tu perfil para empezar tu viaje
+						</Text>
+					</View>
 
-          {/* Formulario */}
-          <View style={styles.form}>
-            {/* Nombre Input */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Nombre de usuario</Text>
-              <Controller
-                control={control}
-                name="display_name"
-                rules={{
-                  required: 'El nombre es obligatorio',
-                  minLength: { value: 3, message: 'Mínimo 3 caracteres' },
-                }}
-                defaultValue=""
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                  <>
-                    <TextInput
-                      value={value}
-                      onChangeText={onChange}
-                      placeholder="Tu nombre"
-                      placeholderTextColor="#9CA3AF"
-                      style={styles.input}
-                    />
-                    {error && <Text style={styles.errorText}>{error.message}</Text>}
-                  </>
-                )}
-              />
-            </View>
+					{/* Formulario */}
+					<View style={styles.form}>
+						{/* Nombre Input */}
+						<View style={styles.inputGroup}>
+							<Text style={styles.label}>Nombre de usuario</Text>
+							<Controller
+								control={control}
+								name="display_name"
+								rules={{
+									required: 'El nombre es obligatorio',
+									minLength: { value: 3, message: 'Mínimo 3 caracteres' },
+								}}
+								defaultValue=""
+								render={({
+									field: { onChange, value },
+									fieldState: { error },
+								}) => (
+									<>
+										<TextInput
+											value={value}
+											onChangeText={onChange}
+											placeholder="Tu nombre"
+											placeholderTextColor="#9CA3AF"
+											style={styles.input}
+										/>
+										{error && (
+											<Text style={styles.errorText}>{error.message}</Text>
+										)}
+									</>
+								)}
+							/>
+						</View>
 
-            {/* Selector de avatar */}
-            <View style={styles.avatarSection}>
-              <Text style={styles.label}>Elige tu personaje</Text>
-              <View style={styles.avatarContainer}>
-                {avatars.map((avatar) => (
-                  <TouchableOpacity
-                    key={avatar.id}
-                    onPress={() => setSelectedAvatar(avatar.uri)}
-                    style={[
-                      styles.avatarOption,
-                      selectedAvatar === avatar.uri && styles.avatarSelected,
-                    ]}
-                    activeOpacity={0.7}
-                  >
-                    <Image source={{ uri: avatar.uri }} style={styles.avatarImage} />
-                    <Text
-                      style={[
-                        styles.avatarLabel,
-                        selectedAvatar === avatar.uri && styles.avatarLabelSelected,
-                      ]}
-                    >
-                      {avatar.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-              {!selectedAvatar && (
-                <Text style={styles.hintText}>Selecciona un avatar para continuar</Text>
-              )}
-            </View>
+						{/* Selector de avatar */}
+						<View style={styles.avatarSection}>
+							<Text style={styles.label}>Elige tu personaje</Text>
+							<View style={styles.avatarContainer}>
+								{avatars.map((avatar) => (
+									<TouchableOpacity
+										key={avatar.id}
+										onPress={() => setSelectedAvatar(avatar.uri)}
+										style={[
+											styles.avatarOption,
+											selectedAvatar === avatar.uri && styles.avatarSelected,
+										]}
+										activeOpacity={0.7}
+									>
+										<Image
+											source={{ uri: avatar.uri }}
+											style={styles.avatarImage}
+										/>
+										<Text
+											style={[
+												styles.avatarLabel,
+												selectedAvatar === avatar.uri &&
+													styles.avatarLabelSelected,
+											]}
+										>
+											{avatar.label}
+										</Text>
+									</TouchableOpacity>
+								))}
+							</View>
+							{!selectedAvatar && (
+								<Text style={styles.hintText}>
+									Selecciona un avatar para continuar
+								</Text>
+							)}
+						</View>
 
-            {/* Botón principal */}
-            <TouchableOpacity
-              onPress={handleSubmit(onSubmit)}
-              disabled={loading}
-              style={styles.mainButton}
-              activeOpacity={0.8}
-            >
-              <LinearGradient
-                colors={['#4facfe', '#43e97b']}
-                style={styles.gradientButton}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-              >
-                {loading ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text style={styles.mainButtonText}>Comenzar aventura</Text>
-                )}
-              </LinearGradient>
-            </TouchableOpacity>
+						{/* Botón principal */}
+						<TouchableOpacity
+							onPress={handleSubmit(onSubmit)}
+							disabled={loading}
+							style={styles.mainButton}
+							activeOpacity={0.8}
+						>
+							<LinearGradient
+								colors={['#4facfe', '#43e97b']}
+								style={styles.gradientButton}
+								start={{ x: 0, y: 0 }}
+								end={{ x: 1, y: 0 }}
+							>
+								{loading ? (
+									<ActivityIndicator color="#fff" />
+								) : (
+									<Text style={styles.mainButtonText}>Comenzar aventura</Text>
+								)}
+							</LinearGradient>
+						</TouchableOpacity>
 
-            {/* Info adicional */}
-            <View style={styles.infoBox}>
-              <Text style={styles.infoIcon}>💡</Text>
-              <Text style={styles.infoText}>
-                Ganarás XP completando hábitos y subirás de nivel. ¡Empieza en nivel 1!
-              </Text>
-            </View>
-          </View>
-        </View>
-      </ScrollView>
-    </LinearGradient>
-  )
+						{/* Info adicional */}
+						<View style={styles.infoBox}>
+							<Text style={styles.infoIcon}>💡</Text>
+							<Text style={styles.infoText}>
+								Ganarás XP completando hábitos y subirás de nivel. ¡Empieza en
+								nivel 1!
+							</Text>
+						</View>
+					</View>
+				</View>
+			</ScrollView>
+		</LinearGradient>
+	)
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  decorativeContainer: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-  },
-  floatingEmoji: {
-    position: 'absolute',
-    fontSize: 48,
-    opacity: 0.2,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 40,
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 32,
-    padding: 32,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 10,
-    overflow: 'hidden',
-    alignSelf: 'stretch',
-  },
-  progressBarContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 4,
-    backgroundColor: '#E5E7EB',
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
-  },
-  progressFill: {
-    width: '80%',
-    height: '100%',
-  },
-  logoContainer: {
-    alignItems: 'center',
-    marginBottom: 24,
-    marginTop: 8,
-  },
-  logo: {
-    width: 72,
-    height: 72,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-    shadowColor: '#4facfe',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  logoInner: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: 4,
-  },
-  bar1: {
-    width: 6,
-    height: 24,
-    backgroundColor: '#fff',
-    borderRadius: 3,
-  },
-  bar2: {
-    width: 6,
-    height: 18,
-    backgroundColor: '#fff',
-    borderRadius: 3,
-    marginTop: 6,
-  },
-  bar3: {
-    width: 6,
-    height: 30,
-    backgroundColor: '#fff',
-    borderRadius: 3,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#1F2937',
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginTop: 4,
-    textAlign: 'center',
-  },
-  form: {
-    gap: 20,
-  },
-  inputGroup: {
-    gap: 8,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
-  },
-  input: {
-    backgroundColor: '#F9FAFB',
-    borderWidth: 2,
-    borderColor: '#E5E7EB',
-    borderRadius: 16,
-    padding: 14,
-    fontSize: 16,
-    color: '#1F2937',
-  },
-  errorText: {
-    fontSize: 12,
-    color: '#EF4444',
-    marginTop: 4,
-  },
-  avatarSection: {
-    gap: 12,
-  },
-  avatarContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 20,
-  },
-  avatarOption: {
-    alignItems: 'center',
-    padding: 12,
-    borderRadius: 20,
-    borderWidth: 3,
-    borderColor: 'transparent',
-    backgroundColor: '#F9FAFB',
-  },
-  avatarSelected: {
-    borderColor: '#4facfe',
-    backgroundColor: '#EFF6FF',
-  },
-  avatarImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginBottom: 8,
-  },
-  avatarLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#6B7280',
-  },
-  avatarLabelSelected: {
-    color: '#4facfe',
-  },
-  hintText: {
-    fontSize: 12,
-    color: '#9CA3AF',
-    textAlign: 'center',
-    fontStyle: 'italic',
-  },
-  mainButton: {
-    marginTop: 8,
-    borderRadius: 16,
-    overflow: 'hidden',
-    shadowColor: '#4facfe',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  gradientButton: {
-    paddingVertical: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  mainButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  infoBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F0F9FF',
-    padding: 16,
-    borderRadius: 16,
-    gap: 12,
-    borderWidth: 1,
-    borderColor: '#BFDBFE',
-  },
-  infoIcon: {
-    fontSize: 24,
-  },
-  infoText: {
-    flex: 1,
-    fontSize: 13,
-    color: '#1E40AF',
-    lineHeight: 18,
-  },
+	container: {
+		flex: 1,
+	},
+	decorativeContainer: {
+		position: 'absolute',
+		width: '100%',
+		height: '100%',
+	},
+	floatingEmoji: {
+		position: 'absolute',
+		fontSize: 48,
+		opacity: 0.2,
+	},
+	scrollContent: {
+		flexGrow: 1,
+		justifyContent: 'center',
+		paddingHorizontal: 20,
+		paddingVertical: 40,
+	},
+	card: {
+		backgroundColor: '#fff',
+		borderRadius: 32,
+		padding: 32,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 10 },
+		shadowOpacity: 0.3,
+		shadowRadius: 20,
+		elevation: 10,
+		overflow: 'hidden',
+		alignSelf: 'stretch',
+	},
+	progressBarContainer: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		right: 0,
+		height: 4,
+		backgroundColor: '#E5E7EB',
+		borderTopLeftRadius: 32,
+		borderTopRightRadius: 32,
+	},
+	progressFill: {
+		width: '80%',
+		height: '100%',
+	},
+	logoContainer: {
+		alignItems: 'center',
+		marginBottom: 24,
+		marginTop: 8,
+	},
+	logo: {
+		width: 72,
+		height: 72,
+		borderRadius: 20,
+		justifyContent: 'center',
+		alignItems: 'center',
+		marginBottom: 16,
+		shadowColor: '#4facfe',
+		shadowOffset: { width: 0, height: 4 },
+		shadowOpacity: 0.3,
+		shadowRadius: 8,
+		elevation: 5,
+	},
+	logoInner: {
+		flexDirection: 'row',
+		alignItems: 'flex-end',
+		gap: 4,
+	},
+	bar1: {
+		width: 6,
+		height: 24,
+		backgroundColor: '#fff',
+		borderRadius: 3,
+	},
+	bar2: {
+		width: 6,
+		height: 18,
+		backgroundColor: '#fff',
+		borderRadius: 3,
+		marginTop: 6,
+	},
+	bar3: {
+		width: 6,
+		height: 30,
+		backgroundColor: '#fff',
+		borderRadius: 3,
+	},
+	title: {
+		fontSize: 32,
+		fontWeight: 'bold',
+		color: '#1F2937',
+	},
+	subtitle: {
+		fontSize: 14,
+		color: '#6B7280',
+		marginTop: 4,
+		textAlign: 'center',
+	},
+	form: {
+		gap: 20,
+	},
+	inputGroup: {
+		gap: 8,
+	},
+	label: {
+		fontSize: 14,
+		fontWeight: '600',
+		color: '#374151',
+	},
+	input: {
+		backgroundColor: '#F9FAFB',
+		borderWidth: 2,
+		borderColor: '#E5E7EB',
+		borderRadius: 16,
+		padding: 14,
+		fontSize: 16,
+		color: '#1F2937',
+	},
+	errorText: {
+		fontSize: 12,
+		color: '#EF4444',
+		marginTop: 4,
+	},
+	avatarSection: {
+		gap: 12,
+	},
+	avatarContainer: {
+		flexDirection: 'row',
+		justifyContent: 'center',
+		gap: 20,
+	},
+	avatarOption: {
+		alignItems: 'center',
+		padding: 12,
+		borderRadius: 20,
+		borderWidth: 3,
+		borderColor: 'transparent',
+		backgroundColor: '#F9FAFB',
+	},
+	avatarSelected: {
+		borderColor: '#4facfe',
+		backgroundColor: '#EFF6FF',
+	},
+	avatarImage: {
+		width: 80,
+		height: 80,
+		borderRadius: 40,
+		marginBottom: 8,
+	},
+	avatarLabel: {
+		fontSize: 14,
+		fontWeight: '600',
+		color: '#6B7280',
+	},
+	avatarLabelSelected: {
+		color: '#4facfe',
+	},
+	hintText: {
+		fontSize: 12,
+		color: '#9CA3AF',
+		textAlign: 'center',
+		fontStyle: 'italic',
+	},
+	mainButton: {
+		marginTop: 8,
+		borderRadius: 16,
+		overflow: 'hidden',
+		shadowColor: '#4facfe',
+		shadowOffset: { width: 0, height: 4 },
+		shadowOpacity: 0.3,
+		shadowRadius: 8,
+		elevation: 5,
+	},
+	gradientButton: {
+		paddingVertical: 16,
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	mainButtonText: {
+		color: '#fff',
+		fontSize: 16,
+		fontWeight: '700',
+	},
+	infoBox: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		backgroundColor: '#F0F9FF',
+		padding: 16,
+		borderRadius: 16,
+		gap: 12,
+		borderWidth: 1,
+		borderColor: '#BFDBFE',
+	},
+	infoIcon: {
+		fontSize: 24,
+	},
+	infoText: {
+		flex: 1,
+		fontSize: 13,
+		color: '#1E40AF',
+		lineHeight: 18,
+	},
 })
