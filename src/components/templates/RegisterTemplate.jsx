@@ -1,6 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient'
 import { Controller } from 'react-hook-form'
 import {
+	ActivityIndicator,
 	Alert,
 	StyleSheet,
 	Text,
@@ -8,7 +9,6 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native'
-import { ActivityIndicator } from 'react-native'
 import { AuthTemplate } from '../../autoBarrell'
 
 export function RegisterTemplate({
