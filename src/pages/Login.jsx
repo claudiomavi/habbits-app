@@ -1,4 +1,5 @@
 import { useNavigation } from '@react-navigation/native'
+// import { LinearGradient } from 'expo-linear-gradient'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -11,7 +12,7 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native'
-import { AuthTemplate, useAuthStore, useUsersStore } from '../autoBarrell'
+import { LoginTemplate, useAuthStore, useUsersStore } from '../autoBarrell'
 
 export function Login() {
 	const navigation = useNavigation()
@@ -58,7 +59,7 @@ export function Login() {
 	}
 
 	return (
-		<AuthTemplate
+		<LoginTemplate
 			title="Habits"
 			subtitle="Convierte rutinas en victorias"
 			progressWidth="40%"
@@ -168,7 +169,7 @@ export function Login() {
 					<Text style={styles.footerLink}>Regístrate</Text>
 				</TouchableOpacity>
 			</View>
-		</AuthTemplate>
+		</LoginTemplate>
 	)
 }
 

@@ -11,7 +11,7 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native'
-import { AuthTemplate, useAuthStore } from '../autoBarrell'
+import { RegisterTemplate, useAuthStore } from '../autoBarrell'
 
 export function Register() {
 	const navigation = useNavigation()
@@ -76,7 +76,7 @@ export function Register() {
 	}
 
 	return (
-		<AuthTemplate
+		<RegisterTemplate
 			title="Crear cuenta"
 			subtitle="Únete a la comunidad de Habits"
 			progressWidth="40%"
@@ -210,7 +210,7 @@ export function Register() {
 					<Text style={styles.footerLink}>Inicia sesión</Text>
 				</TouchableOpacity>
 			</View>
-		</AuthTemplate>
+		</RegisterTemplate>
 	)
 }
 

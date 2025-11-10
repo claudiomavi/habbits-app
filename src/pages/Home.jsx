@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { LinearGradient } from 'expo-linear-gradient'
+// import { LinearGradient } from 'expo-linear-gradient'
 import { useMemo } from 'react'
 import {
 	ActivityIndicator,
@@ -17,6 +17,7 @@ import {
 	useAuthStore,
 	useUsersStore,
 } from '../autoBarrell'
+import { LinearGradient } from 'expo-linear-gradient'
 
 export function Home() {
 	const navigation = useNavigation()
