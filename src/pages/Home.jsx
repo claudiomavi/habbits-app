@@ -170,6 +170,7 @@ export function Home() {
 	)
 }
 
+/* styles moved to atomic components */
 const styles = StyleSheet.create({
 	container: { flex: 1, padding: 16 },
 	header: {
