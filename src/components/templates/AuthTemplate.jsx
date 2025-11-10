@@ -1,0 +1,136 @@
+import { LinearGradient } from 'expo-linear-gradient'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
+
+export function AuthTemplate({
+	title,
+	subtitle,
+	progressWidth = '40%',
+	children,
+	footer,
+	emojis = ['🏆', '⚡', '🎯', '🔥'],
+}) {
+	return (
+		<LinearGradient
+			colors={['#667eea', '#764ba2', '#f093fb', '#4facfe']}
+			style={styles.container}
+			start={{ x: 0, y: 0 }}
+			end={{ x: 1, y: 1 }}
+		>
+			<View
+				style={styles.decorativeContainer}
+				pointerEvents="none"
+			>
+				<Text style={[styles.floatingEmoji, { top: 60, left: 30 }]}>
+					{emojis[0]}
+				</Text>
+				<Text style={[styles.floatingEmoji, { top: 120, right: 40 }]}>
+					{emojis[1]}
+				</Text>
+				<Text style={[styles.floatingEmoji, { bottom: 180, left: 50 }]}>
+					{emojis[2]}
+				</Text>
+				<Text style={[styles.floatingEmoji, { bottom: 100, right: 30 }]}>
+					{emojis[3]}
+				</Text>
+			</View>
+
+			<ScrollView
+				contentContainerStyle={styles.scrollContent}
+				showsVerticalScrollIndicator={false}
+				bounces={false}
+			>
+				<View style={styles.card}>
+					<View style={styles.progressBarContainer}>
+						<LinearGradient
+							colors={['#4facfe', '#00f2fe', '#43e97b']}
+							style={[styles.progressFill, { width: progressWidth }]}
+							start={{ x: 0, y: 0 }}
+							end={{ x: 1, y: 0 }}
+						/>
+					</View>
+
+					<View style={styles.logoContainer}>
+						<LinearGradient
+							colors={['#4facfe', '#43e97b']}
+							style={styles.logo}
+							start={{ x: 0, y: 0 }}
+							end={{ x: 1, y: 1 }}
+						>
+							<View style={styles.logoInner}>
+								<View style={styles.bar1} />
+								<View style={styles.bar2} />
+								<View style={styles.bar3} />
+							</View>
+						</LinearGradient>
+						<Text style={styles.title}>{title}</Text>
+						{subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+					</View>
+
+					<View style={styles.form}>{children}</View>
+					{footer}
+				</View>
+			</ScrollView>
+		</LinearGradient>
+	)
+}
+
+const styles = StyleSheet.create({
+	container: { flex: 1 },
+	decorativeContainer: { position: 'absolute', width: '100%', height: '100%' },
+	floatingEmoji: { position: 'absolute', fontSize: 48, opacity: 0.2 },
+	scrollContent: {
+		flexGrow: 1,
+		justifyContent: 'center',
+		paddingHorizontal: 20,
+		paddingVertical: 40,
+	},
+	card: {
+		backgroundColor: '#fff',
+		borderRadius: 32,
+		padding: 32,
+		shadowColor: '#000',
+		shadowOffset: { width: 0, height: 10 },
+		shadowOpacity: 0.3,
+		shadowRadius: 20,
+		elevation: 10,
+		overflow: 'hidden',
+	},
+	progressBarContainer: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		right: 0,
+		height: 4,
+		backgroundColor: '#E5E7EB',
+		borderTopLeftRadius: 32,
+		borderTopRightRadius: 32,
+	},
+	progressFill: { height: '100%' },
+	logoContainer: { alignItems: 'center', marginBottom: 24, marginTop: 8 },
+	logo: {
+		width: 72,
+		height: 72,
+		borderRadius: 20,
+		justifyContent: 'center',
+		alignItems: 'center',
+		marginBottom: 16,
+		shadowColor: '#4facfe',
+		shadowOffset: { width: 0, height: 4 },
+		shadowOpacity: 0.3,
+		shadowRadius: 8,
+		elevation: 5,
+	},
+	logoInner: { flexDirection: 'row', alignItems: 'flex-end', gap: 4 },
+	bar1: { width: 6, height: 24, backgroundColor: '#fff', borderRadius: 3 },
+	bar2: {
+		width: 6,
+		height: 18,
+		backgroundColor: '#fff',
+		borderRadius: 3,
+		marginTop: 6,
+	},
+	bar3: { width: 6, height: 30, backgroundColor: '#fff', borderRadius: 3 },
+	title: { fontSize: 32, fontWeight: 'bold', color: '#1F2937' },
+	subtitle: { fontSize: 14, color: '#6B7280', marginTop: 4 },
+	form: { gap: 16 },
+})
