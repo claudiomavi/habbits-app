@@ -74,6 +74,7 @@ export function Register() {
 			handleSubmit={handleSubmit}
 			onSubmit={onSubmit}
 			loading={loading}
+			navigation={navigation}
 		/>
 	)
 }

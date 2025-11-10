@@ -1,3 +1,4 @@
+import { LinearGradient } from 'expo-linear-gradient'
 import { Controller } from 'react-hook-form'
 import {
 	Alert,
@@ -7,8 +8,7 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native'
-import { LinearGradient } from 'react-native-svg'
-import { ActivityIndicator } from 'react-native-web'
+import { ActivityIndicator } from 'react-native'
 import { AuthTemplate } from '../../autoBarrell'
 
 export function RegisterTemplate({
@@ -18,6 +18,7 @@ export function RegisterTemplate({
 	handleSubmit,
 	onSubmit,
 	loading,
+	navigation,
 }) {
 	return (
 		<AuthTemplate
