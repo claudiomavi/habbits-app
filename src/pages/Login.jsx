@@ -5,14 +5,13 @@ import { Controller, useForm } from 'react-hook-form'
 import {
 	ActivityIndicator,
 	Alert,
-	ScrollView,
 	StyleSheet,
 	Text,
 	TextInput,
 	TouchableOpacity,
 	View,
 } from 'react-native'
-import { useAuthStore, useUsersStore } from '../autoBarrell'
+import { AuthTemplate, useAuthStore, useUsersStore } from '../autoBarrell'
 
 export function Login() {
 	const navigation = useNavigation()
@@ -59,169 +58,117 @@ export function Login() {
 	}
 
 	return (
-		<LinearGradient
+		<AuthTemplate
+			title="Habits"
+			subtitle="Convierte rutinas en victorias"
+			progressWidth="40%"
 			colors={['#667eea', '#764ba2', '#f093fb', '#4facfe']}
 			style={styles.container}
 			start={{ x: 0, y: 0 }}
 			end={{ x: 1, y: 1 }}
 		>
-			{/* Elementos decorativos flotantes */}
-			<View
-				style={styles.decorativeContainer}
-				pointerEvents="none"
-			>
-				<Text style={[styles.floatingEmoji, { top: 60, left: 30 }]}>🏆</Text>
-				<Text style={[styles.floatingEmoji, { top: 120, right: 40 }]}>⚡</Text>
-				<Text style={[styles.floatingEmoji, { bottom: 180, left: 50 }]}>
-					🎯
-				</Text>
-				<Text style={[styles.floatingEmoji, { bottom: 100, right: 30 }]}>
-					🔥
-				</Text>
+			{/* Email Input */}
+			<View style={styles.inputGroup}>
+				<Text style={styles.label}>Email</Text>
+				<Controller
+					control={control}
+					name="email"
+					rules={{ required: true }}
+					defaultValue=""
+					render={({ field: { onChange, value } }) => (
+						<TextInput
+							value={value}
+							onChangeText={onChange}
+							keyboardType="email-address"
+							autoCapitalize="none"
+							placeholder="tu@email.com"
+							placeholderTextColor="#9CA3AF"
+							style={styles.input}
+						/>
+					)}
+				/>
 			</View>
 
-			<ScrollView
-				contentContainerStyle={styles.scrollContent}
-				showsVerticalScrollIndicator={false}
-				bounces={false}
-			>
-				{/* Tarjeta principal */}
-				<View style={styles.card}>
-					{/* Barra de progreso decorativa */}
-					<View style={styles.progressBarContainer}>
-						<LinearGradient
-							colors={['#4facfe', '#00f2fe', '#43e97b']}
-							style={styles.progressFill}
-							start={{ x: 0, y: 0 }}
-							end={{ x: 1, y: 0 }}
+			{/* Password Input */}
+			<View style={styles.inputGroup}>
+				<Text style={styles.label}>Contraseña</Text>
+				<Controller
+					control={control}
+					name="password"
+					rules={{ required: true }}
+					defaultValue=""
+					render={({ field: { onChange, value } }) => (
+						<TextInput
+							value={value}
+							onChangeText={onChange}
+							secureTextEntry
+							placeholder="••••••••"
+							placeholderTextColor="#9CA3AF"
+							style={styles.input}
 						/>
-					</View>
+					)}
+				/>
+			</View>
 
-					{/* Logo y título */}
-					<View style={styles.logoContainer}>
-						<LinearGradient
-							colors={['#4facfe', '#43e97b']}
-							style={styles.logo}
-							start={{ x: 0, y: 0 }}
-							end={{ x: 1, y: 1 }}
-						>
-							<View style={styles.logoInner}>
-								<View style={styles.bar1} />
-								<View style={styles.bar2} />
-								<View style={styles.bar3} />
-							</View>
-						</LinearGradient>
-						<Text style={styles.title}>Habits</Text>
-						<Text style={styles.subtitle}>Convierte rutinas en victorias</Text>
-					</View>
+			{/* Botón principal */}
+			<TouchableOpacity
+				onPress={handleSubmit(onSubmit)}
+				disabled={loading}
+				style={styles.mainButton}
+				activeOpacity={0.8}
+			>
+				<LinearGradient
+					colors={['#4facfe', '#43e97b']}
+					style={styles.gradientButton}
+					start={{ x: 0, y: 0 }}
+					end={{ x: 1, y: 0 }}
+				>
+					{loading ? (
+						<ActivityIndicator color="#fff" />
+					) : (
+						<Text style={styles.mainButtonText}>Entrar</Text>
+					)}
+				</LinearGradient>
+			</TouchableOpacity>
 
-					{/* Formulario */}
-					<View style={styles.form}>
-						{/* Email Input */}
-						<View style={styles.inputGroup}>
-							<Text style={styles.label}>Email</Text>
-							<Controller
-								control={control}
-								name="email"
-								rules={{ required: true }}
-								defaultValue=""
-								render={({ field: { onChange, value } }) => (
-									<TextInput
-										value={value}
-										onChangeText={onChange}
-										keyboardType="email-address"
-										autoCapitalize="none"
-										placeholder="tu@email.com"
-										placeholderTextColor="#9CA3AF"
-										style={styles.input}
-									/>
-								)}
-							/>
-						</View>
+			{/* Divider */}
+			<View style={styles.divider}>
+				<View style={styles.dividerLine} />
+				<Text style={styles.dividerText}>o continúa con</Text>
+				<View style={styles.dividerLine} />
+			</View>
 
-						{/* Password Input */}
-						<View style={styles.inputGroup}>
-							<Text style={styles.label}>Contraseña</Text>
-							<Controller
-								control={control}
-								name="password"
-								rules={{ required: true }}
-								defaultValue=""
-								render={({ field: { onChange, value } }) => (
-									<TextInput
-										value={value}
-										onChangeText={onChange}
-										secureTextEntry
-										placeholder="••••••••"
-										placeholderTextColor="#9CA3AF"
-										style={styles.input}
-									/>
-								)}
-							/>
-						</View>
+			{/* Botones sociales */}
+			<View style={styles.socialButtons}>
+				<TouchableOpacity
+					onPress={() => Alert.alert('Google', 'Próximamente')}
+					disabled={loading}
+					style={styles.googleButton}
+					activeOpacity={0.7}
+				>
+					<Text style={styles.googleIcon}>G</Text>
+					<Text style={styles.socialButtonText}>Google</Text>
+				</TouchableOpacity>
 
-						{/* Botón principal */}
-						<TouchableOpacity
-							onPress={handleSubmit(onSubmit)}
-							disabled={loading}
-							style={styles.mainButton}
-							activeOpacity={0.8}
-						>
-							<LinearGradient
-								colors={['#4facfe', '#43e97b']}
-								style={styles.gradientButton}
-								start={{ x: 0, y: 0 }}
-								end={{ x: 1, y: 0 }}
-							>
-								{loading ? (
-									<ActivityIndicator color="#fff" />
-								) : (
-									<Text style={styles.mainButtonText}>Entrar</Text>
-								)}
-							</LinearGradient>
-						</TouchableOpacity>
+				<TouchableOpacity
+					onPress={() => Alert.alert('Apple', 'Próximamente')}
+					disabled={loading}
+					style={styles.appleButton}
+					activeOpacity={0.7}
+				>
+					<Text style={styles.appleIcon}>A</Text>
+					<Text style={styles.socialButtonTextWhite}>Apple</Text>
+				</TouchableOpacity>
+			</View>
 
-						{/* Divider */}
-						<View style={styles.divider}>
-							<View style={styles.dividerLine} />
-							<Text style={styles.dividerText}>o continúa con</Text>
-							<View style={styles.dividerLine} />
-						</View>
-
-						{/* Botones sociales */}
-						<View style={styles.socialButtons}>
-							<TouchableOpacity
-								onPress={() => Alert.alert('Google', 'Próximamente')}
-								disabled={loading}
-								style={styles.googleButton}
-								activeOpacity={0.7}
-							>
-								<Text style={styles.googleIcon}>G</Text>
-								<Text style={styles.socialButtonText}>Google</Text>
-							</TouchableOpacity>
-
-							<TouchableOpacity
-								onPress={() => Alert.alert('Apple', 'Próximamente')}
-								disabled={loading}
-								style={styles.appleButton}
-								activeOpacity={0.7}
-							>
-								<Text style={styles.appleIcon}>A</Text>
-								<Text style={styles.socialButtonTextWhite}>Apple</Text>
-							</TouchableOpacity>
-						</View>
-
-						{/* Registro */}
-						<View style={styles.footer}>
-							<Text style={styles.footerText}>¿No tienes cuenta? </Text>
-							<TouchableOpacity onPress={() => navigation.navigate('Register')}>
-								<Text style={styles.footerLink}>Regístrate</Text>
-							</TouchableOpacity>
-						</View>
-					</View>
-				</View>
-			</ScrollView>
-		</LinearGradient>
+			{/* Registro */}
+			<View style={styles.footer}>
+				<Text style={styles.footerText}>¿No tienes cuenta? </Text>
+				<TouchableOpacity onPress={() => navigation.navigate('Register')}>
+					<Text style={styles.footerLink}>Regístrate</Text>
+				</TouchableOpacity>
+			</View>
+		</AuthTemplate>
 	)
 }
 

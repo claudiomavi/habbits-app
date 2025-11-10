@@ -5,14 +5,13 @@ import { Controller, useForm } from 'react-hook-form'
 import {
 	ActivityIndicator,
 	Alert,
-	ScrollView,
 	StyleSheet,
 	Text,
 	TextInput,
 	TouchableOpacity,
 	View,
 } from 'react-native'
-import { useAuthStore } from '../autoBarrell'
+import { AuthTemplate, useAuthStore } from '../autoBarrell'
 
 export function Register() {
 	const navigation = useNavigation()
@@ -65,12 +64,9 @@ export function Register() {
 				msg.includes('email already registered') ||
 				status === 422
 			) {
-				Alert.alert(
-					'Cuenta existente',
-'Correo ya registrado.', [
-						{ text: 'Ir al login', onPress: () => navigation.replace('Login') },
-					]
-				)
+				Alert.alert('Cuenta existente', 'Correo ya registrado.', [
+					{ text: 'Ir al login', onPress: () => navigation.replace('Login') },
+				])
 			} else {
 				Alert.alert('Error', err?.message || 'Error al registrar')
 			}
@@ -80,195 +76,141 @@ export function Register() {
 	}
 
 	return (
-		<LinearGradient
+		<AuthTemplate
+			title="Crear cuenta"
+			subtitle="Únete a la comunidad de Habits"
+			progressWidth="40%"
 			colors={['#667eea', '#764ba2', '#f093fb', '#4facfe']}
 			style={styles.container}
 			start={{ x: 0, y: 0 }}
 			end={{ x: 1, y: 1 }}
 		>
-			{/* Elementos decorativos flotantes */}
-			<View
-				style={styles.decorativeContainer}
-				pointerEvents="none"
-			>
-				<Text style={[styles.floatingEmoji, { top: 40, left: 20 }]}>🎯</Text>
-				<Text style={[styles.floatingEmoji, { top: 100, right: 30 }]}>💪</Text>
-				<Text style={[styles.floatingEmoji, { bottom: 150, left: 40 }]}>
-					🚀
-				</Text>
-				<Text style={[styles.floatingEmoji, { bottom: 80, right: 20 }]}>
-					⭐
-				</Text>
+			{/* Email Input */}
+			<View style={styles.inputGroup}>
+				<Text style={styles.label}>Email</Text>
+				<Controller
+					control={control}
+					name="email"
+					rules={{ required: true }}
+					defaultValue=""
+					render={({ field: { onChange, value } }) => (
+						<TextInput
+							value={value}
+							onChangeText={onChange}
+							keyboardType="email-address"
+							autoCapitalize="none"
+							placeholder="tu@email.com"
+							placeholderTextColor="#9CA3AF"
+							style={styles.input}
+						/>
+					)}
+				/>
 			</View>
 
-			<ScrollView
-				contentContainerStyle={styles.scrollContent}
-				showsVerticalScrollIndicator={false}
-				bounces={false}
-			>
-				{/* Tarjeta principal */}
-				<View style={styles.card}>
-					{/* Barra de progreso decorativa */}
-					<View style={styles.progressBarContainer}>
-						<LinearGradient
-							colors={['#4facfe', '#00f2fe', '#43e97b']}
-							style={styles.progressFill}
-							start={{ x: 0, y: 0 }}
-							end={{ x: 1, y: 0 }}
+			{/* Password Input */}
+			<View style={styles.inputGroup}>
+				<Text style={styles.label}>Contraseña</Text>
+				<Controller
+					control={control}
+					name="password"
+					rules={{ required: true }}
+					defaultValue=""
+					render={({ field: { onChange, value } }) => (
+						<TextInput
+							value={value}
+							onChangeText={onChange}
+							secureTextEntry
+							placeholder="••••••••"
+							placeholderTextColor="#9CA3AF"
+							style={styles.input}
 						/>
-					</View>
+					)}
+				/>
+			</View>
 
-					{/* Logo y título */}
-					<View style={styles.logoContainer}>
-						<LinearGradient
-							colors={['#4facfe', '#43e97b']}
-							style={styles.logo}
-							start={{ x: 0, y: 0 }}
-							end={{ x: 1, y: 1 }}
-						>
-							<View style={styles.logoInner}>
-								<View style={styles.bar1} />
-								<View style={styles.bar2} />
-								<View style={styles.bar3} />
-							</View>
-						</LinearGradient>
-						<Text style={styles.title}>Crear cuenta</Text>
-						<Text style={styles.subtitle}>Únete a la comunidad de Habits</Text>
-					</View>
+			{/* Confirm Password Input */}
+			<View style={styles.inputGroup}>
+				<Text style={styles.label}>Confirmar contraseña</Text>
+				<Controller
+					control={control}
+					name="confirmPassword"
+					rules={{ required: true }}
+					defaultValue=""
+					render={({ field: { onChange, value } }) => (
+						<TextInput
+							value={value}
+							onChangeText={onChange}
+							secureTextEntry
+							placeholder="••••••••"
+							placeholderTextColor="#9CA3AF"
+							style={styles.input}
+						/>
+					)}
+				/>
+				{confirmPassword && confirmPassword !== password && (
+					<Text style={styles.errorText}>Las contraseñas no coinciden</Text>
+				)}
+			</View>
 
-					{/* Formulario */}
-					<View style={styles.form}>
-						{/* Email Input */}
-						<View style={styles.inputGroup}>
-							<Text style={styles.label}>Email</Text>
-							<Controller
-								control={control}
-								name="email"
-								rules={{ required: true }}
-								defaultValue=""
-								render={({ field: { onChange, value } }) => (
-									<TextInput
-										value={value}
-										onChangeText={onChange}
-										keyboardType="email-address"
-										autoCapitalize="none"
-										placeholder="tu@email.com"
-										placeholderTextColor="#9CA3AF"
-										style={styles.input}
-									/>
-								)}
-							/>
-						</View>
+			{/* Botón principal */}
+			<TouchableOpacity
+				onPress={handleSubmit(onSubmit)}
+				disabled={loading}
+				style={styles.mainButton}
+				activeOpacity={0.8}
+			>
+				<LinearGradient
+					colors={['#4facfe', '#43e97b']}
+					style={styles.gradientButton}
+					start={{ x: 0, y: 0 }}
+					end={{ x: 1, y: 0 }}
+				>
+					{loading ? (
+						<ActivityIndicator color="#fff" />
+					) : (
+						<Text style={styles.mainButtonText}>Crear cuenta</Text>
+					)}
+				</LinearGradient>
+			</TouchableOpacity>
 
-						{/* Password Input */}
-						<View style={styles.inputGroup}>
-							<Text style={styles.label}>Contraseña</Text>
-							<Controller
-								control={control}
-								name="password"
-								rules={{ required: true }}
-								defaultValue=""
-								render={({ field: { onChange, value } }) => (
-									<TextInput
-										value={value}
-										onChangeText={onChange}
-										secureTextEntry
-										placeholder="••••••••"
-										placeholderTextColor="#9CA3AF"
-										style={styles.input}
-									/>
-								)}
-							/>
-						</View>
+			{/* Divider */}
+			<View style={styles.divider}>
+				<View style={styles.dividerLine} />
+				<Text style={styles.dividerText}>o regístrate con</Text>
+				<View style={styles.dividerLine} />
+			</View>
 
-						{/* Confirm Password Input */}
-						<View style={styles.inputGroup}>
-							<Text style={styles.label}>Confirmar contraseña</Text>
-							<Controller
-								control={control}
-								name="confirmPassword"
-								rules={{ required: true }}
-								defaultValue=""
-								render={({ field: { onChange, value } }) => (
-									<TextInput
-										value={value}
-										onChangeText={onChange}
-										secureTextEntry
-										placeholder="••••••••"
-										placeholderTextColor="#9CA3AF"
-										style={styles.input}
-									/>
-								)}
-							/>
-							{confirmPassword && confirmPassword !== password && (
-								<Text style={styles.errorText}>
-									Las contraseñas no coinciden
-								</Text>
-							)}
-						</View>
+			{/* Botones sociales */}
+			<View style={styles.socialButtons}>
+				<TouchableOpacity
+					onPress={() => Alert.alert('Google', 'Próximamente')}
+					disabled={loading}
+					style={styles.googleButton}
+					activeOpacity={0.7}
+				>
+					<Text style={styles.googleIcon}>G</Text>
+					<Text style={styles.socialButtonText}>Google</Text>
+				</TouchableOpacity>
 
-						{/* Botón principal */}
-						<TouchableOpacity
-							onPress={handleSubmit(onSubmit)}
-							disabled={loading}
-							style={styles.mainButton}
-							activeOpacity={0.8}
-						>
-							<LinearGradient
-								colors={['#4facfe', '#43e97b']}
-								style={styles.gradientButton}
-								start={{ x: 0, y: 0 }}
-								end={{ x: 1, y: 0 }}
-							>
-								{loading ? (
-									<ActivityIndicator color="#fff" />
-								) : (
-									<Text style={styles.mainButtonText}>Crear cuenta</Text>
-								)}
-							</LinearGradient>
-						</TouchableOpacity>
+				<TouchableOpacity
+					onPress={() => Alert.alert('Apple', 'Próximamente')}
+					disabled={loading}
+					style={styles.appleButton}
+					activeOpacity={0.7}
+				>
+					<Text style={styles.appleIcon}>A</Text>
+					<Text style={styles.socialButtonTextWhite}>Apple</Text>
+				</TouchableOpacity>
+			</View>
 
-						{/* Divider */}
-						<View style={styles.divider}>
-							<View style={styles.dividerLine} />
-							<Text style={styles.dividerText}>o regístrate con</Text>
-							<View style={styles.dividerLine} />
-						</View>
-
-						{/* Botones sociales */}
-						<View style={styles.socialButtons}>
-							<TouchableOpacity
-								onPress={() => Alert.alert('Google', 'Próximamente')}
-								disabled={loading}
-								style={styles.googleButton}
-								activeOpacity={0.7}
-							>
-								<Text style={styles.googleIcon}>G</Text>
-								<Text style={styles.socialButtonText}>Google</Text>
-							</TouchableOpacity>
-
-							<TouchableOpacity
-								onPress={() => Alert.alert('Apple', 'Próximamente')}
-								disabled={loading}
-								style={styles.appleButton}
-								activeOpacity={0.7}
-							>
-								<Text style={styles.appleIcon}>A</Text>
-								<Text style={styles.socialButtonTextWhite}>Apple</Text>
-							</TouchableOpacity>
-						</View>
-
-						{/* Login link */}
-						<View style={styles.footer}>
-							<Text style={styles.footerText}>¿Ya tienes cuenta? </Text>
-							<TouchableOpacity onPress={() => navigation.goBack()}>
-								<Text style={styles.footerLink}>Inicia sesión</Text>
-							</TouchableOpacity>
-						</View>
-					</View>
-				</View>
-			</ScrollView>
-		</LinearGradient>
+			{/* Login link */}
+			<View style={styles.footer}>
+				<Text style={styles.footerText}>¿Ya tienes cuenta? </Text>
+				<TouchableOpacity onPress={() => navigation.goBack()}>
+					<Text style={styles.footerLink}>Inicia sesión</Text>
+				</TouchableOpacity>
+			</View>
+		</AuthTemplate>
 	)
 }
 
