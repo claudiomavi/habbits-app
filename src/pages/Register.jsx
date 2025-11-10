@@ -3,17 +3,16 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import {
-	ActivityIndicator,
-	Alert,
-	ScrollView,
-	StyleSheet,
-	Text,
-	TextInput,
-	TouchableOpacity,
-	View,
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { supabase, useAuthStore } from '../autoBarrell'
+import { useAuthStore } from '../autoBarrell'
 
 export function Register() {
 	const navigation = useNavigation()
