@@ -3,16 +3,16 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import {
-  ActivityIndicator,
-  Alert,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+	ActivityIndicator,
+	Alert,
+	ScrollView,
+	StyleSheet,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	View,
 } from 'react-native'
-import { useAuthStore } from '../autoBarrell'
+import { supabase, useAuthStore } from '../autoBarrell'
 
 export function Register() {
 	const navigation = useNavigation()
@@ -220,9 +220,11 @@ export function Register() {
 								start={{ x: 0, y: 0 }}
 								end={{ x: 1, y: 0 }}
 							>
-								{loading ?
+								{loading ? (
 									<ActivityIndicator color="#fff" />
-								:	<Text style={styles.mainButtonText}>Crear cuenta</Text>}
+								) : (
+									<Text style={styles.mainButtonText}>Crear cuenta</Text>
+								)}
 							</LinearGradient>
 						</TouchableOpacity>
 
