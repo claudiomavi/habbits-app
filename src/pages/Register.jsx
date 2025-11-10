@@ -67,13 +67,8 @@ export function Register() {
 			) {
 				Alert.alert(
 					'Cuenta existente',
-					'Correo ya registrado. Si olvidaste tu contraseña, puedes restablecerla.',
-					[
+'Correo ya registrado.', [
 						{ text: 'Ir al login', onPress: () => navigation.replace('Login') },
-						{
-							text: 'Restablecer contraseña',
-							onPress: () => navigation.replace('ForgotPassword'),
-						},
 					]
 				)
 			} else {
