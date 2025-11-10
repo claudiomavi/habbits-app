@@ -1,4 +1,3 @@
-export * from './autoBarrell'
 export * from './components/atomos/AvatarInitials'
 export * from './components/atomos/GradientBackground'
 export * from './components/atomos/PrimaryButton'
