@@ -210,6 +210,12 @@ export function Register() {
 					<Text style={styles.footerLink}>Inicia sesión</Text>
 				</TouchableOpacity>
 			</View>
+			<View style={styles.footer}>
+				<Text style={styles.footerText}>¿Ya tienes cuenta? </Text>
+				<TouchableOpacity onPress={() => navigation.navigate('CreateProfile')}>
+					<Text style={styles.footerLink}>CREA</Text>
+				</TouchableOpacity>
+			</View>
 		</RegisterTemplate>
 	)
 }
