@@ -47,6 +47,20 @@ Este documento resume la visión, reglas, estilos, convenciones de desarrollo y 
 
 ## 3) Estructura de carpetas (resumen)
 
+Modelo Atomic Design
+- Atoms (atomos): piezas UI indivisibles (botones básicos, inputs, badges).
+- Molecules (moleculas): combinación simple de átomos (XPBar, DifficultyBadge).
+- Organisms (organismos): secciones con funcionalidad (HeaderBar, HabitCard, CardContainer).
+- Templates: esqueletos de página con layout/estilo uniforme (HomeTemplate, AuthTemplate, CreateProfileTemplate).
+- Pages: orquestación de datos, lógica de formularios y navegación; consumen Templates y componentes.
+
+Rationale (por qué Templates + Pages)
+- Los Templates fijan estructura y estilo común entre pantallas, evitando duplicación de UI.
+- Las Pages se enfocan en la lógica de negocio: TanStack Query/fetch, stores Zustand, react-hook-form y navegación.
+- Facilita reuse, pruebas y mantenimiento; reduce conflicto al tocar estilos.
+
+
+
 - src/pages: pantallas (Login, Register, CreateProfile, Home, ...)
 - src/stores: Zustand stores (AuthStore, UsersStore, HabitsStore)
 - src/supabase: cliente y CRUDs (supabaseClient, crudUsers, crudHabits)
