@@ -1,5 +1,4 @@
 export * from './pages/CreateProfile'
-export * from './pages/ForgotPassword'
 export * from './pages/Home'
 export * from './pages/Login'
 export * from './pages/Register'

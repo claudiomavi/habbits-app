@@ -41,17 +41,9 @@ export function Register() {
 			const identities = result?.user?.identities
 			if (Array.isArray(identities) && identities.length === 0) {
 				// Usuario ya existe (patrón de Supabase: identities vacío)
-				Alert.alert(
-					'Cuenta existente',
-					'Correo ya registrado. Si olvidaste tu contraseña, puedes restablecerla.',
-					[
-						{ text: 'Ir al login', onPress: () => navigation.replace('Login') },
-						{
-							text: 'Restablecer contraseña',
-							onPress: () => navigation.replace('ForgotPassword'),
-						},
-					]
-				)
+				Alert.alert('Cuenta existente', 'Correo ya registrado.', [
+					{ text: 'Ir al login', onPress: () => navigation.replace('Login') },
+				])
 				return
 			}
 

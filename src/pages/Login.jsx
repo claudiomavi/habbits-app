@@ -173,22 +173,12 @@ export function Login() {
 								start={{ x: 0, y: 0 }}
 								end={{ x: 1, y: 0 }}
 							>
-								{loading ?
+								{loading ? (
 									<ActivityIndicator color="#fff" />
-								:	<Text style={styles.mainButtonText}>Entrar</Text>}
+								) : (
+									<Text style={styles.mainButtonText}>Entrar</Text>
+								)}
 							</LinearGradient>
-						</TouchableOpacity>
-
-						{/* Olvidaste tu contraseña */}
-						<TouchableOpacity
-							onPress={() => navigation.navigate('ForgotPassword')}
-							style={{ alignItems: 'center' }}
-						>
-							<Text
-								style={{ color: '#4facfe', fontSize: 14, fontWeight: '600' }}
-							>
-								¿Olvidaste tu contraseña?
-							</Text>
 						</TouchableOpacity>
 
 						{/* Divider */}
