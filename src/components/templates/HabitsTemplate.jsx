@@ -1,7 +1,9 @@
 import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { CardContainer, DifficultyBadge, GradientBackground, PrimaryButton } from '../../autoBarrell'
 
-export function HabitsTemplate({ habits = [], loading, onAddPress, onEditPress, onDeletePress }) {
+import { HabitModal } from '../organismos/HabitModal'
+
+export function HabitsTemplate({ habits = [], loading, onAddPress, onEditPress, onDeletePress, modalVisible, modalForm, setModalForm, modalEditing, onModalCancel, onModalSave }) {
   return (
     <GradientBackground style={styles.container}>
       <CardContainer>
@@ -36,6 +38,15 @@ export function HabitsTemplate({ habits = [], loading, onAddPress, onEditPress, 
           />
         )}
       </CardContainer>
+
+      <HabitModal
+        visible={modalVisible}
+        editing={modalEditing}
+        form={modalForm}
+        setForm={setModalForm}
+        onCancel={onModalCancel}
+        onSave={onModalSave}
+      />
     </GradientBackground>
   )
 }
