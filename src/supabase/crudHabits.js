@@ -51,6 +51,19 @@ export async function getProgressForDate(user_id, dateISO) {
   return data || []
 }
 
+export async function getProgressHistoryForHabit(user_id, habit_id, untilISO, limit = 60) {
+  const { data, error } = await supabase
+    .from('progress_entries')
+    .select('*')
+    .eq('user_id', user_id)
+    .eq('habit_id', habit_id)
+    .lte('date', untilISO)
+    .order('date', { ascending: false })
+    .limit(limit)
+  if (error) throw error
+  return data || []
+}
+
 export async function upsertProgress({ habit_id, user_id, dateISO, completed, xp_awarded = 0 }) {
   // try existing
   const { data: existing, error: findErr } = await supabase
