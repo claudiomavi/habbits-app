@@ -1,12 +1,13 @@
 import { create } from 'zustand'
 import {
 	addProfile,
+	computeLevel,
 	getProfileByMail,
 	getProfileByUserId,
 	updateIdAuth,
 } from '../autoBarrell'
 
-export const useUsersStore = create((set) => ({
+export const useUsersStore = create((set, get) => ({
 	users: [],
 	profile: null,
 	loading: false,
@@ -27,6 +28,15 @@ export const useUsersStore = create((set) => ({
 		const profile = await getProfileByMail(email)
 		set({ profile })
 		return profile
+	},
+
+	optimisticUpdateXp: (delta) => {
+		if (!delta) return
+		const current = get().profile
+		if (!current) return
+		const newXp = Math.max(0, (current.xp || 0) + delta)
+		const newLevel = computeLevel(newXp)
+		set({ profile: { ...current, xp: newXp, level: newLevel } })
 	},
 
 	updateIdAuth,
