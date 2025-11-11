@@ -43,3 +43,34 @@ export async function updateIdAuth(email, id_auth) {
 		.is('id_auth', null)
 	if (error) throw error
 }
+
+// XP/Level helpers
+export async function getProfileById(userId) {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('user_id', userId)
+    .maybeSingle()
+  if (error) throw error
+  return data
+}
+
+export function computeLevel(totalXP) {
+  const safe = Math.max(0, totalXP || 0)
+  return Math.floor(Math.sqrt(safe / 100)) + 1
+}
+
+export async function updateProfileXpAndLevel(userId, delta) {
+  if (!delta) return null
+  const current = await getProfileById(userId)
+  const newXp = Math.max(0, (current?.xp || 0) + delta)
+  const newLevel = computeLevel(newXp)
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({ xp: newXp, level: newLevel })
+    .eq('user_id', userId)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
