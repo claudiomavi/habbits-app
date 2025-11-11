@@ -108,14 +108,15 @@ export function Home() {
 		)
 	}
 
-	return (
-		<HomeTemplate
-			profile={profile}
-			handleLogout={handleLogout}
-			habitsLoading={habitsLoading}
-			progressLoading={progressLoading}
-			todaysHabits={todaysHabits}
-			renderHabit={renderHabit}
-		/>
-	)
+return (
+  <HomeTemplate
+    profile={profile}
+    handleLogout={handleLogout}
+    habitsLoading={habitsLoading}
+    progressLoading={progressLoading}
+    todaysHabits={todaysHabits}
+    renderHabit={renderHabit}
+    xpPercent={xpPercent}
+  />
+)
 }
