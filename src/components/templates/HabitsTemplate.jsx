@@ -106,7 +106,7 @@ export function HabitsTemplate({
 }
 
 const styles = StyleSheet.create({
-	container: { flex: 1, padding: 16, paddingTop: 60 },
+	container: { flex: 1, padding: 16 },
 	headerRowCentered: {
 		alignItems: 'center',
 		justifyContent: 'center',
