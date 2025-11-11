@@ -6,6 +6,7 @@ import {
 	getHabitsByUser,
 	getProgressForDate,
 	HomeTemplate,
+	HabitCard,
 	upsertProgress,
 	useAuthStore,
 	useUsersStore,
@@ -83,30 +84,16 @@ export function Home() {
 	}
 
 	const renderHabit = ({ item }) => {
-		const done = progressMap.get(item.id)?.completed
-		return (
-			<View style={styles.habitCard}>
-				<View style={{ flex: 1 }}>
-					<Text style={styles.habitTitle}>{item.title}</Text>
-					{item.reminder_time && (
-						<Text style={styles.habitMeta}>⏰ {item.reminder_time}</Text>
-					)}
-				</View>
-				<View style={styles.badge}>
-					<Text style={styles.badgeText}>D{item.difficulty || 1}</Text>
-				</View>
-				<TouchableOpacity
-					onPress={() => toggleMutation.mutate(item)}
-					style={[styles.completeBtn, done && styles.completeBtnDone]}
-					activeOpacity={0.8}
-				>
-					<Text style={styles.completeBtnText}>
-						{done ? 'Hecho' : 'Marcar'}
-					</Text>
-				</TouchableOpacity>
-			</View>
-		)
-	}
+  const done = progressMap.get(item.id)?.completed
+  return (
+    <HabitCard habit={item} done={!!done} onToggle={() => toggleMutation.mutate(item)} />
+  )
+}
+
+	const level = profile?.level ?? 1
+const xp = profile?.xp ?? 0
+// Regla simple: cada nivel requiere 100 xp. El percent es el progreso dentro del nivel actual
+const xpPercent = (xp % 100) / 100
 
 return (
   <HomeTemplate
