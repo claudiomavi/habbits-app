@@ -8,13 +8,16 @@ export function HomeTemplate({
 	progressLoading,
 	todaysHabits,
 	renderHabit,
+	xpPercent = 0,
 }) {
 	return (
 		<GradientBackground style={styles.container}>
 			<HeaderBar
 				name={profile?.display_name}
 				initial={profile?.display_name}
-				xpPercent={'.1'}
+				xpPercent={xpPercent}
+				level={profile?.level ?? 1}
+				avatarUri={profile?.avatar?.uri || profile?.avatar}
 				onLogout={handleLogout}
 			/>
 
