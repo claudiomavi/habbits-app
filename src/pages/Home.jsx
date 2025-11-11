@@ -40,6 +40,21 @@ export function Home() {
 	}, [progress])
 
 	const toggleMutation = useMutation({
+		onMutate: async (habit) => {
+			// Este hook se ejecuta antes de la mutación => update optimista
+			const existing = progressMap.get(habit.id)
+			const newCompleted = !(existing?.completed ?? false)
+			const baseXP = 10
+			// streak rápida mínima (no conocemos historia aún), no sumar streak aquí para evitar sobreestimar
+			const earned = baseXP * (habit.difficulty || 1)
+			const deltaXp = newCompleted
+				? Math.round(earned)
+				: -(existing?.xp_awarded || 0)
+			try {
+				useUsersStore.getState().optimisticUpdateXp(deltaXp)
+			} catch {}
+			return { deltaXp }
+		},
 		mutationFn: async (habit) => {
 			const existing = progressMap.get(habit.id)
 			const newCompleted = !(existing?.completed ?? false)
@@ -68,8 +83,10 @@ export function Home() {
 							return true
 						return habit.days_of_week.includes(wd)
 					}
-					// TODO: definir monthly con más precisión en playbook
-					return true // daily y monthly cuentan todos los días por ahora
+					if (habit.frequency === 'monthly') {
+						return date.getDate() === 1
+					}
+					return true // daily
 				}
 				// contar hacia atrás incluyendo hoy si está marcado al final de la operación
 				// partimos de ayer si vamos a desmarcar; de hoy si vamos a marcar
@@ -122,13 +139,14 @@ export function Home() {
 	const todaysHabits = useMemo(() => {
 		const d = new Date()
 		const weekday = d.getDay() // 0-6
+		const dayOfMonth = d.getDate()
 		return habits.filter((h) => {
 			if (h.frequency === 'daily') return true
 			if (h.frequency === 'weekly') {
 				if (!Array.isArray(h.days_of_week)) return true
 				return h.days_of_week.includes(weekday)
 			}
-			if (h.frequency === 'monthly') return true // TODO: definir regla exacta
+			if (h.frequency === 'monthly') return dayOfMonth === 1
 			return true
 		})
 	}, [habits])
