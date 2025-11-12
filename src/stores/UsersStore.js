@@ -5,6 +5,7 @@ import {
 	getProfileByMail,
 	getProfileByUserId,
 	updateIdAuth,
+	updateProfileFields,
 } from '../autoBarrell'
 
 export const useUsersStore = create((set, get) => ({
@@ -37,6 +38,12 @@ export const useUsersStore = create((set, get) => ({
 		const newXp = Math.max(0, (current.xp || 0) + delta)
 		const newLevel = computeLevel(newXp)
 		set({ profile: { ...current, xp: newXp, level: newLevel } })
+	},
+
+	updateProfile: async (userId, patch) => {
+		const updated = await updateProfileFields(userId, patch)
+		set({ profile: updated })
+		return updated
 	},
 
 	updateIdAuth,
