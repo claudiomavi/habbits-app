@@ -40,17 +40,20 @@ export function Home() {
 	}, [progress])
 
 	const toggleMutation = useMutation({
-		onMutate: async (habit) => {
+		onMutate: async (payload) => {
+			const habit = payload?.habit || payload
+			const desired = payload?.desired
 			await qc.cancelQueries({ queryKey: ['progress', user?.id, todayISO] })
 			const previous = qc.getQueryData(['progress', user?.id, todayISO]) || []
-			const existing = progressMap.get(habit.id)
-			const newCompleted = !(existing?.completed ?? false)
+			const cached = Array.isArray(previous) ? previous : []
+			const existing = cached.find((p) => p.habit_id === habit.id)
+			const newCompleted = typeof desired === 'boolean' ? desired : !(existing?.completed ?? false)
 			const baseXP = 10
 			const earned = baseXP * (habit.difficulty || 1)
 			const deltaXp = newCompleted ? Math.round(earned) : -(existing?.xp_awarded || 0)
 			// optimistic cache update
 			const next = (() => {
-				const copy = Array.isArray(previous) ? [...previous] : []
+				const copy = [...cached]
 				const idx = copy.findIndex((p) => p.habit_id === habit.id)
 				if (idx >= 0) {
 					copy[idx] = { ...copy[idx], completed: newCompleted, xp_awarded: newCompleted ? Math.round(earned) : 0 }
@@ -66,11 +69,15 @@ export function Home() {
 			})()
 			qc.setQueryData(['progress', user?.id, todayISO], next)
 			try { useUsersStore.getState().optimisticUpdateXp(deltaXp) } catch {}
-			return { previous, deltaXp }
+			return { previous, deltaXp, desired: newCompleted, habitId: habit.id }
 		},
-		mutationFn: async (habit) => {
-			const existing = progressMap.get(habit.id)
-			const newCompleted = !(existing?.completed ?? false)
+		mutationFn: async (payload) => {
+			const habit = payload?.habit || payload
+			const desired = payload?.desired
+			// IMPORTANT: read latest cache, not render-time progressMap, to avoid stale flips on rapid toggles
+			const cached = qc.getQueryData(['progress', user?.id, todayISO]) || []
+			const existing = Array.isArray(cached) ? cached.find((p) => p.habit_id === habit.id) : undefined
+			const newCompleted = typeof desired === 'boolean' ? desired : !(existing?.completed ?? false)
 			const baseXP = 10
 			// calcular streakDays: consecutivos en días programados
 			let streakDays = 0
@@ -183,12 +190,12 @@ export function Home() {
 	}
 
 	const renderHabit = ({ item }) => {
-		const done = progressMap.get(item.id)?.completed
+		const done = !!progressMap.get(item.id)?.completed
 		return (
 			<HabitCard
 				habit={item}
-				done={!!done}
-				onToggle={() => toggleMutation.mutate(item)}
+				done={done}
+				onToggle={() => toggleMutation.mutate({ habit: item, desired: !done })}
 			/>
 		)
 	}
