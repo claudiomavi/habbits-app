@@ -141,6 +141,7 @@ export function Home() {
 				dateISO: todayISO,
 				completed: newCompleted,
 				xp_awarded: newCompleted ? Math.round(earned) : 0,
+				client_awarded: existing?.xp_awarded || 0,
 			})
 			return { res, deltaXp }
 		},

@@ -66,7 +66,7 @@ export async function getProgressHistoryForHabit(user_id, habit_id, untilISO, li
   return data || []
 }
 
-export async function upsertProgress({ habit_id, user_id, dateISO, completed, xp_awarded = 0 }) {
+export async function upsertProgress({ habit_id, user_id, dateISO, completed, xp_awarded = 0, client_awarded = null }) {
   // try existing
   const { data: existing, error: findErr } = await supabase
     .from('progress_entries')
@@ -88,8 +88,10 @@ export async function upsertProgress({ habit_id, user_id, dateISO, completed, xp
         .eq('id', existing.id)
       if (delErr) throw delErr
     }
+    // Fallback: if not found, use client_awarded as last known awarded value
+    const toRemove = removedXp || (client_awarded ? Math.round(client_awarded) : 0)
     // Return a synthetic response to update cache/UI coherently
-    return { id: existing?.id || `tmp_${habit_id}_${dateISO}`, habit_id, user_id, date: dateISO, completed: false, xp_awarded: 0, xp_delta: -Math.round(removedXp) }
+    return { id: existing?.id || `tmp_${habit_id}_${dateISO}`, habit_id, user_id, date: dateISO, completed: false, xp_awarded: 0, xp_delta: -toRemove }
   }
 
   // When checking as completed, upsert/insert
