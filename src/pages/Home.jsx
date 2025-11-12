@@ -41,19 +41,32 @@ export function Home() {
 
 	const toggleMutation = useMutation({
 		onMutate: async (habit) => {
-			// Este hook se ejecuta antes de la mutación => update optimista
+			await qc.cancelQueries({ queryKey: ['progress', user?.id, todayISO] })
+			const previous = qc.getQueryData(['progress', user?.id, todayISO]) || []
 			const existing = progressMap.get(habit.id)
 			const newCompleted = !(existing?.completed ?? false)
 			const baseXP = 10
-			// streak rápida mínima (no conocemos historia aún), no sumar streak aquí para evitar sobreestimar
 			const earned = baseXP * (habit.difficulty || 1)
-			const deltaXp = newCompleted
-				? Math.round(earned)
-				: -(existing?.xp_awarded || 0)
-			try {
-				useUsersStore.getState().optimisticUpdateXp(deltaXp)
-			} catch {}
-			return { deltaXp }
+			const deltaXp = newCompleted ? Math.round(earned) : -(existing?.xp_awarded || 0)
+			// optimistic cache update
+			const next = (() => {
+				const copy = Array.isArray(previous) ? [...previous] : []
+				const idx = copy.findIndex((p) => p.habit_id === habit.id)
+				if (idx >= 0) {
+					copy[idx] = { ...copy[idx], completed: newCompleted, xp_awarded: newCompleted ? Math.round(earned) : 0 }
+				} else {
+					copy.push({ id: `tmp_${habit.id}_${todayISO}`,
+						habit_id: habit.id,
+						user_id: user.id,
+						date: todayISO,
+						completed: newCompleted,
+						xp_awarded: newCompleted ? Math.round(earned) : 0 })
+				}
+				return copy
+			})()
+			qc.setQueryData(['progress', user?.id, todayISO], next)
+			try { useUsersStore.getState().optimisticUpdateXp(deltaXp) } catch {}
+			return { previous, deltaXp }
 		},
 		mutationFn: async (habit) => {
 			const existing = progressMap.get(habit.id)
@@ -132,6 +145,15 @@ export function Home() {
 				} catch (e) {
 					console.warn('xp update', e)
 				}
+			}
+		},
+		onError: (err, habit, context) => {
+			if (context?.previous) {
+				qc.setQueryData(['progress', user?.id, todayISO], context.previous)
+			}
+			// rollback xp
+			if (context?.deltaXp) {
+				try { useUsersStore.getState().optimisticUpdateXp(-context.deltaXp) } catch {}
 			}
 		},
 	})
