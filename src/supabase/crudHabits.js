@@ -79,7 +79,9 @@ export async function upsertProgress({ habit_id, user_id, dateISO, completed, xp
 
   // If unchecking, delete entry instead of storing completed=false
   if (!completed) {
+    let removedXp = 0
     if (existing) {
+      removedXp = existing.xp_awarded || 0
       const { error: delErr } = await supabase
         .from('progress_entries')
         .delete()
@@ -87,7 +89,7 @@ export async function upsertProgress({ habit_id, user_id, dateISO, completed, xp
       if (delErr) throw delErr
     }
     // Return a synthetic response to update cache/UI coherently
-    return { id: existing?.id || `tmp_${habit_id}_${dateISO}`, habit_id, user_id, date: dateISO, completed: false, xp_awarded: 0 }
+    return { id: existing?.id || `tmp_${habit_id}_${dateISO}`, habit_id, user_id, date: dateISO, completed: false, xp_awarded: 0, xp_delta: -Math.round(removedXp) }
   }
 
   // When checking as completed, upsert/insert
@@ -100,7 +102,7 @@ export async function upsertProgress({ habit_id, user_id, dateISO, completed, xp
       .select()
       .single()
     if (error) throw error
-    updated = data
+    updated = { ...data, xp_delta: Math.round(xp_awarded - (existing.xp_awarded || 0)) }
   } else {
     const { data, error } = await supabase
       .from('progress_entries')
@@ -108,7 +110,7 @@ export async function upsertProgress({ habit_id, user_id, dateISO, completed, xp
       .select()
       .single()
     if (error) throw error
-    updated = data
+    updated = { ...data, xp_delta: Math.round(xp_awarded) }
   }
 
   // Cleanup duplicates for same (user, habit, date)

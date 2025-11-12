@@ -146,9 +146,10 @@ export function Home() {
 		},
 		onSuccess: async ({ res, deltaXp }, habit) => {
 			await qc.invalidateQueries({ queryKey: ['progress', user?.id, todayISO] })
-			if (deltaXp) {
+			const serverDelta = typeof res?.xp_delta === 'number' ? res.xp_delta : deltaXp
+			if (serverDelta) {
 				try {
-					await updateProfileXpAndLevel(user.id, deltaXp)
+					await updateProfileXpAndLevel(user.id, serverDelta)
 				} catch (e) {
 					console.warn('xp update', e)
 				}
