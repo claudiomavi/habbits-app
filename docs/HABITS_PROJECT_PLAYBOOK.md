@@ -48,6 +48,7 @@ Este documento resume la visión, reglas, estilos, convenciones de desarrollo y 
 ## 3) Estructura de carpetas (resumen)
 
 Modelo Atomic Design
+
 - Atoms (atomos): piezas UI indivisibles (botones básicos, inputs, badges).
 - Molecules (moleculas): combinación simple de átomos (XPBar, DifficultyBadge).
 - Organisms (organismos): secciones con funcionalidad (HeaderBar, HabitCard, CardContainer).
@@ -55,11 +56,10 @@ Modelo Atomic Design
 - Pages: orquestación de datos, lógica de formularios y navegación; consumen Templates y componentes.
 
 Rationale (por qué Templates + Pages)
+
 - Los Templates fijan estructura y estilo común entre pantallas, evitando duplicación de UI.
 - Las Pages se enfocan en la lógica de negocio: TanStack Query/fetch, stores Zustand, react-hook-form y navegación.
 - Facilita reuse, pruebas y mantenimiento; reduce conflicto al tocar estilos.
-
-
 
 - src/pages: pantallas (Login, Register, CreateProfile, Home, ...)
 - src/stores: Zustand stores (AuthStore, UsersStore, HabitsStore)
@@ -211,7 +211,7 @@ Nota: ajusta los tipos/constraints definitivos en la DB si es necesario.
 ## 8) Reglas de XP / niveles (propuesta)
 
 - baseXP = 10
-- XP por completado = baseXP _ difficulty _ streakMultiplier
+- XP por completado = baseXP _difficulty_ streakMultiplier
   - difficulty: 1, 2, o 3
   - streakMultiplier = 1 + (streakDays \* 0.05), cap en 2.0
 - Level (ejemplo): level = floor(sqrt(totalXP / 100)) + 1
@@ -255,146 +255,146 @@ RLS (Row-Level Security)
 
 ```json
 [
-  {
-    "schemaname": "public",
-    "tablename": "group_members",
-    "policyname": "members can view members",
-    "permissive": "PERMISSIVE",
-    "roles": "{public}",
-    "cmd": "SELECT",
-    "qual": "(EXISTS ( SELECT 1\n FROM group_members gm\n WHERE ((gm.group_id = group_members.group_id) AND (gm.user_id = auth.uid()))))",
-    "with_check": null
-  },
-  {
-    "schemaname": "public",
-    "tablename": "group_members",
-    "policyname": "user can insert self",
-    "permissive": "PERMISSIVE",
-    "roles": "{public}",
-    "cmd": "INSERT",
-    "qual": null,
-    "with_check": "(user_id = auth.uid())"
-  },
-  {
-    "schemaname": "public",
-    "tablename": "groups",
-    "policyname": "members can view group",
-    "permissive": "PERMISSIVE",
-    "roles": "{public}",
-    "cmd": "SELECT",
-    "qual": "(EXISTS ( SELECT 1\n FROM group_members gm\n WHERE ((gm.group_id = gm.id) AND (gm.user_id = auth.uid()))))",
-    "with_check": null
-  },
-  {
-    "schemaname": "public",
-    "tablename": "groups",
-    "policyname": "owner can modify group",
-    "permissive": "PERMISSIVE",
-    "roles": "{public}",
-    "cmd": "UPDATE",
-    "qual": "(owner_id = auth.uid())",
-    "with_check": null
-  },
-  {
-    "schemaname": "public",
-    "tablename": "groups",
-    "policyname": "owner can delete group",
-    "permissive": "PERMISSIVE",
-    "roles": "{public}",
-    "cmd": "DELETE",
-    "qual": "(owner_id = auth.uid())",
-    "with_check": null
-  },
-  {
-    "schemaname": "public",
-    "tablename": "habits",
-    "policyname": "users can view own habits",
-    "permissive": "PERMISSIVE",
-    "roles": "{public}",
-    "cmd": "SELECT",
-    "qual": "(auth.uid() = created_by)",
-    "with_check": null
-  },
-  {
-    "schemaname": "public",
-    "tablename": "habits",
-    "policyname": "users can delete own habits",
-    "permissive": "PERMISSIVE",
-    "roles": "{public}",
-    "cmd": "DELETE",
-    "qual": "(auth.uid() = created_by)",
-    "with_check": null
-  },
-  {
-    "schemaname": "public",
-    "tablename": "habits",
-    "policyname": "users can insert habits",
-    "permissive": "PERMISSIVE",
-    "roles": "{public}",
-    "cmd": "INSERT",
-    "qual": null,
-    "with_check": "(auth.uid() = created_by)"
-  },
-  {
-    "schemaname": "public",
-    "tablename": "habits",
-    "policyname": "users can modify own habits",
-    "permissive": "PERMISSIVE",
-    "roles": "{public}",
-    "cmd": "UPDATE",
-    "qual": "(auth.uid() = created_by)",
-    "with_check": null
-  },
-  {
-    "schemaname": "public",
-    "tablename": "profiles",
-    "policyname": "users can insert their own profile",
-    "permissive": "PERMISSIVE",
-    "roles": "{public}",
-    "cmd": "INSERT",
-    "qual": null,
-    "with_check": "(auth.uid() = id_auth)"
-  },
-  {
-    "schemaname": "public",
-    "tablename": "profiles",
-    "policyname": "users can view self",
-    "permissive": "PERMISSIVE",
-    "roles": "{public}",
-    "cmd": "SELECT",
-    "qual": "(auth.uid() = id_auth)",
-    "with_check": null
-  },
-  {
-    "schemaname": "public",
-    "tablename": "profiles",
-    "policyname": "users can update self",
-    "permissive": "PERMISSIVE",
-    "roles": "{public}",
-    "cmd": "UPDATE",
-    "qual": "(auth.uid() = id_auth)",
-    "with_check": null
-  },
-  {
-    "schemaname": "public",
-    "tablename": "progress_entries",
-    "policyname": "users can view own progress",
-    "permissive": "PERMISSIVE",
-    "roles": "{public}",
-    "cmd": "SELECT",
-    "qual": "(auth.uid() = user_id)",
-    "with_check": null
-  },
-  {
-    "schemaname": "public",
-    "tablename": "progress_entries",
-    "policyname": "users can insert own progress",
-    "permissive": "PERMISSIVE",
-    "roles": "{public}",
-    "cmd": "INSERT",
-    "qual": null,
-    "with_check": "(auth.uid() = user_id)"
-  }
+	{
+		"schemaname": "public",
+		"tablename": "group_members",
+		"policyname": "members can view members",
+		"permissive": "PERMISSIVE",
+		"roles": "{public}",
+		"cmd": "SELECT",
+		"qual": "(EXISTS ( SELECT 1\n FROM group_members gm\n WHERE ((gm.group_id = group_members.group_id) AND (gm.user_id = auth.uid()))))",
+		"with_check": null
+	},
+	{
+		"schemaname": "public",
+		"tablename": "group_members",
+		"policyname": "user can insert self",
+		"permissive": "PERMISSIVE",
+		"roles": "{public}",
+		"cmd": "INSERT",
+		"qual": null,
+		"with_check": "(user_id = auth.uid())"
+	},
+	{
+		"schemaname": "public",
+		"tablename": "groups",
+		"policyname": "members can view group",
+		"permissive": "PERMISSIVE",
+		"roles": "{public}",
+		"cmd": "SELECT",
+		"qual": "(EXISTS ( SELECT 1\n FROM group_members gm\n WHERE ((gm.group_id = gm.id) AND (gm.user_id = auth.uid()))))",
+		"with_check": null
+	},
+	{
+		"schemaname": "public",
+		"tablename": "groups",
+		"policyname": "owner can modify group",
+		"permissive": "PERMISSIVE",
+		"roles": "{public}",
+		"cmd": "UPDATE",
+		"qual": "(owner_id = auth.uid())",
+		"with_check": null
+	},
+	{
+		"schemaname": "public",
+		"tablename": "groups",
+		"policyname": "owner can delete group",
+		"permissive": "PERMISSIVE",
+		"roles": "{public}",
+		"cmd": "DELETE",
+		"qual": "(owner_id = auth.uid())",
+		"with_check": null
+	},
+	{
+		"schemaname": "public",
+		"tablename": "habits",
+		"policyname": "users can view own habits",
+		"permissive": "PERMISSIVE",
+		"roles": "{public}",
+		"cmd": "SELECT",
+		"qual": "(auth.uid() = created_by)",
+		"with_check": null
+	},
+	{
+		"schemaname": "public",
+		"tablename": "habits",
+		"policyname": "users can delete own habits",
+		"permissive": "PERMISSIVE",
+		"roles": "{public}",
+		"cmd": "DELETE",
+		"qual": "(auth.uid() = created_by)",
+		"with_check": null
+	},
+	{
+		"schemaname": "public",
+		"tablename": "habits",
+		"policyname": "users can insert habits",
+		"permissive": "PERMISSIVE",
+		"roles": "{public}",
+		"cmd": "INSERT",
+		"qual": null,
+		"with_check": "(auth.uid() = created_by)"
+	},
+	{
+		"schemaname": "public",
+		"tablename": "habits",
+		"policyname": "users can modify own habits",
+		"permissive": "PERMISSIVE",
+		"roles": "{public}",
+		"cmd": "UPDATE",
+		"qual": "(auth.uid() = created_by)",
+		"with_check": null
+	},
+	{
+		"schemaname": "public",
+		"tablename": "profiles",
+		"policyname": "users can insert their own profile",
+		"permissive": "PERMISSIVE",
+		"roles": "{public}",
+		"cmd": "INSERT",
+		"qual": null,
+		"with_check": "(auth.uid() = id_auth)"
+	},
+	{
+		"schemaname": "public",
+		"tablename": "profiles",
+		"policyname": "users can view self",
+		"permissive": "PERMISSIVE",
+		"roles": "{public}",
+		"cmd": "SELECT",
+		"qual": "(auth.uid() = id_auth)",
+		"with_check": null
+	},
+	{
+		"schemaname": "public",
+		"tablename": "profiles",
+		"policyname": "users can update self",
+		"permissive": "PERMISSIVE",
+		"roles": "{public}",
+		"cmd": "UPDATE",
+		"qual": "(auth.uid() = id_auth)",
+		"with_check": null
+	},
+	{
+		"schemaname": "public",
+		"tablename": "progress_entries",
+		"policyname": "users can view own progress",
+		"permissive": "PERMISSIVE",
+		"roles": "{public}",
+		"cmd": "SELECT",
+		"qual": "(auth.uid() = user_id)",
+		"with_check": null
+	},
+	{
+		"schemaname": "public",
+		"tablename": "progress_entries",
+		"policyname": "users can insert own progress",
+		"permissive": "PERMISSIVE",
+		"roles": "{public}",
+		"cmd": "INSERT",
+		"qual": null,
+		"with_check": "(auth.uid() = user_id)"
+	}
 ]
 ```
 
@@ -402,246 +402,606 @@ RLS (Row-Level Security)
 
 ```json
 [
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "INSERT",
-    "grantee": "postgres"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "SELECT",
-    "grantee": "postgres"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "UPDATE",
-    "grantee": "postgres"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "DELETE",
-    "grantee": "postgres"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "TRUNCATE",
-    "grantee": "postgres"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "REFERENCES",
-    "grantee": "postgres"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "TRIGGER",
-    "grantee": "postgres"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "INSERT",
-    "grantee": "anon"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "SELECT",
-    "grantee": "anon"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "UPDATE",
-    "grantee": "anon"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "DELETE",
-    "grantee": "anon"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "TRUNCATE",
-    "grantee": "anon"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "REFERENCES",
-    "grantee": "anon"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "TRIGGER",
-    "grantee": "anon"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "INSERT",
-    "grantee": "authenticated"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "SELECT",
-    "grantee": "authenticated"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "UPDATE",
-    "grantee": "authenticated"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "DELETE",
-    "grantee": "authenticated"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "TRUNCATE",
-    "grantee": "authenticated"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "REFERENCES",
-    "grantee": "authenticated"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "TRIGGER",
-    "grantee": "authenticated"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "INSERT",
-    "grantee": "service_role"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "SELECT",
-    "grantee": "service_role"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "UPDATE",
-    "grantee": "service_role"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "DELETE",
-    "grantee": "service_role"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "TRUNCATE",
-    "grantee": "service_role"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "REFERENCES",
-    "grantee": "service_role"
-  },
-  {
-    "table_schema": "public",
-    "table_name": "group_members",
-    "privilege_type": "TRIGGER",
-    "grantee": "service_role"
-  },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "INSERT", "grantee": "anon" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "REFERENCES", "grantee": "service_role" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "TRUNCATE", "grantee": "service_role" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "DELETE", "grantee": "service_role" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "UPDATE", "grantee": "service_role" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "SELECT", "grantee": "service_role" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "INSERT", "grantee": "service_role" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "TRIGGER", "grantee": "authenticated" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "REFERENCES", "grantee": "authenticated" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "TRUNCATE", "grantee": "authenticated" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "DELETE", "grantee": "authenticated" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "UPDATE", "grantee": "authenticated" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "SELECT", "grantee": "authenticated" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "INSERT", "grantee": "authenticated" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "TRIGGER", "grantee": "anon" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "REFERENCES", "grantee": "anon" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "TRUNCATE", "grantee": "anon" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "DELETE", "grantee": "anon" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "UPDATE", "grantee": "anon" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "SELECT", "grantee": "anon" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "TRIGGER", "grantee": "service_role" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "TRIGGER", "grantee": "postgres" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "REFERENCES", "grantee": "postgres" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "TRUNCATE", "grantee": "postgres" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "DELETE", "grantee": "postgres" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "UPDATE", "grantee": "postgres" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "SELECT", "grantee": "postgres" },
-  { "table_schema": "public", "table_name": "groups", "privilege_type": "INSERT", "grantee": "postgres" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "TRIGGER", "grantee": "service_role" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "REFERENCES", "grantee": "service_role" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "TRUNCATE", "grantee": "service_role" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "DELETE", "grantee": "service_role" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "UPDATE", "grantee": "service_role" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "SELECT", "grantee": "service_role" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "INSERT", "grantee": "service_role" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "TRIGGER", "grantee": "authenticated" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "REFERENCES", "grantee": "authenticated" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "TRUNCATE", "grantee": "authenticated" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "DELETE", "grantee": "authenticated" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "UPDATE", "grantee": "authenticated" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "SELECT", "grantee": "authenticated" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "INSERT", "grantee": "authenticated" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "TRIGGER", "grantee": "anon" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "REFERENCES", "grantee": "anon" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "TRUNCATE", "grantee": "anon" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "DELETE", "grantee": "anon" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "UPDATE", "grantee": "anon" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "SELECT", "grantee": "anon" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "INSERT", "grantee": "anon" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "TRIGGER", "grantee": "postgres" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "REFERENCES", "grantee": "postgres" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "TRUNCATE", "grantee": "postgres" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "DELETE", "grantee": "postgres" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "UPDATE", "grantee": "postgres" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "SELECT", "grantee": "postgres" },
-  { "table_schema": "public", "table_name": "habit_stats", "privilege_type": "INSERT", "grantee": "postgres" },
-  { "table_schema": "public", "table_name": "habits", "privilege_type": "TRIGGER", "grantee": "service_role" },
-  { "table_schema": "public", "table_name": "habits", "privilege_type": "REFERENCES", "grantee": "service_role" },
-  { "table_schema": "public", "table_name": "habits", "privilege_type": "TRUNCATE", "grantee": "service_role" },
-  { "table_schema": "public", "table_name": "habits", "privilege_type": "DELETE", "grantee": "service_role" },
-  { "table_schema": "public", "table_name": "habits", "privilege_type": "UPDATE", "grantee": "service_role" },
-  { "table_schema": "public", "table_name": "habits", "privilege_type": "SELECT", "grantee": "service_role" },
-  { "table_schema": "public", "table_name": "habits", "privilege_type": "INSERT", "grantee": "service_role" },
-  { "table_schema": "public", "table_name": "habits", "privilege_type": "TRIGGER", "grantee": "authenticated" },
-  { "table_schema": "public", "table_name": "habits", "privilege_type": "REFERENCES", "grantee": "authenticated" },
-  { "table_schema": "public", "table_name": "habits", "privilege_type": "TRUNCATE", "grantee": "authenticated" },
-  { "table_schema": "public", "table_name": "habits", "privilege_type": "DELETE", "grantee": "authenticated" },
-  { "table_schema": "public", "table_name": "habits", "privilege_type": "UPDATE", "grantee": "authenticated" },
-  { "table_schema": "public", "table_name": "habits", "privilege_type": "SELECT", "grantee": "authenticated" },
-  { "table_schema": "public", "table_name": "habits", "privilege_type": "INSERT", "grantee": "authenticated" },
-  { "table_schema": "public", "table_name": "habits", "privilege_type": "TRIGGER", "grantee": "anon" },
-  { "table_schema": "public", "table_name": "habits", "privilege_type": "REFERENCES", "grantee": "anon" }
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "INSERT",
+		"grantee": "postgres"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "SELECT",
+		"grantee": "postgres"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "UPDATE",
+		"grantee": "postgres"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "DELETE",
+		"grantee": "postgres"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "TRUNCATE",
+		"grantee": "postgres"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "REFERENCES",
+		"grantee": "postgres"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "TRIGGER",
+		"grantee": "postgres"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "INSERT",
+		"grantee": "anon"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "SELECT",
+		"grantee": "anon"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "UPDATE",
+		"grantee": "anon"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "DELETE",
+		"grantee": "anon"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "TRUNCATE",
+		"grantee": "anon"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "REFERENCES",
+		"grantee": "anon"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "TRIGGER",
+		"grantee": "anon"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "INSERT",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "SELECT",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "UPDATE",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "DELETE",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "TRUNCATE",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "REFERENCES",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "TRIGGER",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "INSERT",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "SELECT",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "UPDATE",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "DELETE",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "TRUNCATE",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "REFERENCES",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "group_members",
+		"privilege_type": "TRIGGER",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "INSERT",
+		"grantee": "anon"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "REFERENCES",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "TRUNCATE",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "DELETE",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "UPDATE",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "SELECT",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "INSERT",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "TRIGGER",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "REFERENCES",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "TRUNCATE",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "DELETE",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "UPDATE",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "SELECT",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "INSERT",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "TRIGGER",
+		"grantee": "anon"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "REFERENCES",
+		"grantee": "anon"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "TRUNCATE",
+		"grantee": "anon"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "DELETE",
+		"grantee": "anon"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "UPDATE",
+		"grantee": "anon"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "SELECT",
+		"grantee": "anon"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "TRIGGER",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "TRIGGER",
+		"grantee": "postgres"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "REFERENCES",
+		"grantee": "postgres"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "TRUNCATE",
+		"grantee": "postgres"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "DELETE",
+		"grantee": "postgres"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "UPDATE",
+		"grantee": "postgres"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "SELECT",
+		"grantee": "postgres"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "groups",
+		"privilege_type": "INSERT",
+		"grantee": "postgres"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "TRIGGER",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "REFERENCES",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "TRUNCATE",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "DELETE",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "UPDATE",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "SELECT",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "INSERT",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "TRIGGER",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "REFERENCES",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "TRUNCATE",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "DELETE",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "UPDATE",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "SELECT",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "INSERT",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "TRIGGER",
+		"grantee": "anon"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "REFERENCES",
+		"grantee": "anon"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "TRUNCATE",
+		"grantee": "anon"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "DELETE",
+		"grantee": "anon"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "UPDATE",
+		"grantee": "anon"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "SELECT",
+		"grantee": "anon"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "INSERT",
+		"grantee": "anon"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "TRIGGER",
+		"grantee": "postgres"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "REFERENCES",
+		"grantee": "postgres"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "TRUNCATE",
+		"grantee": "postgres"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "DELETE",
+		"grantee": "postgres"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "UPDATE",
+		"grantee": "postgres"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "SELECT",
+		"grantee": "postgres"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habit_stats",
+		"privilege_type": "INSERT",
+		"grantee": "postgres"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habits",
+		"privilege_type": "TRIGGER",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habits",
+		"privilege_type": "REFERENCES",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habits",
+		"privilege_type": "TRUNCATE",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habits",
+		"privilege_type": "DELETE",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habits",
+		"privilege_type": "UPDATE",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habits",
+		"privilege_type": "SELECT",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habits",
+		"privilege_type": "INSERT",
+		"grantee": "service_role"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habits",
+		"privilege_type": "TRIGGER",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habits",
+		"privilege_type": "REFERENCES",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habits",
+		"privilege_type": "TRUNCATE",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habits",
+		"privilege_type": "DELETE",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habits",
+		"privilege_type": "UPDATE",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habits",
+		"privilege_type": "SELECT",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habits",
+		"privilege_type": "INSERT",
+		"grantee": "authenticated"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habits",
+		"privilege_type": "TRIGGER",
+		"grantee": "anon"
+	},
+	{
+		"table_schema": "public",
+		"table_name": "habits",
+		"privilege_type": "REFERENCES",
+		"grantee": "anon"
+	}
 ]
 ```
 
