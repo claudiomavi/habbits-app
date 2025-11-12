@@ -47,6 +47,8 @@ export async function getProgressForDate(user_id, dateISO) {
     .select('*')
     .eq('user_id', user_id)
     .eq('date', dateISO)
+    .order('created_at', { ascending: true })
+    .order('id', { ascending: true })
   if (error) throw error
   return data || []
 }
@@ -75,24 +77,59 @@ export async function upsertProgress({ habit_id, user_id, dateISO, completed, xp
     .maybeSingle()
   if (findErr) throw findErr
 
+  // If unchecking, delete entry instead of storing completed=false
+  if (!completed) {
+    if (existing) {
+      const { error: delErr } = await supabase
+        .from('progress_entries')
+        .delete()
+        .eq('id', existing.id)
+      if (delErr) throw delErr
+    }
+    // Return a synthetic response to update cache/UI coherently
+    return { id: existing?.id || `tmp_${habit_id}_${dateISO}`, habit_id, user_id, date: dateISO, completed: false, xp_awarded: 0 }
+  }
+
+  // When checking as completed, upsert/insert
+  let updated
   if (existing) {
     const { data, error } = await supabase
       .from('progress_entries')
-      .update({ completed, xp_awarded })
+      .update({ completed: true, xp_awarded })
       .eq('id', existing.id)
       .select()
       .single()
     if (error) throw error
-    return data
+    updated = data
   } else {
     const { data, error } = await supabase
       .from('progress_entries')
-      .insert({ habit_id, user_id, date: dateISO, completed, xp_awarded })
+      .insert({ habit_id, user_id, date: dateISO, completed: true, xp_awarded })
       .select()
       .single()
     if (error) throw error
-    return data
+    updated = data
   }
+
+  // Cleanup duplicates for same (user, habit, date)
+  try {
+    const { data: dupes } = await supabase
+      .from('progress_entries')
+      .select('id')
+      .eq('habit_id', habit_id)
+      .eq('user_id', user_id)
+      .eq('date', dateISO)
+    const ids = (dupes || []).map((d) => d.id).filter((id) => id !== updated.id)
+    if (ids.length) {
+      await supabase
+        .from('progress_entries')
+        .delete()
+        .in('id', ids)
+    }
+  } catch (e) {
+    console.warn('dupe clean failed', e)
+  }
+  return updated
 }
 
 // XP helper: increment profile XP
