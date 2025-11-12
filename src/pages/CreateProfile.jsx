@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Alert } from 'react-native'
 import {
@@ -16,12 +16,31 @@ export function CreateProfile() {
 
 	const [selectedAvatar, setSelectedAvatar] = useState(null)
 	const [loading, setLoading] = useState(false)
+	const [avatars, setAvatars] = useState([])
 
-	// Avatares (puedes cambiar las URLs)
-	const avatars = [
-		{ id: 'male', uri: 'https://imgur.com/dYYo70A.png', label: 'Hombre' },
-		{ id: 'female', uri: 'https://imgur.com/0MyPvoE.png', label: 'Mujer' },
-	]
+	useEffect(() => {
+		let mounted = true
+		import('../autoBarrell').then(async ({ getCharacters, getImageForLevel }) => {
+			try {
+				const chars = await getCharacters()
+				if (!mounted) return
+				const mapped = chars.map((c) => ({
+					id: c.id,
+					uri: getImageForLevel(c, 1),
+					label: c.name || c.key || 'Personaje',
+					_character: c,
+				}))
+				setAvatars(mapped)
+				// preselect first if none
+				if (!selectedAvatar && mapped[0]?.uri) setSelectedAvatar(mapped[0])
+			} catch (e) {
+				console.warn('characters load', e)
+			}
+		})
+		return () => {
+			mounted = false
+		}
+	}, [])
 
 	const onSubmit = async (data) => {
 		if (!selectedAvatar) {
@@ -35,7 +54,8 @@ export function CreateProfile() {
 				id_auth: user?.id,
 				email: user?.email,
 				display_name: data.display_name,
-				avatar: selectedAvatar,
+				avatar: selectedAvatar?.uri,
+				character_id: selectedAvatar?.id || null,
 				xp: 0,
 				level: 1,
 			})

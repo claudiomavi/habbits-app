@@ -116,13 +116,13 @@ export function CreateProfileTemplate({
 						<View style={styles.avatarSection}>
 							<Text style={styles.label}>Elige tu personaje</Text>
 							<View style={styles.avatarContainer}>
-								{avatars.map((avatar) => (
+								{(avatars || []).map((avatar) => (
 									<TouchableOpacity
 										key={avatar.id}
-										onPress={() => setSelectedAvatar(avatar.uri)}
+										onPress={() => setSelectedAvatar(avatar)}
 										style={[
 											styles.avatarOption,
-											selectedAvatar === avatar.uri && styles.avatarSelected,
+											selectedAvatar?.uri === avatar.uri && styles.avatarSelected,
 										]}
 										activeOpacity={0.7}
 									>
@@ -133,7 +133,7 @@ export function CreateProfileTemplate({
 										<Text
 											style={[
 												styles.avatarLabel,
-												selectedAvatar === avatar.uri &&
+												selectedAvatar?.uri === avatar.uri &&
 													styles.avatarLabelSelected,
 											]}
 										>

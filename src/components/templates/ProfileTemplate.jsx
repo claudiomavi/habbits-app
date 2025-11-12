@@ -15,7 +15,13 @@ import {
 	XPBar,
 } from '../../autoBarrell'
 
-export function ProfileTemplate({ profile, xpPercent = 0, saving, onSave }) {
+export function ProfileTemplate({
+	profile,
+	xpPercent = 0,
+	saving,
+	onSave,
+	avatarOptions = [],
+}) {
 	const [editing, setEditing] = React.useState(false)
 	const [displayName, setDisplayName] = React.useState(
 		profile?.display_name || ''
@@ -31,7 +37,8 @@ export function ProfileTemplate({ profile, xpPercent = 0, saving, onSave }) {
 	const avatarUri = avatar?.uri || avatar
 
 	const saveChanges = () => {
-		const patch = { display_name: displayName, avatar }
+		const avatarValue = avatar?.uri || avatar || null
+		const patch = { display_name: displayName, avatar: avatarValue }
 		onSave?.(patch)
 		setEditing(false)
 	}
@@ -60,8 +67,10 @@ export function ProfileTemplate({ profile, xpPercent = 0, saving, onSave }) {
 						<XPBar percent={xpPercent} />
 					</View>
 				</View>
+			</CardContainer>
 
-				{editing ? (
+			{editing ? (
+				<CardContainer>
 					<View style={{ gap: 12, marginTop: 12 }}>
 						<Text style={styles.label}>Nombre para mostrar</Text>
 						<TextInput
@@ -73,23 +82,13 @@ export function ProfileTemplate({ profile, xpPercent = 0, saving, onSave }) {
 
 						<Text style={styles.label}>Avatar</Text>
 						<View style={styles.avatarsRow}>
-							{[
-								// utiliza los mismos de CreateProfile como opciones rápidas
-								{
-									id: 'male',
-									uri: 'https://imgur.com/dYYo70A.png',
-									label: 'Hombre',
-								},
-								{
-									id: 'female',
-									uri: 'https://imgur.com/0MyPvoE.png',
-									label: 'Mujer',
-								},
-								{ id: 'none', uri: null, label: 'Inicial' },
-							].map((a) => (
+							{(avatarOptions && avatarOptions.length
+								? avatarOptions
+								: [{ id: 'none', uri: null, label: 'Inicial' }]
+							).map((a) => (
 								<TouchableOpacity
 									key={a.id}
-									onPress={() => setAvatar(a.uri ? a : null)}
+									onPress={() => setAvatar(a && a.uri ? a : null)}
 								>
 									{a.uri ? (
 										<Image
@@ -115,15 +114,15 @@ export function ProfileTemplate({ profile, xpPercent = 0, saving, onSave }) {
 							<Text style={styles.cancel}>Cancelar</Text>
 						</TouchableOpacity>
 					</View>
-				) : (
-					<View style={{ marginTop: 12 }}>
-						<PrimaryButton
-							title="Editar perfil"
-							onPress={() => setEditing(true)}
-						/>
-					</View>
-				)}
-			</CardContainer>
+				</CardContainer>
+			) : (
+				<View style={{ marginTop: 12 }}>
+					<PrimaryButton
+						title="Editar perfil"
+						onPress={() => setEditing(true)}
+					/>
+				</View>
+			)}
 		</GradientBackground>
 	)
 }
