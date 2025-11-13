@@ -1,7 +1,9 @@
 import { ScrollView, StyleSheet, Text } from 'react-native'
-import { CardContainer, GradientBackground } from '../../autoBarrell'
+import { CardContainer, GradientBackground, PrimaryButton } from '../../autoBarrell'
+import { useNavigation } from '@react-navigation/native'
 
 export function CooperativeTemplate() {
+	const navigation = useNavigation()
 	return (
 		<GradientBackground style={styles.container}>
 			<ScrollView contentContainerStyle={styles.scrollContent}>
@@ -11,6 +13,7 @@ export function CooperativeTemplate() {
 						Proximamente: configuración de equipos, invitaciones y progreso
 						compartido.
 					</Text>
+					<PrimaryButton title="Volver" onPress={() => navigation.goBack()} style={{ marginTop: 16 }} />
 				</CardContainer>
 			</ScrollView>
 		</GradientBackground>
