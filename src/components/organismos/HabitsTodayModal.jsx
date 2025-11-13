@@ -1,3 +1,4 @@
+import React from 'react'
 import {
 	ActivityIndicator,
 	Dimensions,
@@ -7,6 +8,9 @@ import {
 	StyleSheet,
 	Text,
 	View,
+	Animated,
+	Easing,
+	TouchableWithoutFeedback,
 } from 'react-native'
 import { CardContainer } from '../../autoBarrell'
 
@@ -17,23 +21,45 @@ export function HabitsTodayModal({
 	renderHabit,
 	loading,
 }) {
+	const [internalVisible, setInternalVisible] = React.useState(visible)
+	const backdrop = React.useRef(new Animated.Value(0)).current
+	const translateY = React.useRef(new Animated.Value(60)).current
+
+	React.useEffect(() => {
+		if (visible) {
+			setInternalVisible(true)
+			Animated.parallel([
+				Animated.timing(backdrop, { toValue: 1, duration: 220, useNativeDriver: true, easing: Easing.out(Easing.cubic) }),
+				Animated.spring(translateY, { toValue: 0, useNativeDriver: true, friction: 8, tension: 60 }),
+			]).start()
+		} else if (internalVisible) {
+			Animated.parallel([
+				Animated.timing(backdrop, { toValue: 0, duration: 180, useNativeDriver: true, easing: Easing.in(Easing.cubic) }),
+				Animated.timing(translateY, { toValue: 60, duration: 180, useNativeDriver: true, easing: Easing.inOut(Easing.quad) }),
+			]).start(() => setInternalVisible(false))
+		}
+	}, [visible])
+
+	const handleClose = () => {
+		Animated.parallel([
+			Animated.timing(backdrop, { toValue: 0, duration: 180, useNativeDriver: true }),
+			Animated.timing(translateY, { toValue: 60, duration: 180, useNativeDriver: true }),
+		]).start(() => onClose?.())
+	}
+
+	if (!internalVisible) return null
+
 	return (
-		<Modal
-			visible={visible}
-			transparent
-			animationType="slide"
-			onRequestClose={onClose}
-		>
-			<View style={styles.backdrop}>
-				<View style={styles.sheet}>
+		<Modal visible transparent animationType="none" onRequestClose={handleClose}>
+			<TouchableWithoutFeedback onPress={handleClose}>
+				<Animated.View style={[styles.backdrop, { opacity: backdrop }]} />
+			</TouchableWithoutFeedback>
+			<View style={styles.absoluteFill} pointerEvents="box-none">
+				<Animated.View style={[styles.sheet, { transform: [{ translateY }] }]}>
 					<CardContainer>
 						<View style={styles.header}>
 							<Text style={styles.title}>Hábitos de hoy</Text>
-							<Pressable
-								onPress={onClose}
-								style={styles.closeBtn}
-								accessibilityLabel="Cerrar"
-							>
+							<Pressable onPress={handleClose} style={styles.closeBtn} accessibilityLabel="Cerrar">
 								<Text style={styles.closeTxt}>✕</Text>
 							</Pressable>
 						</View>
@@ -49,7 +75,7 @@ export function HabitsTodayModal({
 							/>
 						)}
 					</CardContainer>
-				</View>
+				</Animated.View>
 			</View>
 		</Modal>
 	)
@@ -57,8 +83,19 @@ export function HabitsTodayModal({
 
 const styles = StyleSheet.create({
 	backdrop: {
-		flex: 1,
-		backgroundColor: 'rgba(0,0,0,0.35)',
+		position: 'absolute',
+		left: 0,
+		right: 0,
+		top: 0,
+		bottom: 0,
+		backgroundColor: 'rgba(0,0,0,0.45)'
+	},
+	absoluteFill: {
+		position: 'absolute',
+		left: 0,
+		right: 0,
+		top: 0,
+		bottom: 0,
 		justifyContent: 'flex-end',
 	},
 	sheet: {
