@@ -123,7 +123,9 @@ Archivo: `src/supabase/crudHabits.js`
 - updateHabit(id, changes): actualiza un hábito por id.
 - deleteHabit(id): borra un hábito.
 - getProgressForDate(user_id, dateISO): progreso del día para el usuario.
-- upsertProgress({ habit_id, user_id, dateISO, completed, xp_awarded }): crea o actualiza la marca del día.
+- upsertProgress({ habit_id, user_id, dateISO, completed, xp_awarded, client_awarded? }):
+  - Si completed=true → inserta/actualiza la fila con xp_awarded y devuelve xp_delta positivo.
+  - Si completed=false → elimina la fila del día y devuelve xp_delta negativo equivalente al último xp_awarded (usa client_awarded como respaldo).
 
 Store: `src/stores/HabitsStore.js`
 
@@ -198,17 +200,19 @@ Resumen de tablas relevantes (tal como has compartido):
   - id_auth (uuid)
   - email (text)
   - display_name (text)
-  - avatar (text)
+  - character_id (uuid) -- FK a public.characters(id)
   - xp (int)
   - level (int)
   - created_at (timestamptz)
   - updated_at (timestamptz)
 
+Nota: avatar (text) queda deprecado/opcional y no se persiste desde la app; la imagen se resuelve por character_id + level vía tabla characters.
+
 Nota: ajusta los tipos/constraints definitivos en la DB si es necesario.
 
 ---
 
-## 8) Reglas de XP / niveles (propuesta)
+## 8) Reglas de XP / niveles (vigente)
 
 - baseXP = 10
 - XP por completado = baseXP _difficulty_ streakMultiplier
@@ -1039,9 +1043,10 @@ Cómo exportar permisos/políticas (guía rápida):
 
 ### 11.3 Perfil: datos reales y edición
 
-- ProfileTemplate muestra: avatar, nombre, email, nivel, XP bar y permite editar display_name y avatar.
+- ProfileTemplate muestra: imagen de personaje (por nivel), nombre, email, nivel, XP bar, y permite editar display_name y personaje.
 - Profile.jsx asegura el fetch del perfil y calcula el porcentaje de XP del nivel actual.
-- UsersStore expone `updateProfile` y se usa `updateProfileFields` (Supabase) para persistir cambios.
+- UsersStore expone `updateProfile` y se usa `updateProfileFields` (Supabase) para persistir cambios de display_name y character_id.
+- Nota: avatar (text) de profiles queda deprecado/opcional; no se persiste desde la app.
 
 ### 11.4 Personajes (characters) como fuente de avatares
 
@@ -1050,9 +1055,11 @@ Cómo exportar permisos/políticas (guía rápida):
 - CRUD en cliente: `src/supabase/crudCharacters.js`
   - `getCharacters()`, `getCharacterById(id)`, `upsertCharacter(character)`, `deleteCharacter(id)`, `getImageForLevel(character, level)`.
 - Integración:
-  - CreateProfile carga `getCharacters()` y mapea opciones de avatar desde Supabase; guarda `avatar` (uri) y opcional `character_id` en `profiles`.
-  - Profile carga opciones por nivel actual y permite cambiar avatar desde esa lista.
-- Sugerencia de esquema en `profiles`: añadir `character_id uuid references public.characters(id)`.
+  - CreateProfile carga `getCharacters()` y mapea opciones de avatar desde Supabase; guarda `character_id` en `profiles` (sin persistir avatar).
+  - Profile carga opciones por nivel actual y permite cambiar el personaje (actualiza `character_id`).
+- Esquema en `profiles`: `character_id uuid references public.characters(id)`.
+- Render de imagen: se calcula en cliente con `getImageForLevel` en base al `level` actual.
+
 
 ### 11.5 RLS/Permisos necesarios para progreso
 
