@@ -1,6 +1,6 @@
 import React from 'react'
 import { ActivityIndicator, FlatList, StyleSheet, Text } from 'react-native'
-import { CardContainer, GradientBackground, HeaderBar } from '../../autoBarrell'
+import { CardContainer, GradientBackground, HeaderBar, CharacterHero, PrimaryButton } from '../../autoBarrell'
 
 export function HomeTemplate({
 	profile,
@@ -46,6 +46,37 @@ export function HomeTemplate({
 			/>
 
 			<CardContainer>
+				{/* Personaje al centro */}
+				<CharacterHero
+					characterId={profile?.character_id}
+					level={profile?.level ?? 1}
+					fallbackUri={avatarUri}
+					initial={profile?.display_name}
+					size={260}
+				/>
+
+				{/* Acciones rápidas */}
+				<Text style={styles.title}>Acciones</Text>
+				<FlatList
+					data={[
+						{ id: 'today', label: 'Hábitos de hoy', action: 'today' },
+						{ id: 'coop', label: 'Cooperativo (próx.)', action: 'coop', disabled: true },
+						{ id: 'profile', label: 'Perfil', action: 'profile' },
+						{ id: 'stats', label: 'Estadísticas (próx.)', action: 'stats', disabled: true },
+					]}
+					keyExtractor={(item) => item.id}
+					renderItem={({ item }) => (
+						<PrimaryButton
+							title={item.label}
+							onPress={() => console.log('navigate:', item.action)}
+							disabled={item.disabled}
+							style={{ marginVertical: 6 }}
+						/>
+					)}
+					contentContainerStyle={{ gap: 6, paddingVertical: 8 }}
+				/>
+
+				{/* Lista de hábitos del día (visible por ahora; se puede mover a otra pantalla si se desea) */}
 				<Text style={styles.title}>Hábitos de hoy</Text>
 				{habitsLoading || progressLoading ? (
 					<ActivityIndicator />
