@@ -1,5 +1,7 @@
 import React from 'react'
 import {
+	Animated,
+	Easing,
 	Image,
 	StyleSheet,
 	Text,
@@ -33,12 +35,50 @@ export function ProfileTemplate({
 	const [displayUri, setDisplayUri] = React.useState(
 		profile?.avatar?.uri || profile?.avatar || null
 	)
+	// Animación de sección de edición
+	const editOpacity = React.useRef(new Animated.Value(0)).current
+	const editTranslate = React.useRef(new Animated.Value(12)).current
 
 	React.useEffect(() => {
 		setDisplayName(profile?.display_name || '')
 		setAvatar(profile?.avatar || null)
 		setCharacterId(profile?.character_id || null)
 	}, [profile])
+
+	// Animar entrada/salida de la sección de edición
+	React.useEffect(() => {
+		if (editing) {
+			Animated.parallel([
+				Animated.timing(editOpacity, {
+					toValue: 1,
+					duration: 220,
+					useNativeDriver: true,
+					easing: Easing.out(Easing.cubic),
+				}),
+				Animated.timing(editTranslate, {
+					toValue: 0,
+					duration: 220,
+					useNativeDriver: true,
+					easing: Easing.out(Easing.cubic),
+				}),
+			]).start()
+		} else {
+			Animated.parallel([
+				Animated.timing(editOpacity, {
+					toValue: 0,
+					duration: 180,
+					useNativeDriver: true,
+					easing: Easing.in(Easing.cubic),
+				}),
+				Animated.timing(editTranslate, {
+					toValue: 12,
+					duration: 180,
+					useNativeDriver: true,
+					easing: Easing.inOut(Easing.quad),
+				}),
+			]).start()
+		}
+	}, [editing])
 
 	// Resolve display image: prefer character evolution by level; fallback to profile avatar
 	React.useEffect(() => {
@@ -105,55 +145,62 @@ export function ProfileTemplate({
 			</CardContainer>
 
 			{editing ? (
-				<CardContainer marginTop={12}>
-					<View style={{ gap: 12, marginTop: 12 }}>
-						<Text style={styles.label}>Nombre para mostrar</Text>
-						<TextInput
-							value={displayName}
-							onChangeText={setDisplayName}
-							placeholder="Tu nombre"
-							style={styles.input}
-						/>
+				<Animated.View
+					style={{
+						opacity: editOpacity,
+						transform: [{ translateY: editTranslate }],
+					}}
+				>
+					<CardContainer marginTop={12}>
+						<View style={{ gap: 12, marginTop: 12 }}>
+							<Text style={styles.label}>Nombre para mostrar</Text>
+							<TextInput
+								value={displayName}
+								onChangeText={setDisplayName}
+								placeholder="Tu nombre"
+								style={styles.input}
+							/>
 
-						<Text style={styles.label}>Avatar / Personaje</Text>
-						<View style={styles.avatarsRow}>
-							{(avatarOptions && avatarOptions.length
-								? avatarOptions
-								: [{ id: 'none', uri: null, label: 'Inicial' }]
-							).map((a) => (
-								<TouchableOpacity
-									key={a.id}
-									onPress={() => {
-										setAvatar(a && a.uri ? a : null)
-										setCharacterId(a?.id || null)
-										setDisplayUri(a?.uri || null)
-									}}
-								>
-									{a.uri ? (
-										<Image
-											source={{ uri: a.uri }}
-											style={styles.pickAvatar}
-										/>
-									) : (
-										<AvatarInitials
-											text={displayName || initial}
-											size={56}
-										/>
-									)}
-								</TouchableOpacity>
-							))}
+							<Text style={styles.label}>Avatar / Personaje</Text>
+							<View style={styles.avatarsRow}>
+								{(avatarOptions && avatarOptions.length
+									? avatarOptions
+									: [{ id: 'none', uri: null, label: 'Inicial' }]
+								).map((a) => (
+									<TouchableOpacity
+										key={a.id}
+										onPress={() => {
+											setAvatar(a && a.uri ? a : null)
+											setCharacterId(a?.id || null)
+											setDisplayUri(a?.uri || null)
+										}}
+									>
+										{a.uri ? (
+											<Image
+												source={{ uri: a.uri }}
+												style={styles.pickAvatar}
+											/>
+										) : (
+											<AvatarInitials
+												text={displayName || initial}
+												size={56}
+											/>
+										)}
+									</TouchableOpacity>
+								))}
+							</View>
+
+							<PrimaryButton
+								title={saving ? 'Guardando...' : 'Guardar cambios'}
+								onPress={saveChanges}
+								loading={!!saving}
+							/>
+							<TouchableOpacity onPress={() => setEditing(false)}>
+								<Text style={styles.cancel}>Cancelar</Text>
+							</TouchableOpacity>
 						</View>
-
-						<PrimaryButton
-							title={saving ? 'Guardando...' : 'Guardar cambios'}
-							onPress={saveChanges}
-							loading={!!saving}
-						/>
-						<TouchableOpacity onPress={() => setEditing(false)}>
-							<Text style={styles.cancel}>Cancelar</Text>
-						</TouchableOpacity>
-					</View>
-				</CardContainer>
+					</CardContainer>
+				</Animated.View>
 			) : (
 				<View style={{ marginTop: 12 }}>
 					<PrimaryButton
