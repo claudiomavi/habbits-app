@@ -24,6 +24,7 @@ export function ProfileTemplate({
 	onSave,
 	avatarOptions = [],
 }) {
+	const [showEditor, setShowEditor] = React.useState(false)
 	const [editing, setEditing] = React.useState(false)
 	const [displayName, setDisplayName] = React.useState(
 		profile?.display_name || ''
@@ -38,6 +39,9 @@ export function ProfileTemplate({
 	// Animación de sección de edición
 	const editOpacity = React.useRef(new Animated.Value(0)).current
 	const editTranslate = React.useRef(new Animated.Value(12)).current
+	// Animación del botón "Editar perfil" (estado inverso)
+	const btnOpacity = React.useRef(new Animated.Value(1)).current
+	const btnTranslate = React.useRef(new Animated.Value(0)).current
 
 	React.useEffect(() => {
 		setDisplayName(profile?.display_name || '')
@@ -45,40 +49,65 @@ export function ProfileTemplate({
 		setCharacterId(profile?.character_id || null)
 	}, [profile])
 
-	// Animar entrada/salida de la sección de edición
+	// Animar entrada/salida de la sección de edición y botón inverso
 	React.useEffect(() => {
 		if (editing) {
+			setShowEditor(true)
 			Animated.parallel([
 				Animated.timing(editOpacity, {
 					toValue: 1,
-					duration: 220,
+					duration: 300,
 					useNativeDriver: true,
 					easing: Easing.out(Easing.cubic),
 				}),
 				Animated.timing(editTranslate, {
 					toValue: 0,
+					duration: 300,
+					useNativeDriver: true,
+					easing: Easing.out(Easing.cubic),
+				}),
+				Animated.timing(btnOpacity, {
+					toValue: 0,
+					duration: 220,
+					useNativeDriver: true,
+					easing: Easing.out(Easing.cubic),
+				}),
+				Animated.timing(btnTranslate, {
+					toValue: -8,
 					duration: 220,
 					useNativeDriver: true,
 					easing: Easing.out(Easing.cubic),
 				}),
 			]).start()
-		} else {
+		} else if (showEditor) {
 			Animated.parallel([
 				Animated.timing(editOpacity, {
 					toValue: 0,
-					duration: 180,
+					duration: 260,
 					useNativeDriver: true,
-					easing: Easing.in(Easing.cubic),
+					easing: Easing.out(Easing.cubic),
 				}),
 				Animated.timing(editTranslate, {
-					toValue: 12,
-					duration: 180,
+					toValue: 20,
+					duration: 260,
 					useNativeDriver: true,
-					easing: Easing.inOut(Easing.quad),
+					easing: Easing.out(Easing.cubic),
 				}),
-			]).start()
+				Animated.timing(btnOpacity, {
+					toValue: 1,
+					duration: 280,
+					useNativeDriver: true,
+					easing: Easing.out(Easing.cubic),
+				}),
+				Animated.timing(btnTranslate, {
+					toValue: 0,
+					duration: 280,
+					useNativeDriver: true,
+					easing: Easing.out(Easing.cubic),
+				}),
+			]).start(() => setShowEditor(false))
 		}
-	}, [editing])
+	}, [editing, showEditor])
 
 	// Resolve display image: prefer character evolution by level; fallback to profile avatar
 	React.useEffect(() => {
