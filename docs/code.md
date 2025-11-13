@@ -1,9 +1,5 @@
 # IDEAS DESARROLLO
 
-## Arregla documentación
-
-1. Arregla la documentación `(HABITS_PROJECT_PLAYBOOK)` con todo lo que hemos actualizado hasta ahora
-
 ## ARREGLAR LA VISTA DE LOS AVATARES
 
 1. Actualiza el HeaderBar para que, si `profile.character_id` existe, **calcule la imagen por nivel**
