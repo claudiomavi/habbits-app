@@ -214,6 +214,7 @@ export function Home() {
 	const xpPercent =
 		nextBase > currentBase ? (xp - currentBase) / (nextBase - currentBase) : 0
 
+	const navigation = useNavigation()
 	return (
 		<HomeTemplate
 			profile={profile}
@@ -223,6 +224,9 @@ export function Home() {
 			todaysHabits={todaysHabits}
 			renderHabit={renderHabit}
 			xpPercent={xpPercent}
+			onAction={(action) => {
+				if (action === 'coop') navigation.navigate('Cooperative')
+			}}
 		/>
 	)
 }

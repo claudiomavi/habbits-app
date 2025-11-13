@@ -1,6 +1,13 @@
 import React from 'react'
-import { ActivityIndicator, FlatList, StyleSheet, Text } from 'react-native'
-import { CardContainer, GradientBackground, HeaderBar, CharacterHero, PrimaryButton } from '../../autoBarrell'
+import { FlatList, StyleSheet, Text } from 'react-native'
+import {
+	CardContainer,
+	CharacterHero,
+	GradientBackground,
+	HabitsTodayModal,
+	HeaderBar,
+	PrimaryButton,
+} from '../../autoBarrell'
 
 export function HomeTemplate({
 	profile,
@@ -10,8 +17,13 @@ export function HomeTemplate({
 	todaysHabits,
 	renderHabit,
 	xpPercent = 0,
+	onAction,
 }) {
-	const [avatarUri, setAvatarUri] = React.useState(profile?.avatar?.uri || profile?.avatar || null)
+	const [showToday, setShowToday] = React.useState(false)
+
+	const [avatarUri, setAvatarUri] = React.useState(
+		profile?.avatar?.uri || profile?.avatar || null
+	)
 	React.useEffect(() => {
 		let mounted = true
 		const load = async () => {
@@ -22,7 +34,9 @@ export function HomeTemplate({
 					if (mounted) setAvatarUri(fallback)
 					return
 				}
-				const { getCharacterById, getImageForLevel } = await import('../../autoBarrell')
+				const { getCharacterById, getImageForLevel } = await import(
+					'../../autoBarrell'
+				)
 				const character = await getCharacterById(profile.character_id)
 				const evolved = getImageForLevel(character, level) || fallback
 				if (mounted) setAvatarUri(evolved)
@@ -31,7 +45,9 @@ export function HomeTemplate({
 			}
 		}
 		load()
-		return () => { mounted = false }
+		return () => {
+			mounted = false
+		}
 	}, [profile?.character_id, profile?.level, profile?.avatar])
 
 	return (
@@ -60,35 +76,31 @@ export function HomeTemplate({
 				<FlatList
 					data={[
 						{ id: 'today', label: 'Hábitos de hoy', action: 'today' },
-						{ id: 'coop', label: 'Cooperativo (próx.)', action: 'coop', disabled: true },
-						{ id: 'profile', label: 'Perfil', action: 'profile' },
-						{ id: 'stats', label: 'Estadísticas (próx.)', action: 'stats', disabled: true },
+						{ id: 'coop', label: 'Cooperativo', action: 'coop' },
 					]}
 					keyExtractor={(item) => item.id}
 					renderItem={({ item }) => (
 						<PrimaryButton
 							title={item.label}
-							onPress={() => console.log('navigate:', item.action)}
-							disabled={item.disabled}
+							onPress={() => {
+								if (item.action === 'today') setShowToday(true)
+								else if (item.action === 'coop') onAction?.('coop')
+							}}
 							style={{ marginVertical: 6 }}
 						/>
 					)}
 					contentContainerStyle={{ gap: 6, paddingVertical: 8 }}
 				/>
-
-				{/* Lista de hábitos del día (visible por ahora; se puede mover a otra pantalla si se desea) */}
-				<Text style={styles.title}>Hábitos de hoy</Text>
-				{habitsLoading || progressLoading ? (
-					<ActivityIndicator />
-				) : (
-					<FlatList
-						data={todaysHabits}
-						keyExtractor={(item) => item.id}
-						renderItem={renderHabit}
-						contentContainerStyle={{ gap: 12, paddingVertical: 8 }}
-					/>
-				)}
 			</CardContainer>
+
+			{/* Modal de Hábitos de hoy */}
+			<HabitsTodayModal
+				visible={showToday}
+				onClose={() => setShowToday(false)}
+				todaysHabits={todaysHabits}
+				renderHabit={renderHabit}
+				loading={habitsLoading || progressLoading}
+			/>
 		</GradientBackground>
 	)
 }
