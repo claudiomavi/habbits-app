@@ -1,3 +1,4 @@
+import React from 'react'
 import { ActivityIndicator, FlatList, StyleSheet, Text } from 'react-native'
 import { CardContainer, GradientBackground, HeaderBar } from '../../autoBarrell'
 
@@ -10,6 +11,29 @@ export function HomeTemplate({
 	renderHabit,
 	xpPercent = 0,
 }) {
+	const [avatarUri, setAvatarUri] = React.useState(profile?.avatar?.uri || profile?.avatar || null)
+	React.useEffect(() => {
+		let mounted = true
+		const load = async () => {
+			try {
+				const level = profile?.level ?? 1
+				const fallback = profile?.avatar?.uri || profile?.avatar || null
+				if (!profile?.character_id) {
+					if (mounted) setAvatarUri(fallback)
+					return
+				}
+				const { getCharacterById, getImageForLevel } = await import('../../autoBarrell')
+				const character = await getCharacterById(profile.character_id)
+				const evolved = getImageForLevel(character, level) || fallback
+				if (mounted) setAvatarUri(evolved)
+			} catch (e) {
+				console.warn('header character load', e)
+			}
+		}
+		load()
+		return () => { mounted = false }
+	}, [profile?.character_id, profile?.level, profile?.avatar])
+
 	return (
 		<GradientBackground style={styles.container}>
 			<HeaderBar
@@ -17,7 +41,7 @@ export function HomeTemplate({
 				initial={profile?.display_name}
 				xpPercent={xpPercent}
 				level={profile?.level ?? 1}
-				avatarUri={profile?.avatar?.uri || profile?.avatar}
+				avatarUri={avatarUri}
 				onLogout={handleLogout}
 			/>
 

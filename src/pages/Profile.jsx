@@ -36,12 +36,28 @@ export function Profile() {
 		}
 	}
 
+	const [avatarOptions, setAvatarOptions] = useState([])
+	useEffect(() => {
+		let mounted = true
+		;(async () => {
+			try {
+				const { getCharacters, getImageForLevel } = await import('../autoBarrell')
+				const chars = await getCharacters()
+				if (!mounted) return
+				const mapped = chars.map((c) => ({ id: c.id, uri: getImageForLevel(c, profile?.level ?? 1), label: c.name || c.key }))
+				setAvatarOptions(mapped)
+			} catch (e) { console.warn('profile characters load', e) }
+		})()
+		return () => { mounted = false }
+	}, [profile?.level])
+
 	return (
 		<ProfileTemplate
 			profile={profile}
 			xpPercent={xpPercent}
 			saving={saving}
 			onSave={handleSave}
+			avatarOptions={avatarOptions}
 		/>
 	)
 }

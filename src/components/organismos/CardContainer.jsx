@@ -1,9 +1,13 @@
 import { LinearGradient } from 'expo-linear-gradient'
 import { StyleSheet, View } from 'react-native'
 
-export function CardContainer({ children, progressWidth = '65%' }) {
+export function CardContainer({
+	children,
+	progressWidth = '65%',
+	marginTop = 0,
+}) {
 	return (
-		<View style={styles.card}>
+		<View style={[styles.card, { marginTop: marginTop }]}>
 			<View style={styles.progressBarContainer}>
 				<LinearGradient
 					colors={['#4facfe', '#00f2fe', '#43e97b']}

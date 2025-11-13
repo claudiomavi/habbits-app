@@ -54,7 +54,6 @@ export function CreateProfile() {
 				id_auth: user?.id,
 				email: user?.email,
 				display_name: data.display_name,
-				avatar: selectedAvatar?.uri,
 				character_id: selectedAvatar?.id || null,
 				xp: 0,
 				level: 1,

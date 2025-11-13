@@ -27,18 +27,53 @@ export function ProfileTemplate({
 		profile?.display_name || ''
 	)
 	const [avatar, setAvatar] = React.useState(profile?.avatar || null)
+	const [characterId, setCharacterId] = React.useState(
+		profile?.character_id || null
+	)
+	const [displayUri, setDisplayUri] = React.useState(
+		profile?.avatar?.uri || profile?.avatar || null
+	)
 
 	React.useEffect(() => {
 		setDisplayName(profile?.display_name || '')
 		setAvatar(profile?.avatar || null)
+		setCharacterId(profile?.character_id || null)
 	}, [profile])
 
+	// Resolve display image: prefer character evolution by level; fallback to profile avatar
+	React.useEffect(() => {
+		let mounted = true
+		;(async () => {
+			try {
+				const level = profile?.level ?? 1
+				const fallback = profile?.avatar?.uri || profile?.avatar || null
+				if (!profile?.character_id) {
+					if (mounted) setDisplayUri(fallback)
+					return
+				}
+				const { getCharacterById, getImageForLevel } = await import(
+					'../../autoBarrell'
+				)
+				const character = await getCharacterById(profile.character_id)
+				const evolved = getImageForLevel(character, level) || fallback
+				if (mounted) setDisplayUri(evolved)
+			} catch (e) {
+				console.warn('profile character load', e)
+			}
+		})()
+		return () => {
+			mounted = false
+		}
+	}, [profile?.character_id, profile?.level, profile?.avatar])
+
 	const initial = profile?.display_name
-	const avatarUri = avatar?.uri || avatar
 
 	const saveChanges = () => {
-		const avatarValue = avatar?.uri || avatar || null
-		const patch = { display_name: displayName, avatar: avatarValue }
+		// Persist only fields that exist in profiles schema
+		const patch = {
+			display_name: displayName,
+			character_id: characterId || null,
+		}
 		onSave?.(patch)
 		setEditing(false)
 	}
@@ -47,9 +82,9 @@ export function ProfileTemplate({
 		<GradientBackground style={styles.container}>
 			<CardContainer>
 				<View style={styles.header}>
-					{avatarUri ? (
+					{(editing ? avatar?.uri || displayUri : displayUri) ? (
 						<Image
-							source={{ uri: avatarUri }}
+							source={{ uri: editing ? avatar?.uri || displayUri : displayUri }}
 							style={styles.avatar}
 						/>
 					) : (
@@ -70,7 +105,7 @@ export function ProfileTemplate({
 			</CardContainer>
 
 			{editing ? (
-				<CardContainer>
+				<CardContainer marginTop={12}>
 					<View style={{ gap: 12, marginTop: 12 }}>
 						<Text style={styles.label}>Nombre para mostrar</Text>
 						<TextInput
@@ -80,7 +115,7 @@ export function ProfileTemplate({
 							style={styles.input}
 						/>
 
-						<Text style={styles.label}>Avatar</Text>
+						<Text style={styles.label}>Avatar / Personaje</Text>
 						<View style={styles.avatarsRow}>
 							{(avatarOptions && avatarOptions.length
 								? avatarOptions
@@ -88,7 +123,11 @@ export function ProfileTemplate({
 							).map((a) => (
 								<TouchableOpacity
 									key={a.id}
-									onPress={() => setAvatar(a && a.uri ? a : null)}
+									onPress={() => {
+										setAvatar(a && a.uri ? a : null)
+										setCharacterId(a?.id || null)
+										setDisplayUri(a?.uri || null)
+									}}
 								>
 									{a.uri ? (
 										<Image
