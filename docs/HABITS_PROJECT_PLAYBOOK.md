@@ -240,50 +240,6 @@ Pull Requests
 
 ---
 
-## 11) Actualizaciones recientes (Q4)
-
-### 11.1 Home: toggle de hábitos y progreso del día
-
-- Update optimista robusto del progreso del día en la query ["progress", userId, dateISO]. Se pasa el estado deseado (desired) desde el botón para evitar lecturas stale.
-- Mutación upsertProgress con comportamiento server-aligned:
-  - Al marcar: crea/actualiza progress_entries con completed=true y xp_awarded.
-  - Al desmarcar: elimina la fila del día en progress_entries (no se guarda completed=false). La API devuelve xp_delta negativo igual a los XP concedidos previamente (si no encuentra la fila, usa client_awarded enviado por el cliente como respaldo).
-- onSuccess: la UI concilia el caché con el resultado del servidor:
-  - Si res.completed === false, se elimina la entrada de la lista del día.
-  - Si es true, se inserta/actualiza la entrada con los datos devueltos.
-- onError: rollback completo del caché y del XP optimista.
-- Recomendación DB: índice único para evitar duplicados por día: `create unique index if not exists progress_unique_per_day on public.progress_entries (user_id, habit_id, date);`
-
-### 11.2 XP y nivel del perfil
-
-- La mutación de progreso devuelve `xp_delta` (positivo al marcar, negativo al desmarcar). En Home se aplica `updateProfileXpAndLevel(user.id, xp_delta)` tras el éxito.
-- La fórmula de nivel actual se mantiene en cliente: `level = floor(sqrt(totalXP / 100)) + 1`.
-- Si en el futuro se desea desacoplar la progresión, crear tabla `levels` en Supabase (level, xp_required) y computar el nivel consultando `xp_required`.
-
-### 11.3 Perfil: datos reales y edición
-
-- ProfileTemplate muestra: avatar, nombre, email, nivel, XP bar y permite editar display_name y avatar.
-- Profile.jsx asegura el fetch del perfil y calcula el porcentaje de XP del nivel actual.
-- UsersStore expone `updateProfile` y se usa `updateProfileFields` (Supabase) para persistir cambios.
-
-### 11.4 Personajes (characters) como fuente de avatares
-
-- Nueva tabla (sugerida) `characters` para centralizar assets y evoluciones por nivel.
-  - Campos: id (uuid), key (text unique), name (text), gender (text), active (bool), image_url (fallback), variants (jsonb: [{ level_from, image_url }]), created_at.
-- CRUD en cliente: `src/supabase/crudCharacters.js`
-  - `getCharacters()`, `getCharacterById(id)`, `upsertCharacter(character)`, `deleteCharacter(id)`, `getImageForLevel(character, level)`.
-- Integración:
-  - CreateProfile carga `getCharacters()` y mapea opciones de avatar desde Supabase; guarda `avatar` (uri) y opcional `character_id` en `profiles`.
-  - Profile carga opciones por nivel actual y permite cambiar avatar desde esa lista.
-- Sugerencia de esquema en `profiles`: añadir `character_id uuid references public.characters(id)`.
-
-### 11.5 RLS/Permisos necesarios para progreso
-
-- Asegurar políticas RLS de `progress_entries` para DELETE además de SELECT/INSERT/UPDATE:
-  - `create policy "users can delete own progress" on public.progress_entries for delete using (auth.uid() = user_id);`
-
----
-
 ## 10) Supabase: configuración y permisos (RLS)
 
 Autenticación
@@ -1058,3 +1014,47 @@ Cómo exportar permisos/políticas (guía rápida):
   - `supabase db pull` (extrae esquema localmente)
   - `supabase db diff -f rls_export.sql` (genera diff)
 - Si prefieres, pásame capturas o el output SQL y lo incorporamos aquí en un anexo.
+
+---
+
+## 11) Actualizaciones recientes (Q4)
+
+### 11.1 Home: toggle de hábitos y progreso del día
+
+- Update optimista robusto del progreso del día en la query ["progress", userId, dateISO]. Se pasa el estado deseado (desired) desde el botón para evitar lecturas stale.
+- Mutación upsertProgress con comportamiento server-aligned:
+  - Al marcar: crea/actualiza progress_entries con completed=true y xp_awarded.
+  - Al desmarcar: elimina la fila del día en progress_entries (no se guarda completed=false). La API devuelve xp_delta negativo igual a los XP concedidos previamente (si no encuentra la fila, usa client_awarded enviado por el cliente como respaldo).
+- onSuccess: la UI concilia el caché con el resultado del servidor:
+  - Si res.completed === false, se elimina la entrada de la lista del día.
+  - Si es true, se inserta/actualiza la entrada con los datos devueltos.
+- onError: rollback completo del caché y del XP optimista.
+- Recomendación DB: índice único para evitar duplicados por día: `create unique index if not exists progress_unique_per_day on public.progress_entries (user_id, habit_id, date);`
+
+### 11.2 XP y nivel del perfil
+
+- La mutación de progreso devuelve `xp_delta` (positivo al marcar, negativo al desmarcar). En Home se aplica `updateProfileXpAndLevel(user.id, xp_delta)` tras el éxito.
+- La fórmula de nivel actual se mantiene en cliente: `level = floor(sqrt(totalXP / 100)) + 1`.
+- Si en el futuro se desea desacoplar la progresión, crear tabla `levels` en Supabase (level, xp_required) y computar el nivel consultando `xp_required`.
+
+### 11.3 Perfil: datos reales y edición
+
+- ProfileTemplate muestra: avatar, nombre, email, nivel, XP bar y permite editar display_name y avatar.
+- Profile.jsx asegura el fetch del perfil y calcula el porcentaje de XP del nivel actual.
+- UsersStore expone `updateProfile` y se usa `updateProfileFields` (Supabase) para persistir cambios.
+
+### 11.4 Personajes (characters) como fuente de avatares
+
+- Nueva tabla (sugerida) `characters` para centralizar assets y evoluciones por nivel.
+  - Campos: id (uuid), key (text unique), name (text), gender (text), active (bool), image_url (fallback), variants (jsonb: [{ level_from, image_url }]), created_at.
+- CRUD en cliente: `src/supabase/crudCharacters.js`
+  - `getCharacters()`, `getCharacterById(id)`, `upsertCharacter(character)`, `deleteCharacter(id)`, `getImageForLevel(character, level)`.
+- Integración:
+  - CreateProfile carga `getCharacters()` y mapea opciones de avatar desde Supabase; guarda `avatar` (uri) y opcional `character_id` en `profiles`.
+  - Profile carga opciones por nivel actual y permite cambiar avatar desde esa lista.
+- Sugerencia de esquema en `profiles`: añadir `character_id uuid references public.characters(id)`.
+
+### 11.5 RLS/Permisos necesarios para progreso
+
+- Asegurar políticas RLS de `progress_entries` para DELETE además de SELECT/INSERT/UPDATE:
+  - `create policy "users can delete own progress" on public.progress_entries for delete using (auth.uid() = user_id);`
