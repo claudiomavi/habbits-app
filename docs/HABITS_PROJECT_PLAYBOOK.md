@@ -52,7 +52,7 @@ Modelo Atomic Design
 - Atoms (atomos): piezas UI indivisibles (botones básicos, inputs, badges).
 - Molecules (moleculas): combinación simple de átomos (XPBar, DifficultyBadge).
 - Organisms (organismos): secciones con funcionalidad (HeaderBar, HabitCard, CardContainer).
-- Templates: esqueletos de página con layout/estilo uniforme (HomeTemplate, AuthTemplate, CreateProfileTemplate).
+- Templates: esqueletos de página con layout/estilo uniforme (HomeTemplate, AuthTemplate, CreateProfileTemplate, CooperativeTemplate).
 - Pages: orquestación de datos, lógica de formularios y navegación; consumen Templates y componentes.
 
 Rationale (por qué Templates + Pages)
@@ -73,6 +73,12 @@ AutoBarrel: `src/autoBarrell.js` reexporta los módulos clave para imports corto
 ---
 
 ## 4) Estilos y guía de UI
+
+### Patrones de interacción (modales)
+
+- Preferimos transiciones custom con `Animated` (backdrop con `Animated.timing` y contenido con `Animated.spring`).
+- Bottom-sheet para listas temporales (ej.: Hábitos de hoy): aparece desde abajo, cierra al tocar el fondo o el botón de cerrar.
+- Diálogo centrado para edición/creación (ej.: HabitModal) con animación de escala y fondo fade.
 
 Estética base: tarjetas blancas sobre fondo degradado, micro-decoraciones (emojis/gradients), tipografía legible y contraste alto.
 
@@ -99,6 +105,10 @@ Patrones de pantalla a replicar (Login/Register/CreateProfile/Home):
 ---
 
 ## 5) Conexiones de datos y estado
+
+### Navegación y subpantallas no-tab
+
+- La pantalla "Cooperative" se registra fuera de las tabs como `Stack.Screen` y se navega desde Home (acción). Esto permite flujos secundarios sin añadir nuevas tabs.
 
 - Supabase client: `src/supabase/supabaseClient.js`.
 - Auth: `src/stores/AuthStore.js` controla sesión (user, session, signIn/signOut/signUp expuestos vía crudUsers/AuthStore).
@@ -1023,6 +1033,12 @@ Cómo exportar permisos/políticas (guía rápida):
 
 ## 11) Actualizaciones recientes (Q4)
 
+### 11.x UI/UX: Modales y Scroll
+
+- Modal de Hábitos de Hoy (Home): transición custom con Animated (fade de fondo + spring desde abajo). Cierre suave al tocar fuera o con botón ✕.
+- HabitModal (crear/editar hábito): transición custom (fade + scale spring) y cierre animado.
+- CooperativeTemplate: incluye botón “Volver” (navigation.goBack).
+
 ### 11.1 Home: toggle de hábitos y progreso del día
 
 - Update optimista robusto del progreso del día en la query ["progress", userId, dateISO]. Se pasa el estado deseado (desired) desde el botón para evitar lecturas stale.
@@ -1059,7 +1075,6 @@ Cómo exportar permisos/políticas (guía rápida):
   - Profile carga opciones por nivel actual y permite cambiar el personaje (actualiza `character_id`).
 - Esquema en `profiles`: `character_id uuid references public.characters(id)`.
 - Render de imagen: se calcula en cliente con `getImageForLevel` en base al `level` actual.
-
 
 ### 11.5 RLS/Permisos necesarios para progreso
 
