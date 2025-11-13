@@ -1,5 +1,7 @@
+import React from 'react'
 import {
 	Alert,
+	Animated,
 	Modal,
 	Pressable,
 	StyleSheet,
@@ -39,15 +41,66 @@ export function HabitModal({
 		onSave?.()
 	}
 
+	const [internalVisible, setInternalVisible] = React.useState(visible)
+	const backdrop = React.useRef(new Animated.Value(0)).current
+	const scale = React.useRef(new Animated.Value(0.95)).current
+
+	React.useEffect(() => {
+		if (visible) {
+			setInternalVisible(true)
+			Animated.parallel([
+				Animated.timing(backdrop, {
+					toValue: 1,
+					duration: 220,
+					useNativeDriver: true,
+				}),
+				Animated.spring(scale, {
+					toValue: 1,
+					useNativeDriver: true,
+					friction: 8,
+					tension: 60,
+				}),
+			]).start()
+		} else if (internalVisible) {
+			Animated.parallel([
+				Animated.timing(backdrop, {
+					toValue: 0,
+					duration: 180,
+					useNativeDriver: true,
+				}),
+				Animated.timing(scale, {
+					toValue: 0.95,
+					duration: 180,
+					useNativeDriver: true,
+				}),
+			]).start(() => setInternalVisible(false))
+		}
+	}, [visible])
+
+	const handleClose = () => {
+		Animated.parallel([
+			Animated.timing(backdrop, {
+				toValue: 0,
+				duration: 180,
+				useNativeDriver: true,
+			}),
+			Animated.timing(scale, {
+				toValue: 0.95,
+				duration: 180,
+				useNativeDriver: true,
+			}),
+		]).start(() => onCancel?.())
+	}
+
 	return (
 		<Modal
-			visible={visible}
+			visible={internalVisible}
 			transparent
-			animationType="slide"
-			onRequestClose={onCancel}
+			animationType="none"
+			onRequestClose={handleClose}
 		>
-			<View style={styles.modalBg}>
-				<View style={styles.modalCard}>
+			<Animated.View style={[styles.modalBg, { opacity: backdrop }]}>
+				<Animated.View style={[styles.modalCard, { transform: [{ scale }] }]}>
 					<Text style={styles.modalTitle}>
 						{editing ? 'Editar hábito' : 'Nuevo hábito'}
 					</Text>
@@ -79,7 +132,7 @@ export function HabitModal({
 						style={[styles.row, { justifyContent: 'flex-end', marginTop: 12 }]}
 					>
 						<Pressable
-							onPress={onCancel}
+							onPress={handleClose}
 							style={[styles.btn, styles.cancel]}
 						>
 							<Text style={styles.btnText}>Cancelar</Text>
@@ -91,8 +144,8 @@ export function HabitModal({
 							<Text style={styles.btnText}>Guardar</Text>
 						</Pressable>
 					</View>
-				</View>
-			</View>
+				</Animated.View>
+			</Animated.View>
 		</Modal>
 	)
 }
