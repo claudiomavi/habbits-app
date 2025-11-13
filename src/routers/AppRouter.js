@@ -5,6 +5,7 @@ import {
 	Login,
 	Redirector,
 	Register,
+	Cooperative,
 } from '../autoBarrell'
 
 const Stack = createNativeStackNavigator()
@@ -38,6 +39,13 @@ export function AppRouter() {
 			<Stack.Screen
 				name="AppStack"
 				component={AppStack}
+			/>
+
+			{/* Subpantallas no-tab */}
+			<Stack.Screen
+				name="Cooperative"
+				component={Cooperative}
+				options={{ headerShown: false }}
 			/>
 		</Stack.Navigator>
 	)

@@ -47,28 +47,39 @@ export function Home() {
 			const previous = qc.getQueryData(['progress', user?.id, todayISO]) || []
 			const cached = Array.isArray(previous) ? previous : []
 			const existing = cached.find((p) => p.habit_id === habit.id)
-			const newCompleted = typeof desired === 'boolean' ? desired : !(existing?.completed ?? false)
+			const newCompleted =
+				typeof desired === 'boolean' ? desired : !(existing?.completed ?? false)
 			const baseXP = 10
 			const earned = baseXP * (habit.difficulty || 1)
-			const deltaXp = newCompleted ? Math.round(earned) : -(existing?.xp_awarded || 0)
+			const deltaXp = newCompleted
+				? Math.round(earned)
+				: -(existing?.xp_awarded || 0)
 			// optimistic cache update
 			const next = (() => {
 				const copy = [...cached]
 				const idx = copy.findIndex((p) => p.habit_id === habit.id)
 				if (idx >= 0) {
-					copy[idx] = { ...copy[idx], completed: newCompleted, xp_awarded: newCompleted ? Math.round(earned) : 0 }
+					copy[idx] = {
+						...copy[idx],
+						completed: newCompleted,
+						xp_awarded: newCompleted ? Math.round(earned) : 0,
+					}
 				} else {
-					copy.push({ id: `tmp_${habit.id}_${todayISO}`,
+					copy.push({
+						id: `tmp_${habit.id}_${todayISO}`,
 						habit_id: habit.id,
 						user_id: user.id,
 						date: todayISO,
 						completed: newCompleted,
-						xp_awarded: newCompleted ? Math.round(earned) : 0 })
+						xp_awarded: newCompleted ? Math.round(earned) : 0,
+					})
 				}
 				return copy
 			})()
 			qc.setQueryData(['progress', user?.id, todayISO], next)
-			try { useUsersStore.getState().optimisticUpdateXp(deltaXp) } catch {}
+			try {
+				useUsersStore.getState().optimisticUpdateXp(deltaXp)
+			} catch {}
 			return { previous, deltaXp, desired: newCompleted, habitId: habit.id }
 		},
 		mutationFn: async (payload) => {
@@ -76,8 +87,11 @@ export function Home() {
 			const desired = payload?.desired
 			// IMPORTANT: read latest cache, not render-time progressMap, to avoid stale flips on rapid toggles
 			const cached = qc.getQueryData(['progress', user?.id, todayISO]) || []
-			const existing = Array.isArray(cached) ? cached.find((p) => p.habit_id === habit.id) : undefined
-			const newCompleted = typeof desired === 'boolean' ? desired : !(existing?.completed ?? false)
+			const existing = Array.isArray(cached)
+				? cached.find((p) => p.habit_id === habit.id)
+				: undefined
+			const newCompleted =
+				typeof desired === 'boolean' ? desired : !(existing?.completed ?? false)
 			const baseXP = 10
 			// calcular streakDays: consecutivos en días programados
 			let streakDays = 0
@@ -147,7 +161,8 @@ export function Home() {
 		},
 		onSuccess: async ({ res, deltaXp }, habit) => {
 			await qc.invalidateQueries({ queryKey: ['progress', user?.id, todayISO] })
-			const serverDelta = typeof res?.xp_delta === 'number' ? res.xp_delta : deltaXp
+			const serverDelta =
+				typeof res?.xp_delta === 'number' ? res.xp_delta : deltaXp
 			if (serverDelta) {
 				try {
 					await updateProfileXpAndLevel(user.id, serverDelta)
@@ -162,7 +177,9 @@ export function Home() {
 			}
 			// rollback xp
 			if (context?.deltaXp) {
-				try { useUsersStore.getState().optimisticUpdateXp(-context.deltaXp) } catch {}
+				try {
+					useUsersStore.getState().optimisticUpdateXp(-context.deltaXp)
+				} catch {}
 			}
 		},
 	})
@@ -214,7 +231,6 @@ export function Home() {
 	const xpPercent =
 		nextBase > currentBase ? (xp - currentBase) / (nextBase - currentBase) : 0
 
-	const navigation = useNavigation()
 	return (
 		<HomeTemplate
 			profile={profile}
