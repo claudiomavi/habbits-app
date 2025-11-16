@@ -1,19 +1,27 @@
 import { useNavigation } from '@react-navigation/native'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useMemo } from 'react'
+import { useMemo, useEffect, useRef, useState } from 'react'
 import {
 	getHabitsByUser,
 	getProgressForDate,
 	getProgressHistoryForHabit,
+	LevelUpModal,
+	getCharacterById,
+	getImageForLevel,
 	HabitCard,
 	HomeTemplate,
 	updateProfileXpAndLevel,
+	computeLevel,
 	upsertProgress,
 	useAuthStore,
 	useUsersStore,
 } from '../autoBarrell'
 
 export function Home() {
+	const [pendingLevelUp, setPendingLevelUp] = useState(null)
+	const [levelUpImage, setLevelUpImage] = useState(null)
+	const [levelUpLoading, setLevelUpLoading] = useState(false)
+
 	const navigation = useNavigation()
 	const { user, signOut } = useAuthStore()
 	const { profile } = useUsersStore()
@@ -165,7 +173,30 @@ export function Home() {
 				typeof res?.xp_delta === 'number' ? res.xp_delta : deltaXp
 			if (serverDelta) {
 				try {
-					await updateProfileXpAndLevel(user.id, serverDelta)
+					const beforeXp = (useUsersStore.getState().profile?.xp ?? 0)
+					const beforeLevel = computeLevel(beforeXp)
+					const updated = await updateProfileXpAndLevel(user.id, serverDelta)
+					const afterLevel = updated?.level ?? computeLevel((updated?.xp ?? (beforeXp + serverDelta)))
+					if (afterLevel > beforeLevel) {
+						setPendingLevelUp(afterLevel)
+						// Try resolve evolved image
+						;(async () => {
+							try {
+								setLevelUpLoading(true)
+								let evolved = null
+								if (useUsersStore.getState().profile?.character_id) {
+									const ch = await getCharacterById(useUsersStore.getState().profile.character_id)
+									evolved = getImageForLevel(ch, afterLevel)
+								}
+								const fallback = useUsersStore.getState().profile?.avatar?.uri || useUsersStore.getState().profile?.avatar || null
+								setLevelUpImage(evolved || fallback)
+							} catch (e) {
+								console.warn('levelup image', e)
+							} finally {
+								setLevelUpLoading(false)
+							}
+						)()
+					}
 				} catch (e) {
 					console.warn('xp update', e)
 				}
@@ -232,7 +263,13 @@ export function Home() {
 		nextBase > currentBase ? (xp - currentBase) / (nextBase - currentBase) : 0
 
 	return (
-		<HomeTemplate
+		<>
+			<HomeTemplate
+				levelUpVisible={!!pendingLevelUp}
+				onLevelUpClose={() => { setPendingLevelUp(null); setLevelUpImage(null) }}
+				levelUpLevel={pendingLevelUp}
+				levelUpImageUri={levelUpImage}
+				levelUpImageLoading={levelUpLoading}
 			profile={profile}
 			handleLogout={handleLogout}
 			habitsLoading={habitsLoading}
@@ -244,5 +281,6 @@ export function Home() {
 				if (action === 'coop') navigation.navigate('Cooperative')
 			}}
 		/>
+		</>
 	)
 }

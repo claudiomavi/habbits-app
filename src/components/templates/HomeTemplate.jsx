@@ -7,6 +7,7 @@ import {
 	HabitsTodayModal,
 	HeaderBar,
 	PrimaryButton,
+	LevelUpModal,
 } from '../../autoBarrell'
 
 export function HomeTemplate({
@@ -18,6 +19,12 @@ export function HomeTemplate({
 	renderHabit,
 	xpPercent = 0,
 	onAction,
+	// Level up modal props
+	levelUpVisible = false,
+	onLevelUpClose,
+	levelUpLevel,
+	levelUpImageUri,
+	levelUpImageLoading = false,
 }) {
 	const [showToday, setShowToday] = React.useState(false)
 
@@ -100,6 +107,16 @@ export function HomeTemplate({
 				todaysHabits={todaysHabits}
 				renderHabit={renderHabit}
 				loading={habitsLoading || progressLoading}
+			/>
+			{/* Modal de Level Up */}
+			<LevelUpModal
+				visible={!!levelUpVisible}
+				onClose={onLevelUpClose}
+				level={levelUpLevel}
+				imageUri={levelUpImageUri}
+				loadingImage={levelUpImageLoading}
+				title="¡Subiste de nivel!"
+				subtitle={levelUpImageUri ? '¡Tu personaje ha evolucionado!' : 'Sigue así'}
 			/>
 		</GradientBackground>
 	)
