@@ -2,7 +2,10 @@ import { useNavigation } from '@react-navigation/native'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import {
+	computeLevel,
+	getCharacterById,
 	getHabitsByUser,
+	getImageForLevel,
 	getProgressForDate,
 	getProgressHistoryForHabit,
 	HabitCard,
@@ -16,7 +19,8 @@ import {
 export function Home() {
 	const navigation = useNavigation()
 	const { user, signOut } = useAuthStore()
-	const { profile } = useUsersStore()
+	const { profile, showLevelUpBanner, acceptLevelUpBanner, levelUpBanner } =
+		useUsersStore()
 	const qc = useQueryClient()
 
 	const todayISO = new Date().toISOString().slice(0, 10)
@@ -54,6 +58,13 @@ export function Home() {
 			const deltaXp = newCompleted
 				? Math.round(earned)
 				: -(existing?.xp_awarded || 0)
+			// capture pre-optimistic xp/level to decide banner on success
+			let prevXp = 0
+			let prevLevel = 1
+			try {
+				prevXp = useUsersStore.getState().profile?.xp ?? 0
+				prevLevel = computeLevel(prevXp)
+			} catch {}
 			// optimistic cache update
 			const next = (() => {
 				const copy = [...cached]
@@ -80,7 +91,7 @@ export function Home() {
 			try {
 				useUsersStore.getState().optimisticUpdateXp(deltaXp)
 			} catch {}
-			return { previous, deltaXp, desired: newCompleted, habitId: habit.id }
+			return { previous, deltaXp, desired: newCompleted, habitId: habit.id, prevXp, prevLevel }
 		},
 		mutationFn: async (payload) => {
 			const habit = payload?.habit || payload
@@ -159,13 +170,47 @@ export function Home() {
 			})
 			return { res, deltaXp }
 		},
-		onSuccess: async ({ res, deltaXp }, habit) => {
+onSuccess: async ({ res, deltaXp }, _vars, context) => {
 			await qc.invalidateQueries({ queryKey: ['progress', user?.id, todayISO] })
 			const serverDelta =
 				typeof res?.xp_delta === 'number' ? res.xp_delta : deltaXp
 			if (serverDelta) {
 				try {
-					await updateProfileXpAndLevel(user.id, serverDelta)
+					console.log('[XP] applying serverDelta to Supabase', { serverDelta })
+					// compute before/after level and trigger in-app banner
+					const beforeXP = context?.prevXp ?? (useUsersStore.getState().profile?.xp ?? 0)
+					const beforeLevel = computeLevel(beforeXP)
+					const updated = await updateProfileXpAndLevel(user.id, serverDelta)
+					console.log('[XP] updated profile', updated)
+					console.log(
+						'[XP] store profile after update',
+						useUsersStore.getState().profile
+					)
+					const afterXP = updated?.xp ?? beforeXP + serverDelta
+					const afterLevel = updated?.level ?? computeLevel(afterXP)
+					if (afterLevel > beforeLevel) {
+						let evolved = null
+						try {
+							if (useUsersStore.getState().profile?.character_id) {
+								const ch = await getCharacterById(
+									useUsersStore.getState().profile.character_id
+								)
+								evolved = getImageForLevel(ch, afterLevel)
+							}
+						} catch {}
+						const fallback =
+							useUsersStore.getState().profile?.avatar?.uri ||
+							useUsersStore.getState().profile?.avatar ||
+							null
+						console.log('[Banner] show called', {
+							level: afterLevel,
+							image: evolved || fallback,
+						})
+						showLevelUpBanner({
+							level: afterLevel,
+							imageUri: evolved || fallback,
+						})
+					}
 				} catch (e) {
 					console.warn('xp update', e)
 				}
@@ -240,6 +285,9 @@ export function Home() {
 			todaysHabits={todaysHabits}
 			renderHabit={renderHabit}
 			xpPercent={xpPercent}
+			showLevelUpBanner={!!levelUpBanner?.visible}
+			onAcceptLevelUp={acceptLevelUpBanner}
+			levelUpImageUri={levelUpBanner?.imageUri || null}
 			onAction={(action) => {
 				if (action === 'coop') navigation.navigate('Cooperative')
 			}}

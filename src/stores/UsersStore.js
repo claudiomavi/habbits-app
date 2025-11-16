@@ -11,6 +11,12 @@ import {
 export const useUsersStore = create((set, get) => ({
 	users: [],
 	profile: null,
+	// UI flags for in-app banners
+	levelUpBanner: {
+		visible: false,
+		level: null,
+		imageUri: null,
+	},
 	loading: false,
 
 	createProfile: async (data) => {
@@ -38,6 +44,14 @@ export const useUsersStore = create((set, get) => ({
 		const newXp = Math.max(0, (current.xp || 0) + delta)
 		const newLevel = computeLevel(newXp)
 		set({ profile: { ...current, xp: newXp, level: newLevel } })
+	},
+
+	showLevelUpBanner: ({ level, imageUri }) => {
+		console.log('[UsersStore] showLevelUpBanner', { level, imageUri })
+		set({ levelUpBanner: { visible: true, level, imageUri: imageUri || null } })
+	},
+	acceptLevelUpBanner: () => {
+		set({ levelUpBanner: { visible: false, level: null, imageUri: null } })
 	},
 
 	updateProfile: async (userId, patch) => {

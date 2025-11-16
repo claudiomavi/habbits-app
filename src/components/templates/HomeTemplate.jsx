@@ -6,6 +6,7 @@ import {
 	GradientBackground,
 	HabitsTodayModal,
 	HeaderBar,
+	LevelUpBanner,
 	PrimaryButton,
 } from '../../autoBarrell'
 
@@ -18,6 +19,9 @@ export function HomeTemplate({
 	renderHabit,
 	xpPercent = 0,
 	onAction,
+	showLevelUpBanner = false,
+	onAcceptLevelUp,
+	levelUpImageUri = null,
 }) {
 	const [showToday, setShowToday] = React.useState(false)
 
@@ -50,6 +54,7 @@ export function HomeTemplate({
 		}
 	}, [profile?.character_id, profile?.level, profile?.avatar])
 
+	console.log('[HomeTemplate] props', { showLevelUpBanner, levelUpImageUri })
 	return (
 		<GradientBackground style={styles.container}>
 			<HeaderBar
@@ -71,26 +76,35 @@ export function HomeTemplate({
 					size={260}
 				/>
 
-				{/* Acciones rápidas */}
-				<Text style={styles.title}>Acciones</Text>
-				<FlatList
-					data={[
-						{ id: 'today', label: 'Hábitos de hoy', action: 'today' },
-						{ id: 'coop', label: 'Cooperativo', action: 'coop' },
-					]}
-					keyExtractor={(item) => item.id}
-					renderItem={({ item }) => (
-						<PrimaryButton
-							title={item.label}
-							onPress={() => {
-								if (item.action === 'today') setShowToday(true)
-								else if (item.action === 'coop') onAction?.('coop')
-							}}
-							style={{ marginVertical: 6 }}
+				{/* Aviso de subida de nivel - muestra condicional via prop showLevelUpBanner */}
+				{showLevelUpBanner ? (
+					<LevelUpBanner
+						level={profile?.level ?? 1}
+						onAccept={onAcceptLevelUp}
+					/>
+				) : (
+					<>
+						<Text style={styles.title}>Acciones</Text>
+						<FlatList
+							data={[
+								{ id: 'today', label: 'Hábitos de hoy', action: 'today' },
+								{ id: 'coop', label: 'Cooperativo', action: 'coop' },
+							]}
+							keyExtractor={(item) => item.id}
+							renderItem={({ item }) => (
+								<PrimaryButton
+									title={item.label}
+									onPress={() => {
+										if (item.action === 'today') setShowToday(true)
+										else if (item.action === 'coop') onAction?.('coop')
+									}}
+									style={{ marginVertical: 6 }}
+								/>
+							)}
+							contentContainerStyle={{ gap: 6, paddingVertical: 8 }}
 						/>
-					)}
-					contentContainerStyle={{ gap: 6, paddingVertical: 8 }}
-				/>
+					</>
+				)}
 			</CardContainer>
 
 			{/* Modal de Hábitos de hoy */}
