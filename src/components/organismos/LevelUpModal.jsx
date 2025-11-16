@@ -111,6 +111,21 @@ export function LevelUpModal({
 							</View>
 						)}
 						<View style={{ height: 12 }} />
+						{/* TEMP: strong visibility check block */}
+						<View
+							style={{
+								width: 300,
+								height: 240,
+								backgroundColor: '#10B981',
+								borderRadius: 16,
+								alignItems: 'center',
+								justifyContent: 'center',
+							}}
+						>
+							<Text style={{ color: '#fff', fontSize: 18, fontWeight: '800' }}>
+								SUBISTE DE NIVEL
+							</Text>
+						</View>
 						{loadingImage ? (
 							<ActivityIndicator />
 						) : imageUri ? (
