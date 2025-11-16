@@ -109,6 +109,12 @@ export function HomeTemplate({
 				loading={habitsLoading || progressLoading}
 			/>
 			{/* Modal de Level Up */}
+			{__DEV__ && (
+				<Text style={{ color: '#111827', fontSize: 12, textAlign: 'center' }}>
+					[DEV] levelUpVisible: {String(!!levelUpVisible)} levelUpLevel:{' '}
+					{String(levelUpLevel)} loading: {String(levelUpImageLoading)}
+				</Text>
+			)}
 			<LevelUpModal
 				visible={!!levelUpVisible}
 				onClose={onLevelUpClose}

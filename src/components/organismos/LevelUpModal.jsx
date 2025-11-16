@@ -8,7 +8,6 @@ import {
 	Pressable,
 	StyleSheet,
 	Text,
-	TouchableWithoutFeedback,
 	View,
 } from 'react-native'
 import { CardContainer } from '../../autoBarrell'
@@ -28,6 +27,7 @@ export function LevelUpModal({
 	const scale = React.useRef(new Animated.Value(0.95)).current
 
 	React.useEffect(() => {
+		console.log('[LevelUpModal] effect visible->', visible)
 		if (visible) {
 			setInternalVisible(true)
 			Animated.parallel([
@@ -75,7 +75,7 @@ export function LevelUpModal({
 		]).start(() => onClose?.())
 	}
 
-	if (!internalVisible) return null
+	console.log('[LevelUpModal] render', { visible, internalVisible })
 
 	return (
 		<Modal
@@ -84,9 +84,12 @@ export function LevelUpModal({
 			animationType="none"
 			onRequestClose={handleClose}
 		>
-			<TouchableWithoutFeedback onPress={handleClose}>
+			<Pressable
+				onPress={handleClose}
+				style={StyleSheet.absoluteFill}
+			>
 				<Animated.View style={[styles.backdrop, { opacity: backdrop }]} />
-			</TouchableWithoutFeedback>
+			</Pressable>
 			<View
 				style={[
 					styles.absoluteFill,

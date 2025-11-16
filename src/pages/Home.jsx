@@ -184,6 +184,7 @@ export function Home() {
 			await qc.invalidateQueries({ queryKey: ['progress', user?.id, todayISO] })
 			const serverDelta =
 				typeof res?.xp_delta === 'number' ? res.xp_delta : deltaXp
+			console.log('[LevelUp] onSuccess', { serverDelta, context })
 			if (serverDelta) {
 				try {
 					// prefer captured level before optimistic update if available
@@ -192,35 +193,46 @@ export function Home() {
 						computeLevel(
 							context?.prevXp ?? useUsersStore.getState().profile?.xp ?? 0
 						)
+					console.log('[LevelUp] beforeLevel', { beforeLevel })
+					context?.prevLevel ??
+						computeLevel(
+							context?.prevXp ?? useUsersStore.getState().profile?.xp ?? 0
+						)
 					const updated = await updateProfileXpAndLevel(user.id, serverDelta)
 					const afterLevel =
 						updated?.level ??
 						computeLevel(updated?.xp ?? (context?.prevXp ?? 0) + serverDelta)
+					console.log('[LevelUp] afterLevel', {
+						afterLevel,
+						updatedXP: updated?.xp,
+					})
+					updated?.level ??
+						computeLevel(updated?.xp ?? (context?.prevXp ?? 0) + serverDelta)
 					if (afterLevel > beforeLevel) {
+						console.log('[LevelUp] setPending', { pending: afterLevel })
 						setPendingLevelUp(afterLevel)
 						// Try resolve evolved image
-							try {
-								setLevelUpLoading(true)
-								console.log('[LevelUp] opening modal, resolving image...')
-								let evolved = null
-								if (useUsersStore.getState().profile?.character_id) {
-									const ch = await getCharacterById(
-										useUsersStore.getState().profile.character_id
-									)
-									evolved = getImageForLevel(ch, afterLevel)
-								}
-								const fallback =
-									useUsersStore.getState().profile?.avatar?.uri ||
-									useUsersStore.getState().profile?.avatar ||
-									null
-								setLevelUpImage(evolved || fallback)
-								console.log('[LevelUp] image ready', { evolved, fallback })
-							} catch (e) {
-								console.warn('levelup image', e)
-							} finally {
-								setLevelUpLoading(false)
+						try {
+							setLevelUpLoading(true)
+							console.log('[LevelUp] opening modal, resolving image...')
+							let evolved = null
+							if (useUsersStore.getState().profile?.character_id) {
+								const ch = await getCharacterById(
+									useUsersStore.getState().profile.character_id
+								)
+								evolved = getImageForLevel(ch, afterLevel)
 							}
-						
+							const fallback =
+								useUsersStore.getState().profile?.avatar?.uri ||
+								useUsersStore.getState().profile?.avatar ||
+								null
+							setLevelUpImage(evolved || fallback)
+							console.log('[LevelUp] image ready', { evolved, fallback })
+						} catch (e) {
+							console.warn('levelup image', e)
+						} finally {
+							setLevelUpLoading(false)
+						}
 					}
 				} catch (e) {
 					console.warn('xp update', e)
@@ -287,6 +299,11 @@ export function Home() {
 	const xpPercent =
 		nextBase > currentBase ? (xp - currentBase) / (nextBase - currentBase) : 0
 
+	console.log('[LevelUp] render', {
+		pendingLevelUp,
+		levelUpImage,
+		levelUpLoading,
+	})
 	return (
 		<>
 			<HomeTemplate
