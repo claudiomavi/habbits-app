@@ -2,7 +2,6 @@ import React from 'react'
 import {
 	ActivityIndicator,
 	Animated,
-	Dimensions,
 	Easing,
 	Image,
 	Modal,
@@ -26,11 +25,7 @@ export function LevelUpModal({
 }) {
 	const [internalVisible, setInternalVisible] = React.useState(visible)
 	const backdrop = React.useRef(new Animated.Value(0)).current
-	const OFF = React.useMemo(
-		() => Math.min(400, Math.round(Dimensions.get('window').height * 0.45)),
-		[]
-	)
-	const translateY = React.useRef(new Animated.Value(OFF)).current
+	const scale = React.useRef(new Animated.Value(0.95)).current
 
 	React.useEffect(() => {
 		if (visible) {
@@ -42,11 +37,11 @@ export function LevelUpModal({
 					useNativeDriver: true,
 					easing: Easing.out(Easing.cubic),
 				}),
-				Animated.timing(translateY, {
-					toValue: 0,
-					duration: 240,
+				Animated.spring(scale, {
+					toValue: 1,
 					useNativeDriver: true,
-					easing: Easing.out(Easing.cubic),
+					friction: 8,
+					tension: 60,
 				}),
 			]).start()
 		} else if (internalVisible) {
@@ -56,8 +51,8 @@ export function LevelUpModal({
 					duration: 200,
 					useNativeDriver: true,
 				}),
-				Animated.timing(translateY, {
-					toValue: OFF,
+				Animated.timing(scale, {
+					toValue: 0.95,
 					duration: 200,
 					useNativeDriver: true,
 				}),
@@ -72,8 +67,8 @@ export function LevelUpModal({
 				duration: 160,
 				useNativeDriver: true,
 			}),
-			Animated.timing(translateY, {
-				toValue: 60,
+			Animated.timing(scale, {
+				toValue: 0.95,
 				duration: 160,
 				useNativeDriver: true,
 			}),
@@ -93,10 +88,13 @@ export function LevelUpModal({
 				<Animated.View style={[styles.backdrop, { opacity: backdrop }]} />
 			</TouchableWithoutFeedback>
 			<View
-				style={styles.absoluteFill}
+				style={[
+					styles.absoluteFill,
+					{ justifyContent: 'center', alignItems: 'center' },
+				]}
 				pointerEvents="box-none"
 			>
-				<Animated.View style={[styles.sheet, { transform: [{ translateY }] }]}>
+				<Animated.View style={[styles.modalCard, { transform: [{ scale }] }]}>
 					<CardContainer>
 						<View style={{ alignItems: 'center', paddingVertical: 8 }}>
 							{showCongrats && (
@@ -150,9 +148,16 @@ const styles = StyleSheet.create({
 		right: 0,
 		top: 0,
 		bottom: 0,
-		justifyContent: 'flex-end',
 	},
-	sheet: { width: '100%', padding: 16, zIndex: 1000, elevation: 20 },
+	modalCard: {
+		backgroundColor: '#fff',
+		borderRadius: 16,
+		padding: 16,
+		width: '90%',
+		maxWidth: 420,
+		zIndex: 1000,
+		elevation: 20,
+	},
 	congrats: { fontSize: 14, color: '#059669', fontWeight: '700' },
 	title: { fontSize: 18, color: '#111827', fontWeight: '800', marginTop: 4 },
 	subtitle: {
