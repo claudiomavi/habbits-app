@@ -6,8 +6,8 @@ import {
 	GradientBackground,
 	HabitsTodayModal,
 	HeaderBar,
-	PrimaryButton,
 	LevelUpModal,
+	PrimaryButton,
 } from '../../autoBarrell'
 
 export function HomeTemplate({
@@ -116,7 +116,9 @@ export function HomeTemplate({
 				imageUri={levelUpImageUri}
 				loadingImage={levelUpImageLoading}
 				title="¡Subiste de nivel!"
-				subtitle={levelUpImageUri ? '¡Tu personaje ha evolucionado!' : 'Sigue así'}
+				subtitle={
+					levelUpImageUri ? '¡Tu personaje ha evolucionado!' : 'Sigue así'
+				}
 			/>
 		</GradientBackground>
 	)

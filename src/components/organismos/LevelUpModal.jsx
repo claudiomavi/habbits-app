@@ -84,7 +84,7 @@ export function LevelUpModal({
 
 	return (
 		<Modal
-			visible
+			visible={internalVisible}
 			transparent
 			animationType="none"
 			onRequestClose={handleClose}
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
 		bottom: 0,
 		justifyContent: 'flex-end',
 	},
-	sheet: { width: '100%', padding: 16 },
+	sheet: { width: '100%', padding: 16, zIndex: 1000, elevation: 20 },
 	congrats: { fontSize: 14, color: '#059669', fontWeight: '700' },
 	title: { fontSize: 18, color: '#111827', fontWeight: '800', marginTop: 4 },
 	subtitle: {

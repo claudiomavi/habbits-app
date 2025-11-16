@@ -199,9 +199,9 @@ export function Home() {
 					if (afterLevel > beforeLevel) {
 						setPendingLevelUp(afterLevel)
 						// Try resolve evolved image
-;(async () => {
 							try {
 								setLevelUpLoading(true)
+								console.log('[LevelUp] opening modal, resolving image...')
 								let evolved = null
 								if (useUsersStore.getState().profile?.character_id) {
 									const ch = await getCharacterById(
@@ -214,12 +214,13 @@ export function Home() {
 									useUsersStore.getState().profile?.avatar ||
 									null
 								setLevelUpImage(evolved || fallback)
+								console.log('[LevelUp] image ready', { evolved, fallback })
 							} catch (e) {
 								console.warn('levelup image', e)
 							} finally {
 								setLevelUpLoading(false)
 							}
-})()
+						
 					}
 				} catch (e) {
 					console.warn('xp update', e)

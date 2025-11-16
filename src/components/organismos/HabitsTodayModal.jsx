@@ -81,7 +81,7 @@ export function HabitsTodayModal({
 
 	return (
 		<Modal
-			visible
+			visible={internalVisible}
 			transparent
 			animationType="none"
 			onRequestClose={handleClose}
@@ -143,6 +143,8 @@ const styles = StyleSheet.create({
 	sheet: {
 		width: '100%',
 		padding: 16,
+		zIndex: 1000,
+		elevation: 20,
 	},
 	header: { flexDirection: 'row', alignItems: 'center' },
 	title: { flex: 1, fontSize: 18, fontWeight: '700', color: '#111827' },
