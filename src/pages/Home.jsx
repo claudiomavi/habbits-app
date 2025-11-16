@@ -61,6 +61,13 @@ export function Home() {
 			const deltaXp = newCompleted
 				? Math.round(earned)
 				: -(existing?.xp_awarded || 0)
+			// capture pre-optimistic level to detect level-up later
+			let prevXp = 0
+			let prevLevel = 1
+			try {
+				prevXp = useUsersStore.getState().profile?.xp ?? 0
+				prevLevel = computeLevel(prevXp)
+			} catch {}
 			// optimistic cache update
 			const next = (() => {
 				const copy = [...cached]
@@ -87,7 +94,14 @@ export function Home() {
 			try {
 				useUsersStore.getState().optimisticUpdateXp(deltaXp)
 			} catch {}
-			return { previous, deltaXp, desired: newCompleted, habitId: habit.id }
+			return {
+				previous,
+				deltaXp,
+				desired: newCompleted,
+				habitId: habit.id,
+				prevXp,
+				prevLevel,
+			}
 		},
 		mutationFn: async (payload) => {
 			const habit = payload?.habit || payload
@@ -166,22 +180,26 @@ export function Home() {
 			})
 			return { res, deltaXp }
 		},
-		onSuccess: async ({ res, deltaXp }, habit) => {
+		onSuccess: async ({ res, deltaXp }, _vars, context) => {
 			await qc.invalidateQueries({ queryKey: ['progress', user?.id, todayISO] })
 			const serverDelta =
 				typeof res?.xp_delta === 'number' ? res.xp_delta : deltaXp
 			if (serverDelta) {
 				try {
-					const beforeXp = useUsersStore.getState().profile?.xp ?? 0
-					const beforeLevel = computeLevel(beforeXp)
+					// prefer captured level before optimistic update if available
+					const beforeLevel =
+						context?.prevLevel ??
+						computeLevel(
+							context?.prevXp ?? useUsersStore.getState().profile?.xp ?? 0
+						)
 					const updated = await updateProfileXpAndLevel(user.id, serverDelta)
 					const afterLevel =
 						updated?.level ??
-						computeLevel(updated?.xp ?? beforeXp + serverDelta)
+						computeLevel(updated?.xp ?? (context?.prevXp ?? 0) + serverDelta)
 					if (afterLevel > beforeLevel) {
 						setPendingLevelUp(afterLevel)
 						// Try resolve evolved image
-						;async () => {
+;(async () => {
 							try {
 								setLevelUpLoading(true)
 								let evolved = null
@@ -201,7 +219,7 @@ export function Home() {
 							} finally {
 								setLevelUpLoading(false)
 							}
-						}
+})()
 					}
 				} catch (e) {
 					console.warn('xp update', e)
