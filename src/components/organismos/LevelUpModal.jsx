@@ -99,7 +99,6 @@ export function LevelUpModal({
 				pointerEvents="box-none"
 			>
 				<Animated.View style={[styles.modalCard, { transform: [{ scale }] }]}>
-					<CardContainer>
 						<View style={{ alignItems: 'center', paddingVertical: 8 }}>
 							{showCongrats && (
 								<Text style={styles.congrats}>¡Enhorabuena!</Text>
@@ -130,7 +129,6 @@ export function LevelUpModal({
 								<Text style={styles.closeTxt}>Aceptar</Text>
 							</Pressable>
 						</View>
-					</CardContainer>
 				</Animated.View>
 			</View>
 		</Modal>
