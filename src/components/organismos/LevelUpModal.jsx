@@ -10,7 +10,8 @@ import {
 	Text,
 	View,
 } from 'react-native'
-import { CardContainer } from '../../autoBarrell'
+// NOTE: Using plain View inside modal to avoid any interference
+
 
 export function LevelUpModal({
 	visible,

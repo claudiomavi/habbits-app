@@ -28,6 +28,13 @@ export function HomeTemplate({
 }) {
 	const [showToday, setShowToday] = React.useState(false)
 
+	// Si se muestra el LevelUp, cerramos el modal de Hábitos de hoy para evitar solapamientos de RN Modal
+	React.useEffect(() => {
+		if (levelUpVisible && showToday) {
+			setShowToday(false)
+		}
+	}, [levelUpVisible, showToday])
+
 	const [avatarUri, setAvatarUri] = React.useState(
 		profile?.avatar?.uri || profile?.avatar || null
 	)
