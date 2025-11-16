@@ -31,6 +31,7 @@ export function HomeTemplate({
 	// Si se muestra el LevelUp, cerramos el modal de Hábitos de hoy para evitar solapamientos de RN Modal
 	React.useEffect(() => {
 		if (levelUpVisible && showToday) {
+			console.log('[HomeTemplate] closing HabitsToday because LevelUp visible')
 			setShowToday(false)
 		}
 	}, [levelUpVisible, showToday])

@@ -12,7 +12,6 @@ import {
 } from 'react-native'
 // NOTE: Using plain View inside modal to avoid any interference
 
-
 export function LevelUpModal({
 	visible,
 	onClose,
@@ -84,6 +83,9 @@ export function LevelUpModal({
 			transparent
 			animationType="none"
 			onRequestClose={handleClose}
+			presentationStyle="overFullScreen"
+			statusBarTranslucent
+			hardwareAccelerated
 		>
 			<Pressable
 				onPress={handleClose}
@@ -99,36 +101,34 @@ export function LevelUpModal({
 				pointerEvents="box-none"
 			>
 				<Animated.View style={[styles.modalCard, { transform: [{ scale }] }]}>
-						<View style={{ alignItems: 'center', paddingVertical: 8 }}>
-							{showCongrats && (
-								<Text style={styles.congrats}>¡Enhorabuena!</Text>
-							)}
-							<Text style={styles.title}>{title}</Text>
-							{!!subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
-							{typeof level === 'number' && (
-								<View style={styles.levelPill}>
-									<Text style={styles.levelText}>Nivel {level}</Text>
-								</View>
-							)}
-							<View style={{ height: 12 }} />
-							{loadingImage ? (
-								<ActivityIndicator />
-							) : imageUri ? (
-								<Image
-									source={{ uri: imageUri }}
-									style={{ width: 220, height: 220 }}
-									resizeMode="contain"
-								/>
-							) : null}
-							<View style={{ height: 16 }} />
-							<Pressable
-								onPress={handleClose}
-								style={styles.closeBtn}
-								accessibilityLabel="Cerrar"
-							>
-								<Text style={styles.closeTxt}>Aceptar</Text>
-							</Pressable>
-						</View>
+					<View style={{ alignItems: 'center', paddingVertical: 8 }}>
+						{showCongrats && <Text style={styles.congrats}>¡Enhorabuena!</Text>}
+						<Text style={styles.title}>{title}</Text>
+						{!!subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+						{typeof level === 'number' && (
+							<View style={styles.levelPill}>
+								<Text style={styles.levelText}>Nivel {level}</Text>
+							</View>
+						)}
+						<View style={{ height: 12 }} />
+						{loadingImage ? (
+							<ActivityIndicator />
+						) : imageUri ? (
+							<Image
+								source={{ uri: imageUri }}
+								style={{ width: 220, height: 220 }}
+								resizeMode="contain"
+							/>
+						) : null}
+						<View style={{ height: 16 }} />
+						<Pressable
+							onPress={handleClose}
+							style={styles.closeBtn}
+							accessibilityLabel="Cerrar"
+						>
+							<Text style={styles.closeTxt}>Aceptar</Text>
+						</Pressable>
+					</View>
 				</Animated.View>
 			</View>
 		</Modal>
