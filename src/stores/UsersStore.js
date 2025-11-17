@@ -47,7 +47,6 @@ export const useUsersStore = create((set, get) => ({
 	},
 
 	showLevelUpBanner: ({ level, imageUri }) => {
-		console.log('[UsersStore] showLevelUpBanner', { level, imageUri })
 		set({ levelUpBanner: { visible: true, level, imageUri: imageUri || null } })
 	},
 	acceptLevelUpBanner: () => {

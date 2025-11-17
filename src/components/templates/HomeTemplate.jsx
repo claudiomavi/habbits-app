@@ -54,7 +54,6 @@ export function HomeTemplate({
 		}
 	}, [profile?.character_id, profile?.level, profile?.avatar])
 
-	console.log('[HomeTemplate] props', { showLevelUpBanner, levelUpImageUri })
 	return (
 		<GradientBackground style={styles.container}>
 			<HeaderBar

@@ -176,16 +176,10 @@ onSuccess: async ({ res, deltaXp }, _vars, context) => {
 				typeof res?.xp_delta === 'number' ? res.xp_delta : deltaXp
 			if (serverDelta) {
 				try {
-					console.log('[XP] applying serverDelta to Supabase', { serverDelta })
 					// compute before/after level and trigger in-app banner
 					const beforeXP = context?.prevXp ?? (useUsersStore.getState().profile?.xp ?? 0)
 					const beforeLevel = computeLevel(beforeXP)
 					const updated = await updateProfileXpAndLevel(user.id, serverDelta)
-					console.log('[XP] updated profile', updated)
-					console.log(
-						'[XP] store profile after update',
-						useUsersStore.getState().profile
-					)
 					const afterXP = updated?.xp ?? beforeXP + serverDelta
 					const afterLevel = updated?.level ?? computeLevel(afterXP)
 					if (afterLevel > beforeLevel) {
@@ -202,10 +196,6 @@ onSuccess: async ({ res, deltaXp }, _vars, context) => {
 							useUsersStore.getState().profile?.avatar?.uri ||
 							useUsersStore.getState().profile?.avatar ||
 							null
-						console.log('[Banner] show called', {
-							level: afterLevel,
-							image: evolved || fallback,
-						})
 						showLevelUpBanner({
 							level: afterLevel,
 							imageUri: evolved || fallback,
