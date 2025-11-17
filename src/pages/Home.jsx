@@ -91,7 +91,14 @@ export function Home() {
 			try {
 				useUsersStore.getState().optimisticUpdateXp(deltaXp)
 			} catch {}
-			return { previous, deltaXp, desired: newCompleted, habitId: habit.id, prevXp, prevLevel }
+			return {
+				previous,
+				deltaXp,
+				desired: newCompleted,
+				habitId: habit.id,
+				prevXp,
+				prevLevel,
+			}
 		},
 		mutationFn: async (payload) => {
 			const habit = payload?.habit || payload
@@ -170,14 +177,15 @@ export function Home() {
 			})
 			return { res, deltaXp }
 		},
-onSuccess: async ({ res, deltaXp }, _vars, context) => {
+		onSuccess: async ({ res, deltaXp }, _vars, context) => {
 			await qc.invalidateQueries({ queryKey: ['progress', user?.id, todayISO] })
 			const serverDelta =
 				typeof res?.xp_delta === 'number' ? res.xp_delta : deltaXp
 			if (serverDelta) {
 				try {
 					// compute before/after level and trigger in-app banner
-					const beforeXP = context?.prevXp ?? (useUsersStore.getState().profile?.xp ?? 0)
+					const beforeXP =
+						context?.prevXp ?? useUsersStore.getState().profile?.xp ?? 0
 					const beforeLevel = computeLevel(beforeXP)
 					const updated = await updateProfileXpAndLevel(user.id, serverDelta)
 					const afterXP = updated?.xp ?? beforeXP + serverDelta
@@ -221,13 +229,17 @@ onSuccess: async ({ res, deltaXp }, _vars, context) => {
 
 	const todaysHabits = useMemo(() => {
 		const d = new Date()
-		const weekday = d.getDay() // 0-6
+		const weekdaySun0 = d.getDay() // 0-6 (Sun=0)
+		const weekdayMon0 = (weekdaySun0 + 6) % 7 // 0-6 (Mon=0 .. Sun=6)
 		const dayOfMonth = d.getDate()
 		return habits.filter((h) => {
 			if (h.frequency === 'daily') return true
 			if (h.frequency === 'weekly') {
-				if (!Array.isArray(h.days_of_week)) return true
-				return h.days_of_week.includes(weekday)
+				const days = Array.isArray(h.days_of_week)
+					? h.days_of_week.map((d) => Number(d))
+					: []
+				if (days.length === 0) return true
+				return days.includes(weekdayMon0)
 			}
 			if (h.frequency === 'monthly') return dayOfMonth === 1
 			return true
@@ -243,12 +255,14 @@ onSuccess: async ({ res, deltaXp }, _vars, context) => {
 		}
 	}
 
-	const renderHabit = ({ item }) => {
+	const renderHabit = ({ item, streak, streakUnit }) => {
 		const done = !!progressMap.get(item.id)?.completed
 		return (
 			<HabitCard
 				habit={item}
 				done={done}
+				streak={streak}
+				streakUnit={streakUnit}
 				onToggle={() => toggleMutation.mutate({ habit: item, desired: !done })}
 			/>
 		)
