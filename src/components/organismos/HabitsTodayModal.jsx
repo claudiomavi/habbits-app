@@ -14,6 +14,7 @@ import {
 } from 'react-native'
 import {
 	CardContainer,
+	getProgressForDate,
 	getProgressHistoryForHabit,
 	useAuthStore,
 } from '../../autoBarrell'
@@ -87,12 +88,27 @@ export function HabitsTodayModal({
 	const { user } = useAuthStore()
 	const [streaks, setStreaks] = React.useState({})
 
+	const makeLocalISO = (d) => {
+		const y = d.getFullYear()
+		const m = String(d.getMonth() + 1).padStart(2, '0')
+		const day = String(d.getDate()).padStart(2, '0')
+		return `${y}-${m}-${day}`
+	}
+
 	React.useEffect(() => {
 		let cancelled = false
 		const calcAll = async () => {
 			try {
 				if (!user?.id || todaysHabits.length === 0) return
-				const todayISO = new Date().toISOString().slice(0, 10)
+				const todayISO = makeLocalISO(new Date())
+				// Traer progreso de hoy para todos los hábitos
+				let progressToday = []
+				try {
+					progressToday = await getProgressForDate(user.id, todayISO)
+				} catch {}
+				const todayDoneMap = new Map(
+					(progressToday || []).map((p) => [p.habit_id, !!p.completed])
+				)
 				const results = {}
 				for (const h of todaysHabits) {
 					// obtener hasta 365 días de historial para cómputos por día/semana/mes
@@ -111,7 +127,7 @@ export function HabitsTodayModal({
 							: []
 					)
 					const today = new Date(todayISO)
-					const fmt = (d) => d.toISOString().slice(0, 10)
+					const fmt = (d) => makeLocalISO(d)
 					const isScheduled = (date) => {
 						if (h.frequency === 'weekly') {
 							const wdSun0 = date.getDay()
@@ -129,6 +145,7 @@ export function HabitsTodayModal({
 						}
 						return true
 					}
+					const todayCompleted = !!todayDoneMap.get(h.id)
 					let value = 0
 					let unit =
 						h.frequency === 'weekly'
@@ -137,13 +154,20 @@ export function HabitsTodayModal({
 							? 'mes'
 							: 'día'
 					let cursor = new Date(today)
+					// Si hoy no está completado, arrancar el cómputo desde ayer
+					if (!todayCompleted) cursor.setDate(cursor.getDate() - 1)
+					const debugTrace = []
 					for (let i = 0; i < 365; i++) {
 						// saltar días no programados
 						if (!isScheduled(cursor)) {
+							debugTrace.push({ i, iso: fmt(cursor), scheduled: false })
 							cursor.setDate(cursor.getDate() - 1)
 							continue
 						}
-						if (completedDates.has(fmt(cursor))) {
+						const iso = fmt(cursor)
+						const done = completedDates.has(iso)
+						debugTrace.push({ i, iso, scheduled: true, done })
+						if (done) {
 							value += 1
 							cursor.setDate(cursor.getDate() - 1)
 						} else {
