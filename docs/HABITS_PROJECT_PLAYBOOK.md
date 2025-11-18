@@ -177,7 +177,9 @@ Resumen de tablas relevantes (tal como has compartido):
   - title (text, not null)
   - description (text)
   - frequency (text: 'daily' | 'weekly' | 'monthly')
-  - days_of_week (ARRAY int 0–6) (para weekly)
+  - days_of_week (ARRAY int 0–6, monday-based) (para weekly)
+    - Convención monday-based: 0=Lun, 1=Mar, 2=Mié, 3=Jue, 4=Vie, 5=Sáb, 6=Dom
+  - day_of_month (smallint, nullable; 1–31) (para monthly)
   - reminder_time (time)
   - difficulty (int 1–3)
   - target_value (numeric, opcional)
@@ -227,7 +229,11 @@ Nota: ajusta los tipos/constraints definitivos en la DB si es necesario.
 - baseXP = 10
 - XP por completado = baseXP _difficulty_ streakMultiplier
   - difficulty: 1, 2, o 3
-  - streakMultiplier = 1 + (streakDays \* 0.05), cap en 2.0
+  - streakDays: número de ocurrencias programadas consecutivas completadas
+    - daily: días consecutivos (todos los días son programados)
+    - weekly: solo cuentan los días seleccionados; p.ej., si el usuario eligió Lun-Mié-Vie, Mar/Jue no rompen racha
+    - monthly: solo cuenta el día del mes elegido; se compara mes a mes con day_of_month
+  - streakMultiplier = min(2.0, 1 + (streakDays \* 0.05))
 - Level (ejemplo): level = floor(sqrt(totalXP / 100)) + 1
 
 Decisiones pendientes:
@@ -1032,6 +1038,27 @@ Cómo exportar permisos/políticas (guía rápida):
 ---
 
 ## 11) Actualizaciones recientes (Q4)
+
+### Streaks y multiplicador (streakMultiplier)
+- Lógica unificada para contar rachas por ocurrencias programadas consecutivas (no por días naturales):
+  - daily: días consecutivos
+  - weekly: lunes=0, se saltan los días no seleccionados
+  - monthly: day_of_month (1–31)
+- Cálculo usa fecha local (YYYY-MM-DD) en cliente, evitando UTC.
+- Se incluye “hoy” en la racha si se está marcando como completado (newCompleted).
+- streakMultiplier = min(2.0, 1 + 0.05 * streakDays), tope 2.0.
+- Logs añadidos para depuración:
+  - [StreakMultiplier] y [StreakMultiplier:trace] en Home.jsx.
+  - [Streak:UI:trace] en HabitsTodayModal.jsx.
+
+### UI y reactividad
+- HabitsTodayModal ahora recalcula la racha al marcar/desmarcar (usa todayProgress por props para reactualizar en tiempo real).
+- Pastilla dev en HabitCard con “×1.xx” para validar el multiplicador en desarrollo.
+
+### Monthly: selección de día del mes
+- Nuevo campo day_of_month (1–31) en la creación/edición de hábitos (HabitModal).
+- Home.jsx muestra como “hoy” un hábito monthly cuando el día actual coincide con day_of_month.
+- Modelo de datos actualizado en Playbook: day_of_month SMALLINT NULL CHECK (1–31).
 
 ### 11.x UI/UX: Modales y Scroll
 
