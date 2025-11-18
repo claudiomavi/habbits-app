@@ -7,6 +7,7 @@ const defaultForm = {
 	difficulty: 1,
 	frequency: 'daily',
 	days_of_week: [],
+	day_of_month: 1,
 }
 
 export function Habits() {
@@ -33,6 +34,7 @@ export function Habits() {
 			difficulty: h.difficulty || 1,
 			frequency: h.frequency || 'daily',
 			days_of_week: Array.isArray(h.days_of_week) ? h.days_of_week : [],
+			day_of_month: h.day_of_month || 1,
 		})
 		setVisible(true)
 	}
@@ -46,6 +48,7 @@ export function Habits() {
 					difficulty: Number(form.difficulty) || 1,
 					frequency: form.frequency,
 					days_of_week: form.frequency === 'weekly' ? form.days_of_week : null,
+					day_of_month: form.frequency === 'monthly' ? (Number(form.day_of_month) || 1) : null,
 				})
 			} else {
 				await addHabit({
@@ -53,6 +56,7 @@ export function Habits() {
 					difficulty: Number(form.difficulty) || 1,
 					frequency: form.frequency,
 					days_of_week: form.frequency === 'weekly' ? form.days_of_week : null,
+					day_of_month: form.frequency === 'monthly' ? (Number(form.day_of_month) || 1) : null,
 					created_by: user.id,
 				})
 			}

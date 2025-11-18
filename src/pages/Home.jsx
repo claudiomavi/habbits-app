@@ -256,7 +256,7 @@ export function Home() {
 				if (days.length === 0) return true
 				return days.includes(weekdayMon0)
 			}
-			if (h.frequency === 'monthly') return dayOfMonth === 1
+			if (h.frequency === 'monthly') return dayOfMonth === (h.day_of_month || 1)
 			return true
 		})
 	}, [habits])

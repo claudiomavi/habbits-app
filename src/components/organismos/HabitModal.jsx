@@ -27,7 +27,8 @@ export function HabitModal({
 		setForm((f) => ({
 			...f,
 			frequency: fr,
-			days_of_week: fr === 'weekly' ? f.days_of_week || [] : [],
+			days_of_week: fr === 'weekly' ? (f.days_of_week || []) : [],
+			day_of_month: fr === 'monthly' ? (f.day_of_month || 1) : f.day_of_month ?? null,
 		}))
 	const setDays = (arr) => setForm((f) => ({ ...f, days_of_week: arr }))
 
@@ -37,6 +38,12 @@ export function HabitModal({
 			(!Array.isArray(form.days_of_week) || form.days_of_week.length === 0)
 		) {
 			return Alert.alert('Selecciona al menos un día de la semana')
+		}
+		if (form.frequency === 'monthly') {
+			const n = Number(form.day_of_month || 1)
+			if (isNaN(n) || n < 1 || n > 31) {
+				return Alert.alert('Selecciona un día del mes entre 1 y 31')
+			}
 		}
 		onSave?.()
 	}
@@ -126,6 +133,21 @@ export function HabitModal({
 							value={form.days_of_week || []}
 							onChange={setDays}
 						/>
+					)}
+					{form.frequency === 'monthly' && (
+						<View style={[styles.row, { marginTop: 8 }]}> 
+							<Text style={styles.label}>Día del mes</Text>
+							<TextInput
+								keyboardType="number-pad"
+								value={String(Number(form.day_of_month || 1))}
+								onChangeText={(t) => {
+									const n = Math.max(1, Math.min(31, parseInt(t || '1', 10)))
+									setForm((f) => ({ ...f, day_of_month: n }))
+								}}
+								placeholder="1-31"
+								style={[styles.input, { flex: 1 }]}
+							/>
+						</View>
 					)}
 
 					<View

@@ -179,7 +179,7 @@ export function HabitCard({ habit, done, onToggle, streak, streakUnit }) {
 							<View style={styles.streakPill}>
 								<Text style={styles.streakText}>
 									Racha: {streak ? streak : '-'} {streakUnit || 'día'}
-									{streak === 1 ? '' : 's'}
+									{streak === 1 ? '' : streakUnit === 'mes' ? 'es' : 's'}
 								</Text>
 							</View>
 						)}
