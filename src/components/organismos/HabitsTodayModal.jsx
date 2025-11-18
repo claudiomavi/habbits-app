@@ -153,7 +153,6 @@ export function HabitsTodayModal({
 					results[h.id] = { value, unit }
 				}
 				if (!cancelled) {
-					console.log('[Streak] results', results)
 					setStreaks(results)
 				}
 			} catch (e) {
@@ -202,7 +201,6 @@ export function HabitsTodayModal({
 								keyExtractor={(item) => item.id}
 								renderItem={({ item }) => {
 									const s = streaks[item.id]
-									console.log('[Streak] renderItem', { id: item.id, streak: s })
 									return renderHabit({
 										item,
 										streak: typeof s?.value === 'number' ? s.value : 0,

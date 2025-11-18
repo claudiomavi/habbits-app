@@ -29,6 +29,11 @@
 
 ## IDEAS DESARROLLO
 
+- [ ] Hacer pruebas para ver si se está aplicando bien el streakMultiplier
+
 - [ ] Para los hábitos mensuales poder elegir el día del mes
+
   - [ ] Verificar que salga en los habitos de hoy cuando es el día que corresponda
   - [ ] Verificar que se calcule bien la racha
+
+- [ ] Aplicar colores que ha mandado Miguel
