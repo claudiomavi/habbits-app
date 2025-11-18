@@ -23,7 +23,13 @@ export function Home() {
 		useUsersStore()
 	const qc = useQueryClient()
 
-	const todayISO = new Date().toISOString().slice(0, 10)
+	const makeLocalISO = (d) => {
+		const y = d.getFullYear()
+		const m = String(d.getMonth() + 1).padStart(2, '0')
+		const day = String(d.getDate()).padStart(2, '0')
+		return `${y}-${m}-${day}`
+	}
+	const todayISO = makeLocalISO(new Date())
 
 	const { data: habits = [], isLoading: habitsLoading } = useQuery({
 		queryKey: ['habits', user?.id],
@@ -124,19 +130,22 @@ export function Home() {
 				const completedSet = new Set(
 					history.filter((h) => h.completed).map((h) => h.date)
 				)
+				// Si vamos a marcar como completado, incluir hoy en el set para el cálculo de racha
+				if (newCompleted) completedSet.add(todayISO)
 				const d0 = new Date(todayISO)
 				const isScheduled = (date) => {
-					const wd = date.getDay()
+					const wdSun0 = date.getDay() // 0=Dom .. 6=Sab
+					const wdMon0 = (wdSun0 + 6) % 7 // 0=Lun .. 6=Dom
 					if (habit.frequency === 'weekly') {
-						if (
-							!Array.isArray(habit.days_of_week) ||
-							habit.days_of_week.length === 0
-						)
-							return true
-						return habit.days_of_week.includes(wd)
+						const days = Array.isArray(habit.days_of_week)
+							? habit.days_of_week.map((d) => Number(d))
+							: []
+						if (days.length === 0) return true
+						return days.includes(wdMon0)
 					}
 					if (habit.frequency === 'monthly') {
-						return date.getDate() === 1
+						const wanted = habit.day_of_month || 1
+						return date.getDate() === wanted
 					}
 					return true // daily
 				}
@@ -148,12 +157,18 @@ export function Home() {
 					start.setDate(start.getDate() - 1)
 				}
 				// recorre hasta 60 días o hasta romper racha en un día programado
+				const debugTrace = []
 				for (let i = 0; i < 60; i++) {
 					const date = new Date(start)
 					date.setDate(start.getDate() - i)
-					if (!isScheduled(date)) continue
-					const iso = date.toISOString().slice(0, 10)
-					if (completedSet.has(iso)) {
+					if (!isScheduled(date)) {
+						debugTrace.push({ i, iso: makeLocalISO(date), scheduled: false })
+						continue
+					}
+					const iso = makeLocalISO(date)
+					const done = completedSet.has(iso)
+					debugTrace.push({ i, iso, scheduled: true, done })
+					if (done) {
 						streakDays += 1
 					} else {
 						break
