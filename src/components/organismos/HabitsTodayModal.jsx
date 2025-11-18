@@ -25,6 +25,7 @@ export function HabitsTodayModal({
 	todaysHabits = [],
 	renderHabit,
 	loading,
+	todayProgress = [],
 }) {
 	const [internalVisible, setInternalVisible] = React.useState(visible)
 	const backdrop = React.useRef(new Animated.Value(0)).current
@@ -101,11 +102,13 @@ export function HabitsTodayModal({
 			try {
 				if (!user?.id || todaysHabits.length === 0) return
 				const todayISO = makeLocalISO(new Date())
-				// Traer progreso de hoy para todos los hábitos
-				let progressToday = []
-				try {
-					progressToday = await getProgressForDate(user.id, todayISO)
-				} catch {}
+				// Usar progreso de hoy si viene por props para reactividad inmediata; si no, cargarlo
+				let progressToday = Array.isArray(todayProgress) ? todayProgress : []
+				if (!progressToday.length) {
+					try {
+						progressToday = await getProgressForDate(user.id, todayISO)
+					} catch {}
+				}
 				const todayDoneMap = new Map(
 					(progressToday || []).map((p) => [p.habit_id, !!p.completed])
 				)
@@ -187,7 +190,7 @@ export function HabitsTodayModal({
 		return () => {
 			cancelled = true
 		}
-	}, [visible, user?.id, todaysHabits])
+	}, [visible, user?.id, todaysHabits, todayProgress])
 
 	if (!internalVisible) return null
 

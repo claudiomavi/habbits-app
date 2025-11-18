@@ -302,7 +302,8 @@ export function Home() {
 			habitsLoading={habitsLoading}
 			progressLoading={progressLoading}
 			todaysHabits={todaysHabits}
-			renderHabit={renderHabit}
+renderHabit={renderHabit}
+todayProgress={progress}
 			xpPercent={xpPercent}
 			showLevelUpBanner={!!levelUpBanner?.visible}
 			onAcceptLevelUp={acceptLevelUpBanner}

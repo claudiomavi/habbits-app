@@ -17,6 +17,7 @@ export function HomeTemplate({
 	progressLoading,
 	todaysHabits,
 	renderHabit,
+	todayProgress,
 	xpPercent = 0,
 	onAction,
 	showLevelUpBanner = false,
