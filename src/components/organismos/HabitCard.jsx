@@ -95,7 +95,7 @@ export function HabitCard({ habit, done, onToggle, streak, streakUnit }) {
 				onPress={() => onToggle?.(habit)}
 				style={styles.checkboxLabel}
 			>
-				<View style={{ flex: 1 }}>
+				<View style={{ flex: 1, gap: 4 }}>
 					<View style={{ flexDirection: 'row', alignItems: 'center' }}>
 						<View style={styles.checkboxBoxWrapper}>
 							<Animated.View
@@ -178,7 +178,7 @@ export function HabitCard({ habit, done, onToggle, streak, streakUnit }) {
 						{typeof streak === 'number' && (
 							<View style={styles.streakPill}>
 								<Text style={styles.streakText}>
-									Racha: {streak} {streakUnit || 'día'}
+									Racha: {streak ? streak : '-'} {streakUnit || 'día'}
 									{streak === 1 ? '' : 's'}
 								</Text>
 							</View>

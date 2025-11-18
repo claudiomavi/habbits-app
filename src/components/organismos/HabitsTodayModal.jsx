@@ -90,7 +90,7 @@ export function HabitsTodayModal({
 	React.useEffect(() => {
 		let cancelled = false
 		const calcAll = async () => {
-						try {
+			try {
 				if (!user?.id || todaysHabits.length === 0) return
 				const todayISO = new Date().toISOString().slice(0, 10)
 				const results = {}
@@ -98,7 +98,12 @@ export function HabitsTodayModal({
 					// obtener hasta 365 días de historial para cómputos por día/semana/mes
 					let history = []
 					try {
-						history = await getProgressHistoryForHabit(user.id, h.id, todayISO, 365)
+						history = await getProgressHistoryForHabit(
+							user.id,
+							h.id,
+							todayISO,
+							365
+						)
 					} catch {}
 					const completedDates = new Set(
 						Array.isArray(history)
@@ -125,7 +130,12 @@ export function HabitsTodayModal({
 						return true
 					}
 					let value = 0
-					let unit = h.frequency === 'weekly' ? 'día' : h.frequency === 'monthly' ? 'mes' : 'día'
+					let unit =
+						h.frequency === 'weekly'
+							? 'día'
+							: h.frequency === 'monthly'
+							? 'mes'
+							: 'día'
 					let cursor = new Date(today)
 					for (let i = 0; i < 365; i++) {
 						// saltar días no programados
@@ -191,16 +201,20 @@ export function HabitsTodayModal({
 								data={todaysHabits}
 								keyExtractor={(item) => item.id}
 								renderItem={({ item }) => {
-	const s = streaks[item.id]
-	console.log('[Streak] renderItem', { id: item.id, streak: s })
-	return renderHabit({
-		item,
-		streak: typeof s?.value === 'number' ? s.value : 0,
-streakUnit:
-s?.unit || (item.frequency === 'weekly' ? 'día' : item.frequency === 'monthly' ? 'mes' : 'día'),
-	})
-}
-								}
+									const s = streaks[item.id]
+									console.log('[Streak] renderItem', { id: item.id, streak: s })
+									return renderHabit({
+										item,
+										streak: typeof s?.value === 'number' ? s.value : 0,
+										streakUnit:
+											s?.unit ||
+											(item.frequency === 'weekly'
+												? 'día'
+												: item.frequency === 'monthly'
+												? 'mes'
+												: 'día'),
+									})
+								}}
 								contentContainerStyle={{ gap: 12, paddingVertical: 8 }}
 								style={{ maxHeight: Dimensions.get('window').height * 0.6 }}
 							/>
