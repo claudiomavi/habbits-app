@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import {
+	CustomRangeModal,
 	getHabitsByUser,
 	StatisticsTemplate,
 	useAuthStore,
@@ -17,11 +18,17 @@ import {
 export function Statistics() {
 	const { user } = useAuthStore()
 
-	// Default range: last 30 days including today
+	// Range selection state: '7' | '30' | 'custom'
+	const [range, setRange] = useState('30')
+	const [customDays, setCustomDays] = useState(30)
+	const [showCustom, setShowCustom] = useState(false)
+
+	// Compute from/to based on selection
 	const today = new Date()
 	const toISO = makeLocalISO(today)
+	const days = range === '7' ? 7 : customDays
 	const from = new Date(today)
-	from.setDate(today.getDate() - 29)
+	from.setDate(today.getDate() - (days - 1))
 	const fromISO = makeLocalISO(from)
 
 	const { data: habits = [], isLoading: habitsLoading } = useQuery({
@@ -47,14 +54,36 @@ export function Statistics() {
 	}, [habits, progress, fromISO, toISO])
 
 	return (
-		<StatisticsTemplate
-			loading={habitsLoading || progressLoading}
-			fromISO={fromISO}
-			toISO={toISO}
-			habits={habits}
-			progress={progress}
-			perHabitStats={perHabitStats}
-			global={global}
-		/>
+		<>
+			<StatisticsTemplate
+				loading={habitsLoading || progressLoading}
+				fromISO={fromISO}
+				toISO={toISO}
+				habits={habits}
+				progress={progress}
+				perHabitStats={perHabitStats}
+				global={global}
+				rangeValue={range}
+				onChangeRange={(v) => {
+					if (v === '7' || v === '30') {
+						setRange(v)
+						if (v === '30') setCustomDays(30)
+					}
+				}}
+				onOpenCustom={() => {
+					setRange('custom')
+					setShowCustom(true)
+				}}
+			/>
+			<CustomRangeModal
+				visible={showCustom}
+				onClose={() => setShowCustom(false)}
+				onApply={(days) => {
+					setCustomDays(days)
+					setShowCustom(false)
+				}}
+				initialDays={customDays}
+			/>
+		</>
 	)
 }

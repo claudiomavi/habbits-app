@@ -5,7 +5,11 @@ import {
 	Text,
 	View,
 } from 'react-native'
-import { CardContainer, GradientBackground } from '../../autoBarrell'
+import {
+	CardContainer,
+	GradientBackground,
+	RangeSelector,
+} from '../../autoBarrell'
 
 export function StatisticsTemplate({
 	loading = false,
@@ -14,6 +18,9 @@ export function StatisticsTemplate({
 	habits = [],
 	perHabitStats = {},
 	global = {},
+	rangeValue = '30',
+	onChangeRange,
+	onOpenCustom,
 }) {
 	return (
 		<GradientBackground style={styles.container}>
@@ -24,6 +31,13 @@ export function StatisticsTemplate({
 						{fromISO} → {toISO}
 					</Text>
 				</View>
+				<View style={{ marginTop: 8 }}>
+					<RangeSelector
+						value={rangeValue}
+						onChange={onChangeRange}
+						onOpenCustom={onOpenCustom}
+					/>
+				</View>
 				{loading ? (
 					<View style={{ paddingVertical: 24, alignItems: 'center' }}>
 						<ActivityIndicator />
@@ -31,7 +45,7 @@ export function StatisticsTemplate({
 				) : (
 					<>
 						<View style={styles.section}>
-							<Text style={styles.sectionTitle}>Resumen</Text>
+							<Text style={styles.sectionTitle}>Resumen general</Text>
 							<Text style={styles.meta}>
 								Programados: {global.totalScheduled ?? 0}
 							</Text>
@@ -48,7 +62,7 @@ export function StatisticsTemplate({
 						</View>
 
 						<View style={styles.section}>
-							<Text style={styles.sectionTitle}>Por hábito</Text>
+							<Text style={styles.sectionTitle}>Resumen por hábito</Text>
 							<FlatList
 								data={habits}
 								keyExtractor={(h) => h.id}
