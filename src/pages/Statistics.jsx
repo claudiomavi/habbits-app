@@ -13,6 +13,8 @@ import {
 	computeGlobalAggregates,
 	computeStreakCurrentAndMax,
 	makeLocalISO,
+	getDailyCounts,
+	getActiveDaysCount,
 } from '../utils/stats'
 
 export function Statistics() {
@@ -40,7 +42,7 @@ export function Statistics() {
 	const { data: progress = [], isLoading: progressLoading } =
 		useProgressRangeQuery(user?.id, fromISO, toISO)
 
-	const { scheduleMap, perHabitStats, global } = useMemo(() => {
+	const { scheduleMap, perHabitStats, global, dailyCounts, activeDays } = useMemo(() => {
 		const scheduleMap = buildScheduleMap(habits, fromISO, toISO)
 		// Build per habit aggregates
 		const perHabitStats = {}
@@ -50,7 +52,9 @@ export function Statistics() {
 			perHabitStats[h.id] = { ...streak, ...compliance }
 		}
 		const global = computeGlobalAggregates(habits, progress, fromISO, toISO)
-		return { scheduleMap, perHabitStats, global }
+		const dailyCounts = getDailyCounts(habits, progress, fromISO, toISO)
+		const activeDays = getActiveDaysCount(dailyCounts)
+		return { scheduleMap, perHabitStats, global, dailyCounts, activeDays }
 	}, [habits, progress, fromISO, toISO])
 
 	return (
@@ -63,6 +67,8 @@ export function Statistics() {
 				progress={progress}
 				perHabitStats={perHabitStats}
 				global={global}
+				dailyCounts={dailyCounts}
+				activeDays={activeDays}
 				rangeValue={range}
 				onChangeRange={(v) => {
 					if (v === '7' || v === '30') {

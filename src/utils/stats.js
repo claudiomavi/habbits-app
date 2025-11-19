@@ -123,3 +123,68 @@ export function computeGlobalAggregates(habits, progress, fromISO, toISO) {
 		totalScheduled > 0 ? (totalCompleted / totalScheduled) * 100 : 0
 	return { totalScheduled, totalCompleted, overallPct, perHabit }
 }
+
+// New helpers for summary
+export function getDailyCounts(habits, progress, fromISO, toISO) {
+	const days = []
+	const completedByDate = new Map()
+	for (const p of progress || []) {
+		if (p.completed && p.date >= fromISO && p.date <= toISO) {
+			completedByDate.set(p.date, (completedByDate.get(p.date) || 0) + 1)
+		}
+	}
+	// compute scheduled per day using schedule map
+	const scheduleMap = buildScheduleMap(habits || [], fromISO, toISO)
+	const scheduledByDate = new Map()
+	for (const [, dates] of scheduleMap.entries()) {
+		for (const dateISO of dates) {
+			scheduledByDate.set(
+				dateISO,
+				(scheduledByDate.get(dateISO) || 0) + 1
+			)
+		}
+	}
+	for (const d of iterDateRange(fromISO, toISO)) {
+		const iso = makeLocalISO(d)
+		days.push({
+			dateISO: iso,
+			completedCount: completedByDate.get(iso) || 0,
+			scheduledCount: scheduledByDate.get(iso) || 0,
+		})
+	}
+	return days
+}
+
+export function getActiveDaysCount(dailyCounts) {
+	return (dailyCounts || []).reduce(
+		(acc, d) => acc + (d.completedCount > 0 ? 1 : 0),
+		0
+	)
+}
+
+export function getTopHabits(perHabitStats, habits, topN = 3) {
+	const list = (habits || []).map((h) => ({
+		id: h.id,
+		title: h.title,
+		pct: perHabitStats?.[h.id]?.pct ?? 0,
+		programados: perHabitStats?.[h.id]?.programados ?? 0,
+		completados: perHabitStats?.[h.id]?.completados ?? 0,
+	}))
+	list.sort((a, b) => (b.pct || 0) - (a.pct || 0))
+	return list.slice(0, topN)
+}
+
+export function getBottomHabit(perHabitStats, habits) {
+	const list = (habits || []).map((h) => ({
+		id: h.id,
+		title: h.title,
+		pct: perHabitStats?.[h.id]?.pct ?? 0,
+		programados: perHabitStats?.[h.id]?.programados ?? 0,
+		completados: perHabitStats?.[h.id]?.completados ?? 0,
+	}))
+	// filter only those that had scheduled>0 to be meaningful
+	const filtered = list.filter((x) => (x.programados || 0) > 0)
+	if (filtered.length === 0) return null
+	filtered.sort((a, b) => (a.pct || 0) - (b.pct || 0))
+	return filtered[0]
+}

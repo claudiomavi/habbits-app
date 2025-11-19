@@ -22,9 +22,8 @@
 
 ### UI y gráficos (interactivos)
 
-- [ ] Barra superior con:
-  - [ ] Selector de rango (7/30/90/Todo)
-  - [ ] Filtro de hábito (All / hábito concreto)
+- [x] Barra superior con:
+  - [x] Selector de rango (7/30/90/Todo)
 - [ ] Cards:
   - [ ] Racha global: racha actual y máxima (en el rango). Tooltip con “cómo se calcula”.
   - [ ] % Cumplimiento: gráfico de barras por día/semana con tooltip (victory-native).

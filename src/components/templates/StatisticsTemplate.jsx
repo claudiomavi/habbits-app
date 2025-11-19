@@ -9,6 +9,8 @@ import {
 	CardContainer,
 	GradientBackground,
 	RangeSelector,
+	Sparkline,
+	SummaryKPI,
 } from '../../autoBarrell'
 
 export function StatisticsTemplate({
@@ -21,6 +23,10 @@ export function StatisticsTemplate({
 	rangeValue = '30',
 	onChangeRange,
 	onOpenCustom,
+	dailyCounts = [],
+	activeDays = 0,
+	topHabits = [],
+	bottomHabit = null,
 }) {
 	return (
 		<GradientBackground style={styles.container}>
@@ -45,20 +51,35 @@ export function StatisticsTemplate({
 				) : (
 					<>
 						<View style={styles.section}>
-							<Text style={styles.sectionTitle}>Resumen general</Text>
-							<Text style={styles.meta}>
-								Programados: {global.totalScheduled ?? 0}
-							</Text>
-							<Text style={styles.meta}>
-								Completados: {global.totalCompleted ?? 0}
-							</Text>
-							<Text style={styles.meta}>
-								Cumplimiento:{' '}
-								{Number.isFinite(global.overallPct)
-									? Math.round(global.overallPct * 100) / 100
-									: 0}
-								%
-							</Text>
+							<Text style={styles.sectionTitle}>Resumen</Text>
+							<View style={styles.kpisRow}>
+								<SummaryKPI
+									label="Cumplimiento"
+									value={`${
+										Number.isFinite(global.overallPct)
+											? Math.round(global.overallPct)
+											: 0
+									}%`}
+									sublabel={`${global.totalCompleted ?? 0}/${
+										global.totalScheduled ?? 0
+									}`}
+								/>
+								<SummaryKPI
+									label="Días activos"
+									value={String(activeDays)}
+								/>
+								<SummaryKPI
+									label="Hábitos"
+									value={String(habits.length)}
+								/>
+							</View>
+							<View style={{ marginTop: 10 }}>
+								<Text style={styles.sectionTitle}>Tendencia</Text>
+								<Sparkline
+									data={dailyCounts.map((d) => d.completedCount)}
+									height={44}
+								/>
+							</View>
 						</View>
 
 						<View style={styles.section}>
@@ -119,6 +140,7 @@ const styles = StyleSheet.create({
 		color: '#111827',
 		marginBottom: 6,
 	},
+	kpisRow: { flexDirection: 'row', gap: 10 },
 	row: {
 		flexDirection: 'row',
 		alignItems: 'center',
