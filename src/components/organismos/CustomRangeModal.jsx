@@ -1,5 +1,14 @@
 import React from 'react'
-import { Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import {
+	Animated,
+	Easing,
+	Modal,
+	Pressable,
+	StyleSheet,
+	Text,
+	TextInput,
+	View,
+} from 'react-native'
 import { PrimaryButton } from '../../autoBarrell'
 
 export function CustomRangeModal({
@@ -10,6 +19,29 @@ export function CustomRangeModal({
 }) {
 	const [days, setDays] = React.useState(initialDays)
 	const [text, setText] = React.useState(String(initialDays))
+	const scale = React.useRef(new Animated.Value(0.95)).current
+	const opacity = React.useRef(new Animated.Value(0)).current
+	React.useEffect(() => {
+		if (visible) {
+			Animated.parallel([
+				Animated.timing(scale, {
+					toValue: 1,
+					duration: 220,
+					easing: Easing.out(Easing.cubic),
+					useNativeDriver: true,
+				}),
+				Animated.timing(opacity, {
+					toValue: 1,
+					duration: 220,
+					easing: Easing.out(Easing.cubic),
+					useNativeDriver: true,
+				}),
+			]).start()
+		} else {
+			scale.setValue(0.95)
+			opacity.setValue(0)
+		}
+	}, [visible])
 	React.useEffect(() => {
 		if (visible) {
 			setDays(initialDays)
@@ -23,15 +55,34 @@ export function CustomRangeModal({
 		setDays(n)
 		setText(String(n))
 	}
+	const bounce = React.useRef(new Animated.Value(1)).current
+	const triggerBounce = () => {
+		Animated.sequence([
+			Animated.timing(bounce, {
+				toValue: 1.08,
+				duration: 90,
+				easing: Easing.out(Easing.quad),
+				useNativeDriver: true,
+			}),
+			Animated.spring(bounce, {
+				toValue: 1,
+				friction: 4,
+				tension: 120,
+				useNativeDriver: true,
+			}),
+		]).start()
+	}
 	const dec = () => {
 		const n = clamp(days - 1)
 		setDays(n)
 		setText(String(n))
+		triggerBounce()
 	}
 	const inc = () => {
 		const n = clamp(days + 1)
 		setDays(n)
 		setText(String(n))
+		triggerBounce()
 	}
 
 	return (
@@ -56,7 +107,14 @@ export function CustomRangeModal({
 							<Text style={styles.stepText}>−</Text>
 						</Pressable>
 						<View style={styles.daysBox}>
-							<View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+							<Animated.View
+								style={{
+									flexDirection: 'row',
+									alignItems: 'center',
+									gap: 8,
+									transform: [{ scale: bounce }],
+								}}
+							>
 								<TextInput
 									style={styles.input}
 									keyboardType="number-pad"
@@ -67,7 +125,7 @@ export function CustomRangeModal({
 									maxLength={3}
 								/>
 								<Text style={styles.daysSuffix}>días</Text>
-							</View>
+							</Animated.View>
 						</View>
 						<Pressable
 							style={[styles.stepBtn, styles.stepPlus]}
@@ -76,8 +134,8 @@ export function CustomRangeModal({
 							<Text style={styles.stepText}>＋</Text>
 						</Pressable>
 					</View>
-
-					<View style={{ flexDirection: 'row', gap: 10, marginTop: 16 }}>
+					<View style={{ height: 12 }} />
+					<View style={{ flexDirection: 'row', gap: 10 }}>
 						<View style={{ flex: 1 }}>
 							<PrimaryButton
 								title="Cancelar"
@@ -88,7 +146,10 @@ export function CustomRangeModal({
 							<PrimaryButton
 								title="Aplicar"
 								onPress={() => {
-									const n = Math.max(1, Math.min(180, parseInt(text || '0', 10) || 0))
+									const n = Math.max(
+										1,
+										Math.min(180, parseInt(text || '0', 10) || 0)
+									)
 									setDays(n)
 									setText(String(n))
 									onApply?.(n)
@@ -120,6 +181,7 @@ const styles = StyleSheet.create({
 	title: { fontSize: 18, fontWeight: '700', color: '#111827' },
 	subtitle: { fontSize: 12, color: '#6B7280', marginTop: 4 },
 	stepperRow: {
+		gap: 8,
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',

@@ -1,8 +1,26 @@
 import { LinearGradient } from 'expo-linear-gradient'
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import React from 'react'
+import {
+	Animated,
+	Easing,
+	Pressable,
+	StyleSheet,
+	Text,
+	View,
+} from 'react-native'
 
 export function RangeSelector({ value = '30', onChange, onOpenCustom }) {
 	// value can be '7' | '30' | 'custom'
+	const anim = React.useRef(new Animated.Value(0)).current
+	React.useEffect(() => {
+		Animated.timing(anim, {
+			toValue: 1,
+			duration: 220,
+			easing: Easing.out(Easing.cubic),
+			useNativeDriver: true,
+		}).start(() => anim.setValue(0))
+	}, [value])
+
 	const items = [
 		{ key: '7', label: '7 días' },
 		{ key: '30', label: '30 días' },
@@ -12,6 +30,10 @@ export function RangeSelector({ value = '30', onChange, onOpenCustom }) {
 		<View style={styles.wrapper}>
 			{items.map((it) => {
 				const selected = value === it.key
+				const scale = anim.interpolate({
+					inputRange: [0, 1],
+					outputRange: [1, selected ? 1.06 : 1],
+				})
 				const content = (
 					<View style={[styles.pill, selected && styles.pillSelected]}>
 						{selected ? (
@@ -40,7 +62,9 @@ export function RangeSelector({ value = '30', onChange, onOpenCustom }) {
 						onPress={onPress}
 						style={{ flex: 1 }}
 					>
-						{content}
+						<Animated.View style={{ transform: [{ scale }] }}>
+							{content}
+						</Animated.View>
 					</Pressable>
 				)
 			})}
@@ -57,6 +81,7 @@ const styles = StyleSheet.create({
 		borderRadius: 16,
 		borderWidth: 2,
 		borderColor: '#E5E7EB',
+		alignItems: 'center',
 	},
 	pill: {
 		borderRadius: 12,
@@ -64,8 +89,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
-	gradientBg: { paddingVertical: 10, borderRadius: 12 },
-	pillSelected: {},
+	gradientBg: { padding: 10, borderRadius: 12 },
 	label: {
 		textAlign: 'center',
 		paddingVertical: 10,
