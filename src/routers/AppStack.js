@@ -48,12 +48,12 @@ export function AppStack() {
 				component={Habits}
 			/>
 			<Tab.Screen
-				name="Perfil"
-				component={Profile}
-			/>
-			<Tab.Screen
 				name="Estadísticas"
 				component={Statistics}
+			/>
+			<Tab.Screen
+				name="Perfil"
+				component={Profile}
 			/>
 		</Tab.Navigator>
 	)

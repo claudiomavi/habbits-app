@@ -12,9 +12,11 @@ import {
 	computeCompliance,
 	computeGlobalAggregates,
 	computeStreakCurrentAndMax,
-	makeLocalISO,
-	getDailyCounts,
 	getActiveDaysCount,
+	getBottomHabit,
+	getDailyCounts,
+	getTopHabits,
+	makeLocalISO,
 } from '../utils/stats'
 
 export function Statistics() {
@@ -42,7 +44,28 @@ export function Statistics() {
 	const { data: progress = [], isLoading: progressLoading } =
 		useProgressRangeQuery(user?.id, fromISO, toISO)
 
-	const { scheduleMap, perHabitStats, global, dailyCounts, activeDays } = useMemo(() => {
+	// Previous period (same length) for delta comparison
+	const prevTo = new Date(from)
+	prevTo.setDate(prevTo.getDate() - 1)
+	const prevToISO = makeLocalISO(prevTo)
+	const prevFrom = new Date(prevTo)
+	prevFrom.setDate(prevTo.getDate() - (days - 1))
+	const prevFromISO = makeLocalISO(prevFrom)
+
+	const { data: prevProgress = [], isLoading: prevLoading } =
+		useProgressRangeQuery(user?.id, prevFromISO, prevToISO)
+
+	const {
+		scheduleMap,
+		perHabitStats,
+		global,
+		dailyCounts,
+		activeDays,
+		deltaPct,
+		topHabits,
+		bottomHabit,
+		deltaActive,
+	} = useMemo(() => {
 		const scheduleMap = buildScheduleMap(habits, fromISO, toISO)
 		// Build per habit aggregates
 		const perHabitStats = {}
@@ -52,10 +75,37 @@ export function Statistics() {
 			perHabitStats[h.id] = { ...streak, ...compliance }
 		}
 		const global = computeGlobalAggregates(habits, progress, fromISO, toISO)
+		const prevGlobal = computeGlobalAggregates(
+			habits,
+			prevProgress,
+			prevFromISO,
+			prevToISO
+		)
+		const deltaPct = (global.overallPct || 0) - (prevGlobal.overallPct || 0)
 		const dailyCounts = getDailyCounts(habits, progress, fromISO, toISO)
 		const activeDays = getActiveDaysCount(dailyCounts)
-		return { scheduleMap, perHabitStats, global, dailyCounts, activeDays }
-	}, [habits, progress, fromISO, toISO])
+		const topHabits = getTopHabits(perHabitStats, habits, 3)
+		const bottomHabit = getBottomHabit(perHabitStats, habits)
+		const prevDailyCounts = getDailyCounts(
+			habits,
+			prevProgress,
+			prevFromISO,
+			prevToISO
+		)
+		const prevActiveDays = getActiveDaysCount(prevDailyCounts)
+		const deltaActive = activeDays - prevActiveDays
+		return {
+			scheduleMap,
+			perHabitStats,
+			global,
+			dailyCounts,
+			activeDays,
+			deltaPct,
+			topHabits,
+			bottomHabit,
+			deltaActive,
+		}
+	}, [habits, progress, prevProgress, fromISO, toISO, prevFromISO, prevToISO])
 
 	return (
 		<>
@@ -69,6 +119,10 @@ export function Statistics() {
 				global={global}
 				dailyCounts={dailyCounts}
 				activeDays={activeDays}
+				deltaPct={deltaPct}
+				deltaActive={deltaActive}
+				topHabits={topHabits}
+				bottomHabit={bottomHabit}
 				rangeValue={range}
 				onChangeRange={(v) => {
 					if (v === '7' || v === '30') {

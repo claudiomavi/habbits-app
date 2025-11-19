@@ -27,6 +27,8 @@ export function StatisticsTemplate({
 	activeDays = 0,
 	topHabits = [],
 	bottomHabit = null,
+	deltaPct = 0,
+	deltaActive = 0,
 }) {
 	return (
 		<GradientBackground style={styles.container}>
@@ -63,10 +65,15 @@ export function StatisticsTemplate({
 									sublabel={`${global.totalCompleted ?? 0}/${
 										global.totalScheduled ?? 0
 									}`}
+									delta={
+										Number.isFinite(deltaPct) ? Number(deltaPct.toFixed(1)) : 0
+									}
 								/>
 								<SummaryKPI
 									label="Días activos"
 									value={String(activeDays)}
+									delta={deltaActive}
+									deltaSuffix=""
 								/>
 								<SummaryKPI
 									label="Hábitos"
@@ -79,6 +86,34 @@ export function StatisticsTemplate({
 									data={dailyCounts.map((d) => d.completedCount)}
 									height={44}
 								/>
+							</View>
+
+							<View style={{ marginTop: 12 }}>
+								<Text style={styles.sectionTitle}>Insights</Text>
+								<View style={styles.insightBox}>
+									<Text style={styles.meta}>Top 3 hábitos</Text>
+									{(topHabits || []).map((h) => (
+										<View
+											key={h.id}
+											style={styles.insightRow}
+										>
+											<Text style={styles.insightTitle}>{h.title}</Text>
+											<Text style={styles.insightValue}>
+												{Math.round(h.pct)}%
+											</Text>
+										</View>
+									))}
+									{bottomHabit ? (
+										<View style={[styles.insightRow, { marginTop: 6 }]}>
+											<Text style={styles.insightTitle}>
+												Oportunidad: {bottomHabit.title}
+											</Text>
+											<Text style={[styles.insightValue, { color: '#EF4444' }]}>
+												{Math.round(bottomHabit.pct)}%
+											</Text>
+										</View>
+									) : null}
+								</View>
 							</View>
 						</View>
 
@@ -153,4 +188,19 @@ const styles = StyleSheet.create({
 	},
 	habitTitle: { fontSize: 16, fontWeight: '600', color: '#111827' },
 	meta: { fontSize: 12, color: '#6B7280', marginTop: 4 },
+	insightBox: {
+		backgroundColor: '#F9FAFB',
+		borderWidth: 2,
+		borderColor: '#E5E7EB',
+		borderRadius: 16,
+		padding: 12,
+		marginTop: 6,
+	},
+	insightRow: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		paddingVertical: 4,
+	},
+	insightTitle: { fontSize: 13, color: '#374151' },
+	insightValue: { fontSize: 13, color: '#10B981', fontWeight: '700' },
 })

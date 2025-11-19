@@ -20,9 +20,7 @@ export function SummaryKPI({
 					<Text style={styles.value}>{value}</Text>
 					{suffix ? <Text style={styles.suffix}>{suffix}</Text> : null}
 				</View>
-				{sublabel ? (
-					<Text style={styles.sublabel}>{sublabel}</Text>
-				) : null}
+				{sublabel ? <Text style={styles.sublabel}>{sublabel}</Text> : null}
 				{delta !== null && delta !== undefined ? (
 					<Text
 						style={[
@@ -47,7 +45,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 12,
 		alignItems: 'center',
 		justifyContent: 'center',
-		minHeight: 80,
+		minHeight: 90,
 	},
 	value: {
 		color: '#fff',
