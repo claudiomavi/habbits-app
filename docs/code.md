@@ -31,16 +31,15 @@
 
 ## PÁGINA ESTADISTICAS
 
-Me encanta. Antes de escribir una sola línea de código, te propongo estructurar bien la nueva pestaña de “Estadísticas” para que sea clara, útil y 100% entendible por cualquiera, con gráficos interactivos y métricas que realmente aporten.
-
-Objetivos de la pestaña Estadísticas
+### Objetivos de la pestaña Estadísticas
 
 - Claridad para cualquier usuario: lenguaje simple, visualizaciones intuitivas, estados vacíos explicativos.
 - Interactividad suficiente: filtros por rango de fechas, por hábito, y “tap” para ver detalle puntual.
 - Métricas accionables: que ayuden a entender avances y dónde mejorar, no solo “bonitas”.
 
-Métricas y visualizaciones propuestas (MVP y siguientes)
-MVP (primera versión)
+### Métricas y visualizaciones propuestas (MVP y siguientes)
+
+#### MVP (primera versión)
 
 - Racha actual y máxima (global y por hábito)
   - Card resumen: racha actual global (suma por ocurrencias programadas), racha máxima. Tooltip con “cómo se calcula”.
@@ -59,14 +58,14 @@ MVP (primera versión)
   - Ideal para “ver de un vistazo” constancia y huecos.
   - Comparativas (últimos 7 vs 7 previos; últimos 30 vs 30 previos).
 
-Interacciones clave
+#### Interacciones clave
 
 - Selector de rango: 7, 30, 90 días, “Todo”.
 - Filtro por hábito: All vs uno concreto.
 - Tap en barra/punto del gráfico → tooltip con fecha, programado vs completado, XP.
 - Estados vacíos: mensajes claros para “sin datos” y “aún no tienes hábitos”.
 
-Cálculos (alineados con tu lógica actual)
+#### Cálculos (alineados con tu lógica actual)
 
 - Programado (weekly): lunes=0; se ignoran días no seleccionados.
 - Programado (monthly): day_of_month 1–31; días que no existen en el mes no cuentan como programados.
@@ -80,7 +79,7 @@ Cálculos (alineados con tu lógica actual)
 - XP:
   - Ya lo calculas por evento; podemos sumar por rango y por hábito para gráficos de tendencia.
 
-Datos y performance
+#### Datos y performance
 
 - Fuente de datos:
   - habits (frequency, days_of_week monday-based, day_of_month)
@@ -99,7 +98,7 @@ Librería de gráficos recomendada en RN
 - victory-native + react-native-svg: estable, suficiente interactividad, tooltips básicos.
 - Accesibilidad: colores con buen contraste, paleta colorblind-friendly, descripciones para VoiceOver.
 
-Arquitectura de UI
+#### Arquitectura de UI
 
 - Nueva Tab “Estadísticas” → pantalla con secciones en tarjetas:
   - Encabezado: rango de fechas + filtro por hábito
@@ -112,18 +111,18 @@ Arquitectura de UI
   - Calendario/heatmap
   - Métricas del hábito: racha actual/máxima, % cumplimiento, XP en el rango.
 
-Estados y edge cases
+#### Estados y edge cases
 
 - Sin hábitos / sin datos en el rango → mensajes claros y CTA “Crea tu primer hábito”.
 - Meses con day_of_month inexistente: no contabilizan como programados.
 - Cambios de configuración del hábito: los cálculos se basan en la config actual (no recalc de histórico). Lo documentaremos en un tooltip.
 
-Métricas “con historia”
+#### Métricas “con historia”
 
 - Racha máxima: podemos calcularla histórica si descargamos suficiente historial (p. ej., 180 días) o si añadimos una vista agregada en DB **en este caso hay que poner todo el historial que podamos porque hay que indicar al usuario su racha total si en el filtro lo pone**.
 - % cumplimiento por semana/mes: agregar por periodos (agrupando fechas a semanas ISO y meses). Útil una vista SQL.
 
-MVP a implementar
+### MVP a implementar
 
 - Tab Estadísticas (navegación + layout inicial).
 - Selector de rango (7/30/90) y filtro por hábito.
@@ -136,7 +135,7 @@ MVP a implementar
 - Tendencia de XP por día/semana.
 - Vistas SQL/materialized views para performance.
 
-Accesibilidad e i18n
+### Accesibilidad e i18n
 
 - Labels claros, tooltips con texto alternativo.
 - Fechas localizadas (empezando semana en lunes).

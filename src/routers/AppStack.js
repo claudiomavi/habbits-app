@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import { Habits, Home, Profile } from '../autoBarrell'
+import { Habits, Home, Profile, Statistics } from '../autoBarrell'
 
 const Tab = createBottomTabNavigator()
 
@@ -26,6 +26,8 @@ export function AppStack() {
 						iconName = focused ? 'list' : 'list-outline'
 					if (route.name === 'Perfil')
 						iconName = focused ? 'person' : 'person-outline'
+					if (route.name === 'Estadísticas')
+						iconName = focused ? 'stats-chart' : 'stats-chart-outline'
 					return (
 						<Ionicons
 							name={iconName}
@@ -48,6 +50,10 @@ export function AppStack() {
 			<Tab.Screen
 				name="Perfil"
 				component={Profile}
+			/>
+			<Tab.Screen
+				name="Estadísticas"
+				component={Statistics}
 			/>
 		</Tab.Navigator>
 	)
