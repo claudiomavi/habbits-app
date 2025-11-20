@@ -83,16 +83,49 @@ export function StatisticsTemplate({
 							</View>
 							<View style={{ marginTop: 10 }}>
 								<Text style={styles.sectionTitle}>Tendencia</Text>
-							<View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 6 }}>
-								<View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-									<View style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: '#10B981' }} />
-									<Text style={styles.meta}>Período actual</Text>
+								<View
+									style={{
+										flexDirection: 'row',
+										alignItems: 'center',
+										gap: 12,
+										marginVertical: 6,
+									}}
+								>
+									<View
+										style={{
+											flexDirection: 'row',
+											alignItems: 'center',
+											gap: 6,
+										}}
+									>
+										<View
+											style={{
+												width: 10,
+												height: 10,
+												borderRadius: 2,
+												backgroundColor: '#10B981',
+											}}
+										/>
+										<Text style={styles.meta}>Período actual</Text>
+									</View>
+									<View
+										style={{
+											flexDirection: 'row',
+											alignItems: 'center',
+											gap: 6,
+										}}
+									>
+										<View
+											style={{
+												width: 10,
+												height: 10,
+												borderRadius: 2,
+												backgroundColor: '#60A5FA',
+											}}
+										/>
+										<Text style={styles.meta}>Período anterior</Text>
+									</View>
 								</View>
-								<View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-									<View style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: '#60A5FA' }} />
-									<Text style={styles.meta}>Período anterior</Text>
-								</View>
-							</View>
 								<SparklineGifted
 									dailyCounts={dailyCounts}
 									prevDailyCounts={prevDailyCounts}
