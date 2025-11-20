@@ -26,15 +26,20 @@ export function SparklineGifted({
 	const [hoverLabel, setHoverLabel] = useState('')
 	const { data, data2 } = useMemo(() => {
 		const data = (dailyCounts || []).map((d) => ({
-value: d.completedCount || 0,
-label: hideXLabels ? '' : d.dateISO?.slice(5) || '',
-}))
+			value: d.completedCount || 0,
+			label: hideXLabels
+				? ''
+				: `${(d?.dateISO || '').slice(8, 10)}-${(d?.dateISO || '').slice(
+						5,
+						7
+				  )}`,
+		}))
 		const data2 = (prevDailyCounts || []).map((d) => ({
 			value: d.completedCount || 0,
 			label: d.dateISO?.slice(5) || '',
 		}))
 		return { data, data2 }
-	}, [dailyCounts, prevDailyCounts])
+	}, [dailyCounts, prevDailyCounts, hideXLabels])
 
 	if (!data || data.length === 0) {
 		return (
@@ -64,7 +69,10 @@ label: hideXLabels ? '' : d.dateISO?.slice(5) || '',
 					curved
 					areaChart
 					showGradient
-					hideDataPoints
+					showDataPoints
+					pressEnabled
+					dataPointsColor="transparent"
+					dataPointsRadius={8}
 					hideRules
 					width={chartWidth}
 					adjustToWidth
@@ -75,15 +83,17 @@ label: hideXLabels ? '' : d.dateISO?.slice(5) || '',
 					endOpacity={0.01}
 					yAxisTextStyle={{ display: 'none' }}
 					xAxisLabelTextStyle={{ color: '#9CA3AF', fontSize: 10 }}
-focusEnabled={false}
-showStrip={false}
-				onPointPress={(item, index) => {
-					if (item) {
-						setHoverValue(item.value)
-const idx = index ?? 0
-						setHoverLabel(dailyCounts?.[idx]?.dateISO?.slice(5) || '')
-					}
-				}}
+					focusEnabled={false}
+					showStrip={false}
+					onPointPress={(item, index) => {
+						if (item) {
+							setHoverValue(item.value)
+							const idx = index ?? 0
+							const iso = dailyCounts?.[idx]?.dateISO || ''
+							const ddmm = iso ? `${iso.slice(8, 10)}-${iso.slice(5, 7)}` : ''
+							setHoverLabel(ddmm)
+						}
+					}}
 					animateOnDataChange={animate}
 					animationDuration={animationDuration}
 					pointerConfig={{
@@ -112,6 +122,18 @@ const idx = index ?? 0
 					}}
 				/>
 			</ScrollView>
+			{hoverValue != null ? (
+				<View style={{ alignItems: 'flex-end', marginTop: 6 }}>
+					{hideXLabels && hoverLabel ? (
+						<Text style={{ color: '#6B7280', fontSize: 11, marginBottom: 2 }}>
+							{hoverLabel}
+						</Text>
+					) : null}
+					<Text style={{ color: '#111827', fontSize: 12 }}>
+						{hoverValue} hábitos
+					</Text>
+				</View>
+			) : null}
 		</View>
 	)
 }
