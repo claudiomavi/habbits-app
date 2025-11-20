@@ -60,6 +60,7 @@ export function Statistics() {
 		perHabitStats,
 		global,
 		dailyCounts,
+		prevDailyCounts,
 		activeDays,
 		deltaPct,
 		topHabits,
@@ -99,6 +100,7 @@ export function Statistics() {
 			perHabitStats,
 			global,
 			dailyCounts,
+			prevDailyCounts,
 			activeDays,
 			deltaPct,
 			topHabits,
@@ -123,6 +125,7 @@ export function Statistics() {
 				deltaActive={deltaActive}
 				topHabits={topHabits}
 				bottomHabit={bottomHabit}
+				prevDailyCounts={prevDailyCounts}
 				rangeValue={range}
 				onChangeRange={(v) => {
 					if (v === '7' || v === '30') {
