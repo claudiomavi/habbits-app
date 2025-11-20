@@ -1040,22 +1040,25 @@ Cómo exportar permisos/políticas (guía rápida):
 ## 11) Actualizaciones recientes (Q4)
 
 ### Streaks y multiplicador (streakMultiplier)
+
 - Lógica unificada para contar rachas por ocurrencias programadas consecutivas (no por días naturales):
   - daily: días consecutivos
   - weekly: lunes=0, se saltan los días no seleccionados
   - monthly: day_of_month (1–31)
 - Cálculo usa fecha local (YYYY-MM-DD) en cliente, evitando UTC.
 - Se incluye “hoy” en la racha si se está marcando como completado (newCompleted).
-- streakMultiplier = min(2.0, 1 + 0.05 * streakDays), tope 2.0.
+- streakMultiplier = min(2.0, 1 + 0.05 \* streakDays), tope 2.0.
 - Logs añadidos para depuración:
   - [StreakMultiplier] y [StreakMultiplier:trace] en Home.jsx.
   - [Streak:UI:trace] en HabitsTodayModal.jsx.
 
 ### UI y reactividad
+
 - HabitsTodayModal ahora recalcula la racha al marcar/desmarcar (usa todayProgress por props para reactualizar en tiempo real).
 - Pastilla dev en HabitCard con “×1.xx” para validar el multiplicador en desarrollo.
 
 ### Monthly: selección de día del mes
+
 - Nuevo campo day_of_month (1–31) en la creación/edición de hábitos (HabitModal).
 - Home.jsx muestra como “hoy” un hábito monthly cuando el día actual coincide con day_of_month.
 - Modelo de datos actualizado en Playbook: day_of_month SMALLINT NULL CHECK (1–31).
@@ -1107,3 +1110,23 @@ Cómo exportar permisos/políticas (guía rápida):
 
 - Asegurar políticas RLS de `progress_entries` para DELETE además de SELECT/INSERT/UPDATE:
   - `create policy "users can delete own progress" on public.progress_entries for delete using (auth.uid() = user_id);`
+
+### 11.6 Analítica y Estadísticas
+
+- Pestaña “Estadísticas” con:
+
+  - Selector de rango (7/30/custom) con modal y stepper (+/-), animaciones y leyenda de colores.
+  - Resumen general (KPIs: Cumplimiento, Días activos, Hábitos) con delta vs periodo anterior.
+  - Tendencia con react-native-gifted-charts (línea+área) y comparativa de periodo anterior; para X >= 10 días, badge externo con la fecha seleccionada y tooltip por tap; scroll horizontal desde 6 días y ancho dinámico.
+  - Insights: Top 3 hábitos y “Oportunidad”.
+  - Lista “Resumen por hábito”: tarjetas a pulir (tipografías/espaciado) y acceso a detalle.
+
+- Decisiones:
+
+  - Gráficos con gifted-charts + react-native-svg (mejor compatibilidad en Expo RN 0.81/React 19).
+  - Fallback por overlay Pressable para detección de taps en rangos largos (10+), enviando la fecha al template.
+
+- Próximos:
+  - Fix fechas en rangos 10+ (normalizar tap con scrollX, formato DD/MM opcional, mostrar fecha · N hábitos).
+  - Mejorar tarjetas del resumen por hábito (jerarquía tipográfica y espaciados, estados vacíos/loader por hábito).
+  - Pantalla de detalle de hábito con KPIs y gráfico de tendencia individual (misma lib y comparativa), navegación desde la tarjeta.
