@@ -1,6 +1,7 @@
 import {
 	ActivityIndicator,
 	FlatList,
+	ScrollView,
 	StyleSheet,
 	Text,
 	View,
@@ -33,174 +34,180 @@ export function StatisticsTemplate({
 }) {
 	return (
 		<GradientBackground style={styles.container}>
-			<CardContainer>
-				<View style={styles.headerRowCentered}>
-					<Text style={styles.title}>Estadísticas</Text>
-					<Text style={styles.subtitle}>
-						{fromISO} → {toISO}
-					</Text>
-				</View>
-				<View style={{ marginTop: 8 }}>
-					<RangeSelector
-						value={rangeValue}
-						onChange={onChangeRange}
-						onOpenCustom={onOpenCustom}
-					/>
-				</View>
-				{loading ? (
-					<View style={{ paddingVertical: 24, alignItems: 'center' }}>
-						<ActivityIndicator />
+			<ScrollView style={{ borderRadius: 24 }}>
+				<CardContainer>
+					<View style={styles.headerRowCentered}>
+						<Text style={styles.title}>Estadísticas</Text>
+						<Text style={styles.subtitle}>
+							{fromISO} → {toISO}
+						</Text>
 					</View>
-				) : (
-					<>
-						<View style={styles.section}>
-							<Text style={styles.sectionTitle}>Resumen</Text>
-							<View style={styles.kpisRow}>
-								<SummaryKPI
-									label="Cumplimiento"
-									value={`${
-										Number.isFinite(global.overallPct)
-											? Math.round(global.overallPct)
-											: 0
-									}%`}
-									sublabel={`${global.totalCompleted ?? 0}/${
-										global.totalScheduled ?? 0
-									}`}
-									delta={
-										Number.isFinite(deltaPct) ? Number(deltaPct.toFixed(1)) : 0
-									}
-								/>
-								<SummaryKPI
-									label="Días activos"
-									value={String(activeDays)}
-									delta={deltaActive}
-									deltaSuffix=""
-								/>
-								<SummaryKPI
-									label="Hábitos"
-									value={String(habits.length)}
-								/>
-							</View>
-							<View style={{ marginTop: 10 }}>
-								<Text style={styles.sectionTitle}>Tendencia</Text>
-								<View
-									style={{
-										flexDirection: 'row',
-										alignItems: 'center',
-										gap: 12,
-										marginVertical: 6,
-									}}
-								>
-									<View
-										style={{
-											flexDirection: 'row',
-											alignItems: 'center',
-											gap: 6,
-										}}
-									>
-										<View
-											style={{
-												width: 10,
-												height: 10,
-												borderRadius: 2,
-												backgroundColor: '#10B981',
-											}}
-										/>
-										<Text style={styles.meta}>Período actual</Text>
-									</View>
-									<View
-										style={{
-											flexDirection: 'row',
-											alignItems: 'center',
-											gap: 6,
-										}}
-									>
-										<View
-											style={{
-												width: 10,
-												height: 10,
-												borderRadius: 2,
-												backgroundColor: '#60A5FA',
-											}}
-										/>
-										<Text style={styles.meta}>Período anterior</Text>
-									</View>
-								</View>
-								<SparklineGifted
-									dailyCounts={dailyCounts}
-									prevDailyCounts={prevDailyCounts}
-									height={140}
-								/>
-							</View>
-
-							<View style={{ marginTop: 12 }}>
-								<Text style={styles.sectionTitle}>Insights</Text>
-								<View style={styles.insightBox}>
-									<Text style={styles.meta}>Top 3 hábitos</Text>
-									{(topHabits || []).map((h) => (
-										<View
-											key={h.id}
-											style={styles.insightRow}
-										>
-											<Text style={styles.insightTitle}>{h.title}</Text>
-											<Text style={styles.insightValue}>
-												{Math.round(h.pct)}%
-											</Text>
-										</View>
-									))}
-									{bottomHabit ? (
-										<View style={[styles.insightRow, { marginTop: 6 }]}>
-											<Text style={styles.insightTitle}>
-												Oportunidad: {bottomHabit.title}
-											</Text>
-											<Text style={[styles.insightValue, { color: '#EF4444' }]}>
-												{Math.round(bottomHabit.pct)}%
-											</Text>
-										</View>
-									) : null}
-								</View>
-							</View>
+					<View style={{ marginTop: 8 }}>
+						<RangeSelector
+							value={rangeValue}
+							onChange={onChangeRange}
+							onOpenCustom={onOpenCustom}
+						/>
+					</View>
+					{loading ? (
+						<View style={{ paddingVertical: 24, alignItems: 'center' }}>
+							<ActivityIndicator />
 						</View>
+					) : (
+						<>
+							<View style={styles.section}>
+								<Text style={styles.sectionTitle}>Resumen</Text>
+								<View style={styles.kpisRow}>
+									<SummaryKPI
+										label="Cumplimiento"
+										value={`${
+											Number.isFinite(global.overallPct)
+												? Math.round(global.overallPct)
+												: 0
+										}%`}
+										sublabel={`${global.totalCompleted ?? 0}/${
+											global.totalScheduled ?? 0
+										}`}
+										delta={
+											Number.isFinite(deltaPct)
+												? Number(deltaPct.toFixed(1))
+												: 0
+										}
+									/>
+									<SummaryKPI
+										label="Días activos"
+										value={String(activeDays)}
+										delta={deltaActive}
+										deltaSuffix=""
+									/>
+									<SummaryKPI
+										label="Hábitos"
+										value={String(habits.length)}
+									/>
+								</View>
+								<View style={{ marginTop: 10 }}>
+									<Text style={styles.sectionTitle}>Tendencia</Text>
+									<View
+										style={{
+											flexDirection: 'row',
+											alignItems: 'center',
+											gap: 12,
+											marginVertical: 6,
+										}}
+									>
+										<View
+											style={{
+												flexDirection: 'row',
+												alignItems: 'center',
+												gap: 6,
+											}}
+										>
+											<View
+												style={{
+													width: 10,
+													height: 10,
+													borderRadius: 2,
+													backgroundColor: '#10B981',
+												}}
+											/>
+											<Text style={styles.meta}>Período actual</Text>
+										</View>
+										<View
+											style={{
+												flexDirection: 'row',
+												alignItems: 'center',
+												gap: 6,
+											}}
+										>
+											<View
+												style={{
+													width: 10,
+													height: 10,
+													borderRadius: 2,
+													backgroundColor: '#60A5FA',
+												}}
+											/>
+											<Text style={styles.meta}>Período anterior</Text>
+										</View>
+									</View>
+									<SparklineGifted
+										dailyCounts={dailyCounts}
+										prevDailyCounts={prevDailyCounts}
+										height={140}
+									/>
+								</View>
 
-						<View style={styles.section}>
-							<Text style={styles.sectionTitle}>Resumen por hábito</Text>
-							<FlatList
-								data={habits}
-								keyExtractor={(h) => h.id}
-								renderItem={({ item: h }) => {
-									const s = perHabitStats[h.id] || {}
-									return (
-										<View style={styles.row}>
-											<View style={{ flex: 1 }}>
-												<Text style={styles.habitTitle}>{h.title}</Text>
-												<Text style={styles.meta}>
-													Actual: {s.currentStreak ?? 0} · Máx:{' '}
-													{s.maxStreak ?? 0}
-												</Text>
-												<Text style={styles.meta}>
-													Programados: {s.programados ?? 0} · Completados:{' '}
-													{s.completados ?? 0} · %:{' '}
-													{Number.isFinite(s.pct)
-														? Math.round(s.pct * 100) / 100
-														: 0}
-													%
+								<View style={{ marginTop: 12 }}>
+									<Text style={styles.sectionTitle}>Insights</Text>
+									<View style={styles.insightBox}>
+										<Text style={styles.meta}>Top 3 hábitos</Text>
+										{(topHabits || []).map((h) => (
+											<View
+												key={h.id}
+												style={styles.insightRow}
+											>
+												<Text style={styles.insightTitle}>{h.title}</Text>
+												<Text style={styles.insightValue}>
+													{Math.round(h.pct)}%
 												</Text>
 											</View>
-										</View>
-									)
-								}}
-								contentContainerStyle={{ gap: 10, paddingVertical: 8 }}
-							/>
-						</View>
-					</>
-				)}
-			</CardContainer>
+										))}
+										{bottomHabit ? (
+											<View style={[styles.insightRow, { marginTop: 6 }]}>
+												<Text style={styles.insightTitle}>
+													Oportunidad: {bottomHabit.title}
+												</Text>
+												<Text
+													style={[styles.insightValue, { color: '#EF4444' }]}
+												>
+													{Math.round(bottomHabit.pct)}%
+												</Text>
+											</View>
+										) : null}
+									</View>
+								</View>
+							</View>
+
+							<View style={styles.section}>
+								<Text style={styles.sectionTitle}>Resumen por hábito</Text>
+								<FlatList
+									data={habits}
+									keyExtractor={(h) => h.id}
+									renderItem={({ item: h }) => {
+										const s = perHabitStats[h.id] || {}
+										return (
+											<View style={styles.row}>
+												<View style={{ flex: 1 }}>
+													<Text style={styles.habitTitle}>{h.title}</Text>
+													<Text style={styles.meta}>
+														Actual: {s.currentStreak ?? 0} · Máx:{' '}
+														{s.maxStreak ?? 0}
+													</Text>
+													<Text style={styles.meta}>
+														Programados: {s.programados ?? 0} · Completados:{' '}
+														{s.completados ?? 0} · %:{' '}
+														{Number.isFinite(s.pct)
+															? Math.round(s.pct * 100) / 100
+															: 0}
+														%
+													</Text>
+												</View>
+											</View>
+										)
+									}}
+									contentContainerStyle={{ gap: 10, paddingVertical: 8 }}
+								/>
+							</View>
+						</>
+					)}
+				</CardContainer>
+			</ScrollView>
 		</GradientBackground>
 	)
 }
 
 const styles = StyleSheet.create({
-	container: { flex: 1, padding: 16 },
+	container: { flex: 1, paddingHorizontal: 16 },
 	headerRowCentered: {
 		alignItems: 'center',
 		justifyContent: 'center',
