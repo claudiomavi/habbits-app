@@ -39,7 +39,8 @@ export function StatisticsTemplate({
 					<View style={styles.headerRowCentered}>
 						<Text style={styles.title}>Estadísticas</Text>
 						<Text style={styles.subtitle}>
-							{fromISO} → {toISO}
+							{fromISO?.slice(8, 10)}-{fromISO?.slice(5, 7)} →{' '}
+							{toISO?.slice(8, 10)}-{toISO?.slice(5, 7)}
 						</Text>
 					</View>
 					<View style={{ marginTop: 8 }}>
