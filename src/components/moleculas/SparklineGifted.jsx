@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { ScrollView, Text, View, useWindowDimensions } from 'react-native'
 import { LineChart } from 'react-native-gifted-charts'
 
@@ -15,25 +15,26 @@ export function SparklineGifted({
 	const { width: winWidth } = useWindowDimensions()
 	// Estimate inner width (card has horizontal padding ~24 on each side)
 	const count = Array.isArray(dailyCounts) ? dailyCounts.length : 0
-	const enableScroll = count >= 6
 	const minPerPoint = 12
 	const baseWidth = Math.floor(winWidth - 48)
 	const neededWidth =
 		count >= 6 ? Math.max(baseWidth, count * minPerPoint) : baseWidth
 	const chartWidth = Math.max(220, neededWidth)
+	const maxTooltipWidth = Math.min(150, Math.floor(winWidth * 0.6))
 	const hideXLabels = count >= 10
-	const [hoverValue, setHoverValue] = useState(null)
-	const [hoverLabel, setHoverLabel] = useState('')
+
 	const { data, data2 } = useMemo(() => {
-		const data = (dailyCounts || []).map((d) => ({
-			value: d.completedCount || 0,
-			label: hideXLabels
-				? ''
-				: `${(d?.dateISO || '').slice(8, 10)}-${(d?.dateISO || '').slice(
-						5,
-						7
-				  )}`,
-		}))
+		const data = (dailyCounts || []).map((d) => {
+			const iso = d?.dateISO || ''
+			const dd = iso.slice(8, 10)
+			const mm = iso.slice(5, 7)
+			const aa = iso.slice(2, 4)
+			return {
+				value: d.completedCount || 0,
+				label: hideXLabels ? '' : `${dd}-${mm}`,
+				tooltipLabel: iso ? `${dd}/${mm}/${aa}` : '',
+			}
+		})
 		const data2 = (prevDailyCounts || []).map((d) => ({
 			value: d.completedCount || 0,
 			label: d.dateISO?.slice(5) || '',
@@ -56,11 +57,11 @@ export function SparklineGifted({
 	}
 
 	return (
-		<View style={{ overflow: 'hidden' }}>
+		<View style={{ overflow: 'visible', paddingBottom: 8 }}>
 			<ScrollView
 				horizontal
 				showsHorizontalScrollIndicator={false}
-				contentContainerStyle={{ paddingRight: 12 }}
+				contentContainerStyle={{ paddingRight: 60, paddingBottom: 24 }}
 			>
 				<LineChart
 					data={data}
@@ -85,15 +86,6 @@ export function SparklineGifted({
 					xAxisLabelTextStyle={{ color: '#9CA3AF', fontSize: 10 }}
 					focusEnabled={false}
 					showStrip={false}
-					onPointPress={(item, index) => {
-						if (item) {
-							setHoverValue(item.value)
-							const idx = index ?? 0
-							const iso = dailyCounts?.[idx]?.dateISO || ''
-							const ddmm = iso ? `${iso.slice(8, 10)}-${iso.slice(5, 7)}` : ''
-							setHoverLabel(ddmm)
-						}
-					}}
 					animateOnDataChange={animate}
 					animationDuration={animationDuration}
 					pointerConfig={{
@@ -105,35 +97,39 @@ export function SparklineGifted({
 						radius: 0,
 						showPointerLabel: true,
 						pointerLabelComponent: (items) => {
-							const val = items?.[0]?.value ?? 0
+							const item = items?.[0]
+							const val = item?.value ?? 0
+							const date = item?.tooltipLabel || ''
 							return (
 								<View
 									style={{
 										backgroundColor: '#111827',
-										paddingHorizontal: 6,
-										paddingVertical: 2,
+										paddingHorizontal: 8,
+										paddingVertical: 6,
 										borderRadius: 6,
+										width: maxTooltipWidth,
 									}}
 								>
-									<Text style={{ color: 'white', fontSize: 11 }}>{val}</Text>
+									{date ? (
+										<Text
+											style={{
+												color: '#D1D5DB',
+												fontSize: 10,
+												marginBottom: 2,
+											}}
+										>
+											{date}
+										</Text>
+									) : null}
+									<Text style={{ color: 'white', fontSize: 12 }}>
+										{val} {val === 1 ? 'tarea' : 'tareas'}
+									</Text>
 								</View>
 							)
 						},
 					}}
 				/>
 			</ScrollView>
-			{hoverValue != null ? (
-				<View style={{ alignItems: 'flex-end', marginTop: 6 }}>
-					{hideXLabels && hoverLabel ? (
-						<Text style={{ color: '#6B7280', fontSize: 11, marginBottom: 2 }}>
-							{hoverLabel}
-						</Text>
-					) : null}
-					<Text style={{ color: '#111827', fontSize: 12 }}>
-						{hoverValue} hábitos
-					</Text>
-				</View>
-			) : null}
 		</View>
 	)
 }
