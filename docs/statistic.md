@@ -39,10 +39,10 @@
 
 ### Pulido y extensiones
 
-- [ ] Fix interacción fechas en gráfico (10+):
-  - [ ] Unificar handler por tap con overlay (Pressable) y normalización por scrollX.
-  - [ ] Probar en iOS/Android varios tamaños; asegurar selectedLabel en template.
-  - [ ] Opcional: formato DD/MM y combinación fecha · N hábitos.
+- [x] Fix interacción fechas en gráfico (10+):
+  - [x] Unificar handler por tap con overlay (Pressable) y normalización por scrollX.
+  - [x] Probar en iOS/Android varios tamaños; asegurar selectedLabel en template.
+  - [x] Opcional: formato DD/MM y combinación fecha · N hábitos.
 - [ ] Lista “Resumen por hábito” (mejora UI):
   - [ ] Ajustes de fuentes (peso/altura), espaciados y contraste.
   - [ ] Estados vacíos por hábito y loaders.

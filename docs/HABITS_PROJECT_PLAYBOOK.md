@@ -1117,7 +1117,16 @@ Cómo exportar permisos/políticas (guía rápida):
 
   - Selector de rango (7/30/custom) con modal y stepper (+/-), animaciones y leyenda de colores.
   - Resumen general (KPIs: Cumplimiento, Días activos, Hábitos) con delta vs periodo anterior.
-  - Tendencia con react-native-gifted-charts (línea+área) y comparativa de periodo anterior; para X >= 10 días, badge externo con la fecha seleccionada y tooltip por tap; scroll horizontal desde 6 días y ancho dinámico.
+  - Tendencia con react-native-gifted-charts (línea + área) y comparativa del periodo anterior.
+  - Tooltip con fecha dd/mm/aa y “N tarea(s)” al tap sobre un punto.
+  - Scroll horizontal desde 6 días y ancho dinámico calculado manualmente sin adjustToWidth:
+    - width = baseWidth vs initial + (count - 1) * perPoint + rightPad
+    - perPoint por defecto 14; initial 12; rightPad = ceil(maxTooltipWidth + 12)
+  - Evitar recorte del tooltip al final:
+    - endSpacing y ScrollView paddingRight sincronizados con rightPad
+    - tooltip con width fijo (maxTooltipWidth), pointerLabelComponent
+  - Para 10+ días, se ocultan labels del eje X; la fecha siempre va en el tooltip
+  - Mantener área degradada y puntos ocultos para una línea clara
   - Insights: Top 3 hábitos y “Oportunidad”.
   - Lista “Resumen por hábito”: tarjetas a pulir (tipografías/espaciado) y acceso a detalle.
 
