@@ -13,16 +13,28 @@ export function SparklineGifted({
 	animationDuration = 600,
 }) {
 	const { width: winWidth } = useWindowDimensions()
-	// Estimate inner width (card has horizontal padding ~24 on each side)
+
+	// Cálculos de layout
 	const count = Array.isArray(dailyCounts) ? dailyCounts.length : 0
-	const minPerPoint = 12
+	let perPoint = 14
+	const initial = 12
 	const baseWidth = Math.floor(winWidth - 48)
-	const neededWidth =
-		count >= 6 ? Math.max(baseWidth, count * minPerPoint) : baseWidth
-	const chartWidth = Math.max(220, neededWidth)
 	const maxTooltipWidth = Math.min(150, Math.floor(winWidth * 0.6))
+	const rightPad = Math.ceil(maxTooltipWidth + 12)
+	// Espaciado dinámico por punto según ancho y nº de puntos
+	const minPx = 20
+	const maxPx = 70
+	const available = Math.max(0, baseWidth - initial - rightPad)
+	const autoPx = count > 1 ? Math.floor(available / (count - 1)) : available
+	perPoint = Math.max(minPx, Math.min(maxPx, autoPx))
+	// ancho total: margen inicial + (N-1)*espaciado + margen final para tooltip
+	const chartWidth = Math.max(
+		baseWidth,
+		initial + Math.max(0, count - 1) * perPoint
+	)
 	const hideXLabels = count >= 10
 
+	// Datos para el chart
 	const { data, data2 } = useMemo(() => {
 		const data = (dailyCounts || []).map((d) => {
 			const iso = d?.dateISO || ''
@@ -42,6 +54,7 @@ export function SparklineGifted({
 		return { data, data2 }
 	}, [dailyCounts, prevDailyCounts, hideXLabels])
 
+	// Estado vacío
 	if (!data || data.length === 0) {
 		return (
 			<View
@@ -62,7 +75,7 @@ export function SparklineGifted({
 				horizontal
 				showsHorizontalScrollIndicator={false}
 				contentContainerStyle={{
-					paddingRight: 60,
+					paddingRight: rightPad,
 					paddingBottom: 24,
 				}}
 			>
@@ -78,7 +91,10 @@ export function SparklineGifted({
 					dataPointsColor="transparent"
 					dataPointsRadius={8}
 					hideRules
-					width={chartWidth + maxTooltipWidth}
+					width={chartWidth}
+					spacing={perPoint}
+					initialSpacing={initial}
+					endSpacing={rightPad}
 					thickness={3}
 					color1={color1}
 					color2={color2}
