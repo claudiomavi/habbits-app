@@ -61,7 +61,10 @@ export function SparklineGifted({
 			<ScrollView
 				horizontal
 				showsHorizontalScrollIndicator={false}
-				contentContainerStyle={{ paddingRight: 60, paddingBottom: 24 }}
+				contentContainerStyle={{
+					paddingRight: 60,
+					paddingBottom: 24,
+				}}
 			>
 				<LineChart
 					data={data}
