@@ -78,8 +78,7 @@ export function SparklineGifted({
 					dataPointsColor="transparent"
 					dataPointsRadius={8}
 					hideRules
-					width={chartWidth}
-					adjustToWidth
+					width={chartWidth + maxTooltipWidth}
 					thickness={3}
 					color1={color1}
 					color2={color2}
