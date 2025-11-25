@@ -30,10 +30,6 @@
   - [x] Tooltip por tap (badge externo) cuando X >= 10 días.
 - [x] Insights:
   - [x] Top 3 hábitos y “Oportunidad” (peor %).
-- [ ] Lista “Resumen por hábito” (mejoras de legibilidad):
-  - [ ] Ajuste de tipografías, espaciados y jerarquías en cada tarjeta.
-  - [ ] Acceso a detalle de hábito.
-- [ ] Estados vacíos y loaders.
 
 ## DÍA 3 (nuevo plan)
 
@@ -43,19 +39,12 @@
   - [x] Unificar handler por tap con overlay (Pressable) y normalización por scrollX.
   - [x] Probar en iOS/Android varios tamaños; asegurar selectedLabel en template.
   - [x] Opcional: formato DD/MM y combinación fecha · N hábitos.
+
+## DÍA 25/11
+
 - [ ] Lista “Resumen por hábito” (mejora UI):
   - [ ] Ajustes de fuentes (peso/altura), espaciados y contraste.
   - [ ] Estados vacíos por hábito y loaders.
-- [ ] Detalle de hábito (nueva pantalla):
-  - [ ] KPIs del hábito (racha actual/máxima en rango, cumplimiento, días activos del hábito).
-  - [ ] Gráfico tendencia del hábito (gifted-charts) con comparativa de periodo anterior.
-  - [ ] Rutas y navegación desde la tarjeta en el listado.
-- [ ] Heatmap básico (opcional si el tiempo alcanza) para últimos 30/90 días.
-- [ ] Optimización:
-  - [ ] Prefetch de 7/30 días al abrir la tab.
-  - [ ] Memoización de helpers (rango/habits/progress como claves).
-- [ ] QA manual:
-  - [ ] Casos weekly (p.ej., Lun/Mié/Vie), daily con huecos, monthly (day_of_month 31 en meses cortos), zonas horarias.
 
 ## Decisiones técnicas
 

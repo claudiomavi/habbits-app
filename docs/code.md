@@ -9,9 +9,9 @@
     - [ ] Publicarla en Netlify/Vercel y añadir la URL como Redirect en Supabase.
     - [ ] Crear ForgotPassword para enviar a esa URL.
 
-- [ ] Cooperativo: grupos cerrados por invitación/enlace; lista común de hábitos para el grupo.
-
 - [ ] Notificaciones locales (recordatorios por hábito).
+
+- [ ] Cooperativo: grupos cerrados por invitación/enlace; lista común de hábitos para el grupo.
 
 - [ ] Exportar/visualizar progreso básico (pantalla de estadísticas).
 
