@@ -1,6 +1,7 @@
 import {
 	ActivityIndicator,
 	FlatList,
+	Pressable,
 	StyleSheet,
 	Text,
 	View,
@@ -48,7 +49,12 @@ export function StatisticsTemplate({
 		}
 
 		return (
-			<View style={[styles.row]}>
+			<Pressable
+				style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
+				onPress={() => {}}
+			>
+				<View style={styles.innerTopShadow} />
+				<View style={styles.innerBottomShadow} />
 				<View style={{ flex: 1 }}>
 					<Text
 						style={styles.habitTitle}
@@ -90,7 +96,7 @@ export function StatisticsTemplate({
 						<Text style={styles.badgeText}>{pct}%</Text>
 					</View>
 				) : null}
-			</View>
+			</Pressable>
 		)
 	}
 
@@ -250,7 +256,7 @@ export function StatisticsTemplate({
 					borderRadius: 24,
 				}}
 				ListFooterComponent={
-					<View style={[styles.habitsCardBottom, { marginTop: -2 }]} />
+					<View style={[styles.habitsCardBottom, { marginTop: -4 }]} />
 				}
 				ListHeaderComponentStyle={{ gap: 0 }}
 				keyboardShouldPersistTaps="handled"
@@ -311,6 +317,26 @@ const styles = StyleSheet.create({
 		paddingVertical: 12,
 		paddingHorizontal: 12,
 		gap: 12,
+		overflow: 'hidden',
+		position: 'relative',
+	},
+	rowPressed: {
+		backgroundColor: '#e8eaed',
+	},
+	innerTopShadow: {
+		position: 'absolute',
+		top: 0,
+		left: 0,
+		right: 0,
+		height: 2,
+		backgroundColor: 'rgba(0,0,0,0.04)',
+	},
+	innerBottomShadow: {
+		bottom: 0,
+		left: 0,
+		right: 0,
+		height: 2,
+		backgroundColor: 'rgba(0,0,0,0.03)',
 	},
 	habitTitle: {
 		fontSize: 16,
