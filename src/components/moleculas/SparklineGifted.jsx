@@ -1,5 +1,11 @@
 import { useMemo } from 'react'
-import { ScrollView, Text, View, useWindowDimensions } from 'react-native'
+import {
+	ScrollView,
+	StyleSheet,
+	Text,
+	View,
+	useWindowDimensions,
+} from 'react-native'
 import { LineChart } from 'react-native-gifted-charts'
 
 export function SparklineGifted({
@@ -56,27 +62,17 @@ export function SparklineGifted({
 
 	// Estado vacío
 	if (!data || data.length === 0) {
-		return (
-			<View
-				style={{
-					height,
-					backgroundColor: '#F3F4F6',
-					borderRadius: 12,
-					borderWidth: 2,
-					borderColor: '#E5E7EB',
-				}}
-			/>
-		)
+		return <View style={[height, styles.vacuumContainer]} />
 	}
 
 	return (
-		<View style={{ overflow: 'visible', paddingBottom: 8 }}>
+		<View style={styles.container}>
 			<ScrollView
 				horizontal
 				showsHorizontalScrollIndicator={false}
 				contentContainerStyle={{
 					paddingRight: rightPad,
-					paddingBottom: 24,
+					paddingBottom: 36,
 				}}
 			>
 				<LineChart
@@ -115,33 +111,44 @@ export function SparklineGifted({
 						radius: 0,
 						showPointerLabel: true,
 						pointerLabelComponent: (items) => {
-							const item = items?.[0]
-							const val = item?.value ?? 0
-							const date = item?.tooltipLabel || ''
+							const actual = items?.[0]
+							const previous = items?.[1]
+							const actualVal = actual?.value ?? 0
+							const previousVal = previous?.value ?? 0
+							const actualDate = actual?.tooltipLabel || ''
 							return (
 								<View
-									style={{
-										backgroundColor: '#111827',
-										paddingHorizontal: 8,
-										paddingVertical: 6,
-										borderRadius: 6,
-										width: maxTooltipWidth,
-									}}
+									style={[styles.labelContainer, { width: maxTooltipWidth }]}
 								>
-									{date ? (
-										<Text
-											style={{
-												color: '#D1D5DB',
-												fontSize: 10,
-												marginBottom: 2,
-											}}
-										>
-											{date}
-										</Text>
+									{actualDate ? (
+										<Text style={styles.dataLabel}>{actualDate}</Text>
 									) : null}
-									<Text style={{ color: 'white', fontSize: 12 }}>
-										{val} {val === 1 ? 'tarea' : 'tareas'}
-									</Text>
+									<View style={styles.textLabelContainer}>
+										<View
+											style={[
+												styles.textLabelColor,
+												{
+													backgroundColor: '#10B981',
+												},
+											]}
+										/>
+										<Text style={styles.textLabel}>
+											{actualVal} {actualVal === 1 ? 'tarea' : 'tareas'}
+										</Text>
+									</View>
+									<View style={styles.textLabelContainer}>
+										<View
+											style={[
+												styles.textLabelColor,
+												{
+													backgroundColor: '#60A5FA',
+												},
+											]}
+										/>
+										<Text style={styles.textLabel}>
+											{previousVal} {previousVal === 1 ? 'tarea' : 'tareas'}
+										</Text>
+									</View>
 								</View>
 							)
 						},
@@ -151,3 +158,35 @@ export function SparklineGifted({
 		</View>
 	)
 }
+
+const styles = StyleSheet.create({
+	vacuumContainer: {
+		backgroundColor: '#F3F4F6',
+		borderRadius: 12,
+		borderWidth: 2,
+		borderColor: '#E5E7EB',
+	},
+	container: { overflow: 'visible', paddingBottom: 8 },
+	labelContainer: {
+		backgroundColor: '#111827',
+		paddingHorizontal: 8,
+		paddingVertical: 6,
+		borderRadius: 6,
+	},
+	dataLabel: {
+		color: '#D1D5DB',
+		fontSize: 10,
+		marginBottom: 2,
+	},
+	textLabelContainer: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 4,
+	},
+	textLabelColor: {
+		width: 10,
+		height: 10,
+		borderRadius: 2,
+	},
+	textLabel: { color: 'white', fontSize: 12 },
+})
