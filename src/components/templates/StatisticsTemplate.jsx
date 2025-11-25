@@ -1,7 +1,6 @@
 import {
 	ActivityIndicator,
 	FlatList,
-	ScrollView,
 	StyleSheet,
 	Text,
 	View,
@@ -32,177 +31,224 @@ export function StatisticsTemplate({
 	deltaPct = 0,
 	deltaActive = 0,
 }) {
-	return (
-		<GradientBackground style={styles.container}>
-			<ScrollView style={{ borderRadius: 24 }}>
-				<CardContainer>
-					<View style={styles.headerRowCentered}>
-						<Text style={styles.title}>Estadísticas</Text>
-						<Text style={styles.subtitle}>
-							{fromISO?.slice(8, 10)}-{fromISO?.slice(5, 7)} →{' '}
-							{toISO?.slice(8, 10)}-{toISO?.slice(5, 7)}
-						</Text>
-					</View>
-					<View style={{ marginTop: 8 }}>
-						<RangeSelector
-							value={rangeValue}
-							onChange={onChangeRange}
-							onOpenCustom={onOpenCustom}
-						/>
-					</View>
+	const renderHabit = ({ item: h }) => {
+		const s = perHabitStats[h.id] || {}
+		const isEmpty = (s.programados ?? 0) === 0
+		const pct = Number.isFinite(s.pct) ? Math.round(s.pct) : 0
+		const ratio = s.programados
+			? Math.min(1, Math.max(0, (s.completados ?? 0) / s.programados))
+			: 0
+
+		// color del badge según %
+		let badgeColor = '#9CA3AF' // gris por defecto
+		if (!isEmpty) {
+			if (pct >= 80) badgeColor = '#10B981' // verde
+			else if (pct >= 50) badgeColor = '#F59E0B' // ámbar
+			else badgeColor = '#EF4444' // rojo
+		}
+
+		return (
+			<View style={styles.row}>
+				<View style={{ flex: 1 }}>
+					<Text
+						style={styles.habitTitle}
+						numberOfLines={1}
+					>
+						{h.title}
+					</Text>
+
 					{loading ? (
-						<View style={{ paddingVertical: 24, alignItems: 'center' }}>
-							<ActivityIndicator />
+						<View style={styles.habitLoadingRow}>
+							<ActivityIndicator
+								size="small"
+								color="#6B7280"
+							/>
+							<Text style={styles.meta}>Calculando métricas…</Text>
 						</View>
+					) : isEmpty ? (
+						<Text style={styles.meta}>Sin datos en este período</Text>
 					) : (
 						<>
-							<View style={styles.section}>
-								<Text style={styles.sectionTitle}>Resumen</Text>
-								<View style={styles.kpisRow}>
-									<SummaryKPI
-										label="Cumplimiento"
-										value={`${
-											Number.isFinite(global.overallPct)
-												? Math.round(global.overallPct)
-												: 0
-										}%`}
-										sublabel={`${global.totalCompleted ?? 0}/${
-											global.totalScheduled ?? 0
-										}`}
-										delta={
-											Number.isFinite(deltaPct)
-												? Number(deltaPct.toFixed(1))
-												: 0
-										}
-									/>
-									<SummaryKPI
-										label="Días activos"
-										value={String(activeDays)}
-										delta={deltaActive}
-										deltaSuffix=""
-									/>
-									<SummaryKPI
-										label="Hábitos"
-										value={String(habits.length)}
-									/>
-								</View>
-								<View style={{ marginTop: 10 }}>
-									<Text style={styles.sectionTitle}>Tendencia</Text>
-									<View
-										style={{
-											flexDirection: 'row',
-											alignItems: 'center',
-											gap: 12,
-											marginVertical: 6,
-										}}
-									>
-										<View
-											style={{
-												flexDirection: 'row',
-												alignItems: 'center',
-												gap: 6,
-											}}
-										>
-											<View
-												style={{
-													width: 10,
-													height: 10,
-													borderRadius: 2,
-													backgroundColor: '#10B981',
-												}}
-											/>
-											<Text style={styles.meta}>Período actual</Text>
-										</View>
-										<View
-											style={{
-												flexDirection: 'row',
-												alignItems: 'center',
-												gap: 6,
-											}}
-										>
-											<View
-												style={{
-													width: 10,
-													height: 10,
-													borderRadius: 2,
-													backgroundColor: '#60A5FA',
-												}}
-											/>
-											<Text style={styles.meta}>Período anterior</Text>
-										</View>
-									</View>
-									<SparklineGifted
-										dailyCounts={dailyCounts}
-										prevDailyCounts={prevDailyCounts}
-										height={140}
-									/>
-								</View>
-
-								<View style={{ marginTop: 12 }}>
-									<Text style={styles.sectionTitle}>Insights</Text>
-									<View style={styles.insightBox}>
-										<Text style={styles.meta}>Top 3 hábitos</Text>
-										{(topHabits || []).map((h) => (
-											<View
-												key={h.id}
-												style={styles.insightRow}
-											>
-												<Text style={styles.insightTitle}>{h.title}</Text>
-												<Text style={styles.insightValue}>
-													{Math.round(h.pct)}%
-												</Text>
-											</View>
-										))}
-										{bottomHabit ? (
-											<View style={[styles.insightRow, { marginTop: 6 }]}>
-												<Text style={styles.insightTitle}>
-													Oportunidad: {bottomHabit.title}
-												</Text>
-												<Text
-													style={[styles.insightValue, { color: '#EF4444' }]}
-												>
-													{Math.round(bottomHabit.pct)}%
-												</Text>
-											</View>
-										) : null}
-									</View>
-								</View>
-							</View>
-
-							<View style={styles.section}>
-								<Text style={styles.sectionTitle}>Resumen por hábito</Text>
-								<FlatList
-									data={habits}
-									keyExtractor={(h) => h.id}
-									renderItem={({ item: h }) => {
-										const s = perHabitStats[h.id] || {}
-										return (
-											<View style={styles.row}>
-												<View style={{ flex: 1 }}>
-													<Text style={styles.habitTitle}>{h.title}</Text>
-													<Text style={styles.meta}>
-														Actual: {s.currentStreak ?? 0} · Máx:{' '}
-														{s.maxStreak ?? 0}
-													</Text>
-													<Text style={styles.meta}>
-														Programados: {s.programados ?? 0} · Completados:{' '}
-														{s.completados ?? 0} · %:{' '}
-														{Number.isFinite(s.pct)
-															? Math.round(s.pct * 100) / 100
-															: 0}
-														%
-													</Text>
-												</View>
-											</View>
-										)
-									}}
-									contentContainerStyle={{ gap: 10, paddingVertical: 8 }}
+							<Text style={styles.meta}>
+								Actual: {s.currentStreak ?? 0} · Máx: {s.maxStreak ?? 0}
+							</Text>
+							<Text style={styles.meta}>
+								Programados: {s.programados ?? 0} · Completados:{' '}
+								{s.completados ?? 0}
+							</Text>
+							<View style={styles.progressBarContainer}>
+								<View
+									style={[styles.progressBarFill, { width: `${ratio * 100}%` }]}
 								/>
 							</View>
 						</>
 					)}
-				</CardContainer>
-			</ScrollView>
+				</View>
+
+				{!loading && !isEmpty ? (
+					<View style={[styles.badge, { backgroundColor: badgeColor }]}>
+						<Text style={styles.badgeText}>{pct}%</Text>
+					</View>
+				) : null}
+			</View>
+		)
+	}
+
+	const Header = (
+		<CardContainer>
+			<View style={styles.headerRowCentered}>
+				<Text style={styles.title}>Estadísticas</Text>
+				<Text style={styles.subtitle}>
+					{fromISO?.slice(8, 10)}-{fromISO?.slice(5, 7)} → {toISO?.slice(8, 10)}
+					-{toISO?.slice(5, 7)}
+				</Text>
+			</View>
+			<View style={{ marginTop: 8 }}>
+				<RangeSelector
+					value={rangeValue}
+					onChange={onChangeRange}
+					onOpenCustom={onOpenCustom}
+				/>
+			</View>
+			{loading ? (
+				<View style={{ paddingVertical: 24, alignItems: 'center' }}>
+					<ActivityIndicator />
+				</View>
+			) : (
+				<>
+					<View style={styles.section}>
+						<Text style={styles.sectionTitle}>Resumen</Text>
+						<View style={styles.kpisRow}>
+							<SummaryKPI
+								label="Cumplimiento"
+								value={`${
+									Number.isFinite(global.overallPct)
+										? Math.round(global.overallPct)
+										: 0
+								}%`}
+								sublabel={`${global.totalCompleted ?? 0}/${
+									global.totalScheduled ?? 0
+								}`}
+								delta={
+									Number.isFinite(deltaPct) ? Number(deltaPct.toFixed(1)) : 0
+								}
+							/>
+							<SummaryKPI
+								label="Días activos"
+								value={String(activeDays)}
+								delta={deltaActive}
+							/>
+							<SummaryKPI
+								label="Hábitos"
+								value={String(habits.length)}
+							/>
+						</View>
+						<View style={{ marginTop: 10 }}>
+							<Text style={styles.sectionTitle}>Tendencia</Text>
+							<View
+								style={{
+									flexDirection: 'row',
+									alignItems: 'center',
+									gap: 12,
+									marginVertical: 6,
+								}}
+							>
+								<View
+									style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+								>
+									<View
+										style={{
+											width: 10,
+											height: 10,
+											borderRadius: 2,
+											backgroundColor: '#10B981',
+										}}
+									/>
+									<Text style={styles.meta}>Período actual</Text>
+								</View>
+								<View
+									style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+								>
+									<View
+										style={{
+											width: 10,
+											height: 10,
+											borderRadius: 2,
+											backgroundColor: '#60A5FA',
+										}}
+									/>
+									<Text style={styles.meta}>Período anterior</Text>
+								</View>
+							</View>
+							<SparklineGifted
+								dailyCounts={dailyCounts}
+								prevDailyCounts={prevDailyCounts}
+								height={140}
+							/>
+						</View>
+
+						<View style={{ marginTop: 12 }}>
+							<Text style={styles.sectionTitle}>Insights</Text>
+							<View style={styles.insightBox}>
+								<Text style={styles.meta}>Top 3 hábitos</Text>
+								{(topHabits || []).map((h) => (
+									<View
+										key={h.id}
+										style={styles.insightRow}
+									>
+										<Text style={styles.insightTitle}>{h.title}</Text>
+										<Text style={styles.insightValue}>
+											{Math.round(h.pct)}%
+										</Text>
+									</View>
+								))}
+								{bottomHabit ? (
+									<View style={[styles.insightRow, { marginTop: 6 }]}>
+										<Text style={styles.insightTitle}>
+											Oportunidad: {bottomHabit.title}
+										</Text>
+										<Text style={[styles.insightValue, { color: '#EF4444' }]}>
+											{Math.round(bottomHabit.pct)}%
+										</Text>
+									</View>
+								) : null}
+							</View>
+						</View>
+					</View>
+
+					<View style={styles.section}>
+						<Text style={styles.sectionTitle}>Resumen por hábito</Text>
+					</View>
+				</>
+			)}
+		</CardContainer>
+	)
+
+	return (
+		<GradientBackground style={styles.container}>
+			<FlatList
+				data={habits}
+				keyExtractor={(h) => h.id}
+				renderItem={renderHabit}
+				ListHeaderComponent={Header}
+				ListEmptyComponent={
+					!loading ? (
+						<CardContainer>
+							<View style={{ paddingVertical: 24, alignItems: 'center' }}>
+								<Text style={styles.meta}>No tienes hábitos aún</Text>
+							</View>
+						</CardContainer>
+					) : null
+				}
+				contentContainerStyle={{
+					gap: 10,
+					paddingVertical: 12,
+					borderRadius: 24,
+				}}
+				ListFooterComponent={<View style={{ height: 24 }} />}
+				ListHeaderComponentStyle={{ gap: 0 }}
+				keyboardShouldPersistTaps="handled"
+			/>
 		</GradientBackground>
 	)
 }
@@ -215,34 +261,42 @@ const styles = StyleSheet.create({
 		marginBottom: 8,
 	},
 	title: {
-		fontSize: 20,
-		fontWeight: '700',
-		color: '#1F2937',
+		fontSize: 22,
+		fontWeight: '800',
+		lineHeight: 26,
+		color: '#111827',
 		textAlign: 'center',
 	},
-	subtitle: { fontSize: 12, color: '#6B7280', marginTop: 2 },
-	section: { marginTop: 10 },
+	subtitle: { fontSize: 12, color: '#6B7280', lineHeight: 18, marginTop: 2 },
+	section: { marginTop: 12 },
 	sectionTitle: {
-		fontSize: 16,
-		fontWeight: '700',
+		fontSize: 18,
+		fontWeight: '800',
+		lineHeight: 22,
 		color: '#111827',
-		marginBottom: 6,
+		marginBottom: 8,
 	},
 	kpisRow: { flexDirection: 'row', gap: 10 },
 	row: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#F9FAFB',
+		backgroundColor: '#FFFFFF',
 		borderWidth: 2,
 		borderColor: '#E5E7EB',
 		borderRadius: 16,
-		padding: 12,
+		paddingVertical: 12,
+		paddingHorizontal: 12,
 		gap: 12,
 	},
-	habitTitle: { fontSize: 16, fontWeight: '600', color: '#111827' },
-	meta: { fontSize: 12, color: '#6B7280', marginTop: 4 },
+	habitTitle: {
+		fontSize: 16,
+		fontWeight: '700',
+		lineHeight: 20,
+		color: '#111827',
+	},
+	meta: { fontSize: 12, color: '#4B5563', lineHeight: 18, marginTop: 4 },
 	insightBox: {
-		backgroundColor: '#F9FAFB',
+		backgroundColor: '#FFFFFF',
 		borderWidth: 2,
 		borderColor: '#E5E7EB',
 		borderRadius: 16,
@@ -256,4 +310,28 @@ const styles = StyleSheet.create({
 	},
 	insightTitle: { fontSize: 13, color: '#374151' },
 	insightValue: { fontSize: 13, color: '#10B981', fontWeight: '700' },
+	habitLoadingRow: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 8,
+		marginTop: 4,
+	},
+	badge: {
+		paddingHorizontal: 10,
+		paddingVertical: 6,
+		borderRadius: 999,
+		alignSelf: 'flex-start',
+	},
+	badgeText: { color: 'white', fontWeight: '800', fontSize: 12 },
+	progressBarContainer: {
+		marginTop: 8,
+		height: 8,
+		borderRadius: 999,
+		backgroundColor: '#F3F4F6',
+		overflow: 'hidden',
+	},
+	progressBarFill: {
+		height: '100%',
+		backgroundColor: '#10B981',
+	},
 })
