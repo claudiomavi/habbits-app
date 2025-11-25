@@ -216,9 +216,6 @@ export function StatisticsTemplate({
 						</View>
 					</View>
 
-					<View style={styles.section}>
-						<Text style={styles.sectionTitle}>Resumen por hábito</Text>
-					</View>
 				</>
 			)}
 		</CardContainer>
@@ -230,7 +227,14 @@ export function StatisticsTemplate({
 				data={habits}
 				keyExtractor={(h) => h.id}
 				renderItem={renderHabit}
-				ListHeaderComponent={Header}
+				ListHeaderComponent={(
+					<>
+						{Header}
+						<View style={styles.sectionTitleWrapper}>
+							<Text style={styles.sectionTitle}>Resumen por hábito</Text>
+						</View>
+					</>
+				)}
 				ListEmptyComponent={
 					!loading ? (
 						<CardContainer>
@@ -269,6 +273,15 @@ const styles = StyleSheet.create({
 	},
 	subtitle: { fontSize: 12, color: '#6B7280', lineHeight: 18, marginTop: 2 },
 	section: { marginTop: 12 },
+	sectionTitleWrapper: {
+		marginTop: 12,
+		backgroundColor: '#FFFFFF',
+		borderWidth: 2,
+		borderColor: '#E5E7EB',
+		borderRadius: 16,
+		paddingVertical: 8,
+		paddingHorizontal: 12,
+	},
 	sectionTitle: {
 		fontSize: 18,
 		fontWeight: '800',
