@@ -13,7 +13,7 @@
 
 - [ ] Cooperativo: grupos cerrados por invitación/enlace; lista común de hábitos para el grupo.
 
-- [ ] Exportar/visualizar progreso básico (pantalla de estadísticas).
+- [x] Exportar/visualizar progreso básico (pantalla de estadísticas).
 
 - [x] Gamificación: XP por completar hábitos → barra de nivel general. Rachas (streaks).
 
