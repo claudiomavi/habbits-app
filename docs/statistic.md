@@ -42,9 +42,9 @@
 
 ## DÍA 25/11
 
-- [ ] Lista “Resumen por hábito” (mejora UI):
-  - [ ] Ajustes de fuentes (peso/altura), espaciados y contraste.
-  - [ ] Estados vacíos por hábito y loaders.
+- [x] Lista “Resumen por hábito” (mejora UI):
+  - [x] Ajustes de fuentes (peso/altura), espaciados y contraste.
+  - [x] Estados vacíos por hábito y loaders.
 
 ## Decisiones técnicas
 
