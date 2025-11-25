@@ -31,7 +31,7 @@ export function StatisticsTemplate({
 	deltaPct = 0,
 	deltaActive = 0,
 }) {
-	const renderHabit = ({ item: h }) => {
+	const renderHabit = ({ item: h, index }) => {
 		const s = perHabitStats[h.id] || {}
 		const isEmpty = (s.programados ?? 0) === 0
 		const pct = Number.isFinite(s.pct) ? Math.round(s.pct) : 0
@@ -48,7 +48,7 @@ export function StatisticsTemplate({
 		}
 
 		return (
-			<View style={styles.row}>
+			<View style={[styles.row]}>
 				<View style={{ flex: 1 }}>
 					<Text
 						style={styles.habitTitle}
@@ -215,7 +215,6 @@ export function StatisticsTemplate({
 							</View>
 						</View>
 					</View>
-
 				</>
 			)}
 		</CardContainer>
@@ -227,14 +226,14 @@ export function StatisticsTemplate({
 				data={habits}
 				keyExtractor={(h) => h.id}
 				renderItem={renderHabit}
-				ListHeaderComponent={(
+				ListHeaderComponent={
 					<>
 						{Header}
-						<View style={styles.sectionTitleWrapper}>
+						<View style={[styles.habitsCardTop, { marginBottom: -2 }]}>
 							<Text style={styles.sectionTitle}>Resumen por hábito</Text>
 						</View>
 					</>
-				)}
+				}
 				ListEmptyComponent={
 					!loading ? (
 						<CardContainer>
@@ -245,11 +244,14 @@ export function StatisticsTemplate({
 					) : null
 				}
 				contentContainerStyle={{
-					gap: 10,
-					paddingVertical: 12,
+					gap: 0,
+					paddingTop: 12,
+					paddingBottom: 0,
 					borderRadius: 24,
 				}}
-				ListFooterComponent={<View style={{ height: 24 }} />}
+				ListFooterComponent={
+					<View style={[styles.habitsCardBottom, { marginTop: -2 }]} />
+				}
 				ListHeaderComponentStyle={{ gap: 0 }}
 				keyboardShouldPersistTaps="handled"
 			/>
@@ -273,14 +275,22 @@ const styles = StyleSheet.create({
 	},
 	subtitle: { fontSize: 12, color: '#6B7280', lineHeight: 18, marginTop: 2 },
 	section: { marginTop: 12 },
-	sectionTitleWrapper: {
+	habitsCardTop: {
 		marginTop: 12,
 		backgroundColor: '#FFFFFF',
 		borderWidth: 2,
 		borderColor: '#E5E7EB',
-		borderRadius: 16,
+		borderTopLeftRadius: 16,
+		borderTopRightRadius: 16,
 		paddingVertical: 8,
 		paddingHorizontal: 12,
+	},
+	habitsCardBottom: {
+		backgroundColor: '#FFFFFF',
+		borderColor: '#E5E7EB',
+		borderBottomLeftRadius: 16,
+		borderBottomRightRadius: 16,
+		paddingBottom: 12,
 	},
 	sectionTitle: {
 		fontSize: 18,
@@ -291,12 +301,13 @@ const styles = StyleSheet.create({
 	},
 	kpisRow: { flexDirection: 'row', gap: 10 },
 	row: {
+		marginTop: -2,
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#FFFFFF',
-		borderWidth: 2,
+		backgroundColor: '#F9FAFB',
+		borderTopWidth: 1,
+		borderBottomWidth: 1,
 		borderColor: '#E5E7EB',
-		borderRadius: 16,
 		paddingVertical: 12,
 		paddingHorizontal: 12,
 		gap: 12,
