@@ -1,6 +1,5 @@
 # HABITS – Project Playbook
 
-
 Este documento resume la visión, reglas, estilos, convenciones de desarrollo y estructura de datos del proyecto HABITS. Sirve para compartir con otras IAs y con cualquier persona del equipo para alinear criterios y acelerar el onboarding.
 
 ---
@@ -115,6 +114,7 @@ typography: {
 #### 4.2 Tema y tokens (`src/styles/theme.js`)
 
 - Colores principales:
+
   - `colors.orange = #FF6A00` (CTA, acciones)
   - `colors.green = #22C55E` (progreso)
   - `colors.yellow = #FACC15` (logros/acento)
@@ -123,6 +123,7 @@ typography: {
   - Nuevo: `colors.bgBase = #FFF8F1` (base cálida bajo gradiente)
 
 - Gradientes:
+
   - `gradients.cta = ['#FF6A00', '#FF8C1A']`
   - `gradients.accent = ['#22C55E', '#86EFAC']`
   - `gradients.backgroundSoft = ['#FFD3A1', '#FFEBCC', '#FFFFFF']`
@@ -167,7 +168,6 @@ typography: {
 - Añadir `theme.dark` manteniendo CTA naranja y ajustando neutros.
 - Token `warning` separado de `yellow` si se requiere semántica distinta.
 
-
 ### Patrones de interacción (modales)
 
 - Preferimos transiciones custom con `Animated` (backdrop con `Animated.timing` y contenido con `Animated.spring`).
@@ -175,19 +175,6 @@ typography: {
 - Diálogo centrado para edición/creación (ej.: HabitModal) con animación de escala y fondo fade.
 
 Estética base: tarjetas blancas sobre fondo degradado, micro-decoraciones (emojis/gradients), tipografía legible y contraste alto.
-
-- Gradientes principales (ejemplos):
-  - Fondo: [#667eea, #764ba2, #f093fb, #4facfe]
-  - Acentos/barras: [#4facfe, #00f2fe, #43e97b]
-- Tarjetas:
-  - Fondo blanco (#fff), borde redondeado grande (24–32), sombra suave.
-  - Barra superior de progreso/decoración de 4px.
-- Inputs/botones:
-  - Inputs: fondo #F9FAFB, borde #E5E7EB, radios 12–16.
-  - Botón principal: degradado [#4facfe, #43e97b], texto blanco, bold.
-- Tipografía/colores:
-  - Títulos: #1F2937, Subtítulos: #6B7280
-  - Énfasis/links: #4facfe; Éxito: #22c55e; Error: #EF4444.
 
 Patrones de pantalla a replicar (Login/Register/CreateProfile/Home):
 
@@ -1214,7 +1201,7 @@ Cómo exportar permisos/políticas (guía rápida):
   - Tendencia con react-native-gifted-charts (línea + área) y comparativa del periodo anterior.
   - Tooltip con fecha dd/mm/aa y “N tarea(s)” al tap sobre un punto.
   - Scroll horizontal desde 6 días y ancho dinámico calculado manualmente sin adjustToWidth:
-    - width = baseWidth vs initial + (count - 1) * perPoint + rightPad
+    - width = baseWidth vs initial + (count - 1) \* perPoint + rightPad
     - perPoint por defecto 14; initial 12; rightPad = ceil(maxTooltipWidth + 12)
   - Evitar recorte del tooltip al final:
     - endSpacing y ScrollView paddingRight sincronizados con rightPad
