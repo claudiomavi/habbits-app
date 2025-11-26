@@ -23,7 +23,7 @@ export function HabitCard({ habit, done, onToggle, streak, streakUnit }) {
 			easing: done
 				? Easing.bezier(0.68, -0.55, 0.265, 1.55)
 				: Easing.out(Easing.cubic),
-			useNativeDriver: true,
+			useNativeDriver: false,
 		}).start(() => {
 			if (done) {
 				// trigger ripple when transitioning to checked
@@ -81,11 +81,17 @@ export function HabitCard({ habit, done, onToggle, streak, streakUnit }) {
 
 	const borderColor = checkedAnim.interpolate({
 		inputRange: [0, 1],
-		outputRange: ['#D1D5DB', '#10b981'],
+		outputRange: [
+			require('../../styles/theme').colors.gray300,
+			require('../../styles/theme').colors.green,
+		],
 	})
 	const boxBg = checkedAnim.interpolate({
 		inputRange: [0, 1],
-		outputRange: ['#FFFFFF', '#10b981'],
+		outputRange: [
+			require('../../styles/theme').colors.white,
+			require('../../styles/theme').colors.green,
+		],
 	})
 
 	return (
@@ -164,7 +170,8 @@ export function HabitCard({ habit, done, onToggle, streak, streakUnit }) {
 										left: 0,
 										top: -10,
 										height: 2,
-										backgroundColor: '#6b7280',
+										backgroundColor:
+											require('../../styles/theme').colors.gray500,
 										width: lineWidthAnim,
 										transform: [],
 										opacity: 1,
@@ -196,14 +203,16 @@ export function HabitCard({ habit, done, onToggle, streak, streakUnit }) {
 	)
 }
 
+const { colors, typography, radii } = require('../../styles/theme')
+
 const styles = StyleSheet.create({
 	habitCard: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#F9FAFB',
+		backgroundColor: colors.gray50,
 		borderWidth: 2,
-		borderColor: '#E5E7EB',
-		borderRadius: 16,
+		borderColor: colors.gray200,
+		borderRadius: radii.lg,
 		padding: 12,
 		gap: 12,
 	},
@@ -211,7 +220,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		flexDirection: 'column',
 		padding: 8,
-		borderRadius: 8,
+		borderRadius: radii.sm,
 	},
 	checkboxBoxWrapper: { marginRight: 12 },
 	checkboxBox: {
@@ -220,7 +229,7 @@ const styles = StyleSheet.create({
 		height: 22,
 		borderWidth: 2,
 		borderRadius: 6,
-		backgroundColor: '#ffffff',
+		backgroundColor: colors.white,
 		alignItems: 'center',
 		justifyContent: 'center',
 		overflow: 'visible',
@@ -231,14 +240,14 @@ const styles = StyleSheet.create({
 		left: 2,
 		right: 2,
 		bottom: 2,
-		backgroundColor: '#10b981',
-		borderRadius: 4,
+		backgroundColor: colors.green,
+		borderRadius: radii.xxs,
 	},
 	checkmark: {
 		zIndex: 2,
-		color: '#ffffff',
-		fontSize: 14,
-		fontWeight: '900',
+		color: colors.white,
+		fontSize: typography.size.sm,
+		fontWeight: typography.weight.extrabold,
 		textShadowColor: 'rgba(0,0,0,0.2)',
 		textShadowOffset: { width: 0, height: 1 },
 		textShadowRadius: 2,
@@ -249,12 +258,17 @@ const styles = StyleSheet.create({
 		left: '50%',
 		width: 60,
 		height: 60,
-		borderRadius: 30,
+		borderRadius: radii.xxl,
 		backgroundColor: 'rgba(16, 185, 129, 0.4)',
 		transform: [{ translateX: -30 }, { translateY: -30 }, { scale: 0.01 }],
 	},
-	habitTitle: { fontSize: 16, fontWeight: '600', color: '#111827' },
-	habitTitleDone: { color: '#6B7280' },
+	habitTitle: {
+		fontSize: 16,
+		fontWeight: '600',
+		color: colors.black,
+		fontFamily: typography.family.semibold,
+	},
+	habitTitleDone: { color: colors.gray500 },
 	secondLine: {
 		display: 'flex',
 		flexDirection: 'row',
@@ -262,13 +276,24 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 	},
 	streakPill: {
+		backgroundColor: colors.yellowBg,
 		marginTop: 4,
 		alignSelf: 'flex-start',
-		backgroundColor: '#EEF2FF',
-		borderRadius: 999,
+		borderRadius: radii.full,
 		paddingHorizontal: 10,
 		paddingVertical: 4,
+		borderWidth: 1,
+		borderColor: colors.yellow,
 	},
-	streakText: { color: '#4F46E5', fontWeight: '800', fontSize: 12 },
-	habitMeta: { fontSize: 12, color: '#6B7280', marginTop: 4 },
+	streakText: {
+		color: colors.yellow,
+		fontSize: typography.size.xs,
+		fontFamily: typography.family.extrabold,
+	},
+	habitMeta: {
+		fontSize: typography.size.xs,
+		color: colors.gray500,
+		marginTop: 4,
+		fontFamily: typography.family.regular,
+	},
 })

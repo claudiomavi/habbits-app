@@ -242,28 +242,48 @@ export function ProfileTemplate({
 	)
 }
 
+const { colors, typography, radii } = require('../../styles/theme')
+
 const styles = StyleSheet.create({
 	container: { flex: 1, padding: 16 },
 	header: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-	avatar: { width: 72, height: 72, borderRadius: 16 },
-	name: { fontSize: 20, fontWeight: '700', color: '#111827' },
-	email: { fontSize: 12, color: '#6B7280', marginTop: 2 },
-	level: { fontSize: 12, color: '#6B7280', marginTop: 6 },
-	label: { fontSize: 12, color: '#374151' },
+	avatar: { width: 72, height: 72, borderRadius: radii.lg },
+	name: {
+		fontSize: typography.size.xl,
+		color: colors.black,
+		fontFamily: typography.family.bold,
+	},
+	email: {
+		fontSize: typography.size.xs,
+		color: colors.gray500,
+		marginTop: 2,
+		fontFamily: typography.family.regular,
+	},
+	level: {
+		fontSize: typography.size.xs,
+		color: colors.gray500,
+		marginTop: 6,
+		fontFamily: typography.family.light,
+	},
+	label: {
+		fontSize: typography.size.xs,
+		color: colors.gray700,
+		fontFamily: typography.family.regular,
+	},
 	input: {
-		backgroundColor: '#F3F4F6',
+		backgroundColor: colors.gray100,
 		borderWidth: 1,
-		borderColor: '#E5E7EB',
-		borderRadius: 10,
+		borderColor: colors.gray200,
+		borderRadius: radii.md,
 		paddingHorizontal: 12,
 		paddingVertical: 10,
 	},
 	avatarsRow: { flexDirection: 'row', gap: 12, alignItems: 'center' },
-	pickAvatar: { width: 56, height: 56, borderRadius: 12 },
+	pickAvatar: { width: 56, height: 56, borderRadius: radii.md },
 	cancel: {
-		color: '#EF4444',
+		color: colors.red,
 		textAlign: 'center',
 		marginTop: 8,
-		fontWeight: '700',
+		fontFamily: typography.family.bold,
 	},
 })

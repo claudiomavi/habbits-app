@@ -119,12 +119,14 @@ export function HomeTemplate({
 	)
 }
 
+const { colors, typography, radii } = require('../../styles/theme')
+
 const styles = StyleSheet.create({
 	container: { flex: 1, padding: 16 },
 	title: {
-		fontSize: 20,
-		fontWeight: '700',
-		color: '#1F2937',
+		fontFamily: typography.family.bold,
+		fontSize: typography.size.xl,
+		color: colors.black,
 		marginBottom: 8,
 		marginTop: 6,
 	},
@@ -132,29 +134,41 @@ const styles = StyleSheet.create({
 	habitCard: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#F9FAFB',
+		backgroundColor: colors.gray50,
 		borderWidth: 2,
-		borderColor: '#E5E7EB',
-		borderRadius: 16,
+		borderColor: colors.gray200,
+		borderRadius: radii.lg,
 		padding: 12,
 		gap: 12,
 	},
-	habitTitle: { fontSize: 16, fontWeight: '600', color: '#111827' },
-	habitMeta: { fontSize: 12, color: '#6B7280', marginTop: 4 },
+	habitTitle: {
+		fontSize: typography.size.md,
+		color: colors.black,
+		fontFamily: typography.family.semibold,
+	},
+	habitMeta: {
+		fontSize: typography.size.xs,
+		color: colors.gray500,
+		marginTop: 4,
+	},
 	badge: {
-		backgroundColor: '#EEF2FF',
+		backgroundColor: 'rgba(255, 106, 0, 0.12)',
 		paddingHorizontal: 8,
 		paddingVertical: 4,
-		borderRadius: 8,
+		borderRadius: radii.sm,
 	},
-	badgeText: { color: '#4F46E5', fontWeight: '700', fontSize: 12 },
+	badgeText: {
+		color: colors.orange,
+		fontFamily: typography.family.bold,
+		fontSize: typography.size.xs,
+	},
 	completeBtn: {
 		marginLeft: 'auto',
-		backgroundColor: '#4facfe',
+		backgroundColor: colors.orange,
 		paddingHorizontal: 12,
 		paddingVertical: 8,
-		borderRadius: 10,
+		borderRadius: radii.md,
 	},
-	completeBtnDone: { backgroundColor: '#22c55e' },
-	completeBtnText: { color: '#fff', fontWeight: '700' },
+	completeBtnDone: { backgroundColor: colors.green },
+	completeBtnText: { color: colors.white, fontFamily: typography.family.bold },
 })

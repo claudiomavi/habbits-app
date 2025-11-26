@@ -22,7 +22,7 @@ export function CreateProfileTemplate({
 }) {
 	return (
 		<LinearGradient
-			colors={['#667eea', '#764ba2', '#f093fb', '#4facfe']}
+			colors={require('../../styles/theme').gradients.backgroundSoft}
 			style={styles.container}
 			start={{ x: 0, y: 0 }}
 			end={{ x: 1, y: 1 }}
@@ -52,7 +52,7 @@ export function CreateProfileTemplate({
 					{/* Barra de progreso decorativa - más llena que login */}
 					<View style={styles.progressBarContainer}>
 						<LinearGradient
-							colors={['#4facfe', '#00f2fe', '#43e97b']}
+							colors={require('../../styles/theme').gradients.accent}
 							style={styles.progressFill}
 							start={{ x: 0, y: 0 }}
 							end={{ x: 1, y: 0 }}
@@ -101,7 +101,9 @@ export function CreateProfileTemplate({
 											value={value}
 											onChangeText={onChange}
 											placeholder="Tu nombre"
-											placeholderTextColor="#9CA3AF"
+											placeholderTextColor={
+												require('../../styles/theme').colors.gray400
+											}
 											style={styles.input}
 										/>
 										{error && (
@@ -122,7 +124,8 @@ export function CreateProfileTemplate({
 										onPress={() => setSelectedAvatar(avatar)}
 										style={[
 											styles.avatarOption,
-											selectedAvatar?.uri === avatar.uri && styles.avatarSelected,
+											selectedAvatar?.uri === avatar.uri &&
+												styles.avatarSelected,
 										]}
 										activeOpacity={0.7}
 									>
@@ -185,6 +188,8 @@ export function CreateProfileTemplate({
 	)
 }
 
+const { colors, typography, radii } = require('../../styles/theme')
+
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
@@ -196,7 +201,7 @@ const styles = StyleSheet.create({
 	},
 	floatingEmoji: {
 		position: 'absolute',
-		fontSize: 48,
+		fontSize: typography.size.xxxl,
 		opacity: 0.2,
 	},
 	scrollContent: {
@@ -206,10 +211,10 @@ const styles = StyleSheet.create({
 		paddingVertical: 40,
 	},
 	card: {
-		backgroundColor: '#fff',
-		borderRadius: 32,
+		backgroundColor: colors.white,
+		borderRadius: radii.xxl,
 		padding: 32,
-		shadowColor: '#000',
+		shadowColor: colors.black,
 		shadowOffset: { width: 0, height: 10 },
 		shadowOpacity: 0.3,
 		shadowRadius: 20,
@@ -223,7 +228,7 @@ const styles = StyleSheet.create({
 		left: 0,
 		right: 0,
 		height: 4,
-		backgroundColor: '#E5E7EB',
+		backgroundColor: colors.gray200,
 		borderTopLeftRadius: 32,
 		borderTopRightRadius: 32,
 	},
@@ -239,11 +244,11 @@ const styles = StyleSheet.create({
 	logo: {
 		width: 72,
 		height: 72,
-		borderRadius: 20,
+		borderRadius: radii.xl,
 		justifyContent: 'center',
 		alignItems: 'center',
 		marginBottom: 16,
-		shadowColor: '#4facfe',
+		shadowColor: colors.lightBlue,
 		shadowOffset: { width: 0, height: 4 },
 		shadowOpacity: 0.3,
 		shadowRadius: 8,
@@ -257,30 +262,30 @@ const styles = StyleSheet.create({
 	bar1: {
 		width: 6,
 		height: 24,
-		backgroundColor: '#fff',
-		borderRadius: 3,
+		backgroundColor: colors.white,
+		borderRadius: radii.xxs,
 	},
 	bar2: {
 		width: 6,
 		height: 18,
-		backgroundColor: '#fff',
-		borderRadius: 3,
+		backgroundColor: colors.white,
+		borderRadius: radii.xxs,
 		marginTop: 6,
 	},
 	bar3: {
 		width: 6,
 		height: 30,
-		backgroundColor: '#fff',
-		borderRadius: 3,
+		backgroundColor: colors.white,
+		borderRadius: radii.xxs,
 	},
 	title: {
-		fontSize: 32,
-		fontWeight: 'bold',
-		color: '#1F2937',
+		fontSize: typography.size.xxl,
+		fontFamily: typography.family.bold,
+		color: colors.gray800,
 	},
 	subtitle: {
-		fontSize: 14,
-		color: '#6B7280',
+		fontSize: typography.size.sm,
+		color: colors.gray500,
 		marginTop: 4,
 		textAlign: 'center',
 	},
@@ -291,22 +296,23 @@ const styles = StyleSheet.create({
 		gap: 8,
 	},
 	label: {
-		fontSize: 14,
-		fontWeight: '600',
-		color: '#374151',
+		fontSize: typography.size.sm,
+		fontFamily: typography.family.semibold,
+		color: colors.gray700,
 	},
 	input: {
-		backgroundColor: '#F9FAFB',
+		backgroundColor: colors.gray50,
 		borderWidth: 2,
-		borderColor: '#E5E7EB',
-		borderRadius: 16,
+		borderColor: colors.gray200,
+		borderRadius: radii.lg,
 		padding: 14,
-		fontSize: 16,
-		color: '#1F2937',
+		fontSize: typography.size.md,
+		color: colors.gray800,
 	},
 	errorText: {
-		fontSize: 12,
-		color: '#EF4444',
+		fontFamily: typography.family.regular,
+		fontSize: typography.size.xs,
+		color: colors.red,
 		marginTop: 4,
 	},
 	avatarSection: {
@@ -320,40 +326,40 @@ const styles = StyleSheet.create({
 	avatarOption: {
 		alignItems: 'center',
 		padding: 12,
-		borderRadius: 20,
+		borderRadius: radii.xl,
 		borderWidth: 3,
 		borderColor: 'transparent',
-		backgroundColor: '#F9FAFB',
+		backgroundColor: colors.gray50,
 	},
 	avatarSelected: {
-		borderColor: '#4facfe',
-		backgroundColor: '#EFF6FF',
+		borderColor: colors.orange,
+		backgroundColor: 'rgba(255, 106, 0, 0.10)',
 	},
 	avatarImage: {
 		width: 80,
 		height: 80,
-		borderRadius: 40,
+		borderRadius: radii.xxl,
 		marginBottom: 8,
 	},
 	avatarLabel: {
-		fontSize: 14,
-		fontWeight: '600',
-		color: '#6B7280',
+		fontSize: typography.size.sm,
+		fontFamily: typography.family.semibold,
+		color: colors.gray500,
 	},
 	avatarLabelSelected: {
-		color: '#4facfe',
+		color: colors.orange,
 	},
 	hintText: {
-		fontSize: 12,
-		color: '#9CA3AF',
+		fontSize: typography.size.xs,
+		color: colors.gray400,
 		textAlign: 'center',
 		fontStyle: 'italic',
 	},
 	mainButton: {
 		marginTop: 8,
-		borderRadius: 16,
+		borderRadius: radii.lg,
 		overflow: 'hidden',
-		shadowColor: '#4facfe',
+		shadowColor: colors.lightBlue,
 		shadowOffset: { width: 0, height: 4 },
 		shadowOpacity: 0.3,
 		shadowRadius: 8,
@@ -365,22 +371,22 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 	mainButtonText: {
-		color: '#fff',
-		fontSize: 16,
-		fontWeight: '700',
+		color: colors.white,
+		fontSize: typography.size.md,
+		fontFamily: typography.family.bold,
 	},
 	infoBox: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#F0F9FF',
+		backgroundColor: colors.gray100,
 		padding: 16,
-		borderRadius: 16,
+		borderRadius: radii.lg,
 		gap: 12,
 		borderWidth: 1,
 		borderColor: '#BFDBFE',
 	},
 	infoIcon: {
-		fontSize: 24,
+		fontSize: typography.size.h2,
 	},
 	infoText: {
 		flex: 1,

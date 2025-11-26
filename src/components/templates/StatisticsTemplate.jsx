@@ -41,11 +41,12 @@ export function StatisticsTemplate({
 			: 0
 
 		// color del badge según %
-		let badgeColor = '#9CA3AF' // gris por defecto
+		const theme = require('../../styles/theme')
+		let badgeColor = theme.colors.gray400 // gris por defecto
 		if (!isEmpty) {
-			if (pct >= 80) badgeColor = '#10B981' // verde
-			else if (pct >= 50) badgeColor = '#F59E0B' // ámbar
-			else badgeColor = '#EF4444' // rojo
+			if (pct >= 80) badgeColor = theme.colors.green // verde
+			else if (pct >= 50) badgeColor = theme.colors.yellow // amarillo
+			else badgeColor = theme.colors.red // rojo
 		}
 
 		return (
@@ -67,7 +68,7 @@ export function StatisticsTemplate({
 						<View style={styles.habitLoadingRow}>
 							<ActivityIndicator
 								size="small"
-								color="#6B7280"
+								color={require('../../styles/theme').colors.gray500}
 							/>
 							<Text style={styles.meta}>Calculando métricas…</Text>
 						</View>
@@ -180,7 +181,8 @@ export function StatisticsTemplate({
 											width: 10,
 											height: 10,
 											borderRadius: 2,
-											backgroundColor: '#60A5FA',
+											backgroundColor:
+												require('../../styles/theme').colors.yellow,
 										}}
 									/>
 									<Text style={styles.meta}>Período anterior</Text>
@@ -213,7 +215,12 @@ export function StatisticsTemplate({
 										<Text style={styles.insightTitle}>
 											Oportunidad: {bottomHabit.title}
 										</Text>
-										<Text style={[styles.insightValue, { color: '#EF4444' }]}>
+										<Text
+											style={[
+												styles.insightValue,
+												{ color: require('../../styles/theme').colors.red },
+											]}
+										>
 											{Math.round(bottomHabit.pct)}%
 										</Text>
 									</View>
@@ -265,6 +272,8 @@ export function StatisticsTemplate({
 	)
 }
 
+const { colors, typography, radii } = require('../../styles/theme')
+
 const styles = StyleSheet.create({
 	container: { flex: 1, paddingHorizontal: 16 },
 	headerRowCentered: {
@@ -273,36 +282,42 @@ const styles = StyleSheet.create({
 		marginBottom: 8,
 	},
 	title: {
-		fontSize: 22,
-		fontWeight: '800',
+		fontSize: typography.size.h2,
+		fontFamily: typography.family.extrabold,
 		lineHeight: 26,
-		color: '#111827',
+		color: colors.black,
 		textAlign: 'center',
 	},
-	subtitle: { fontSize: 12, color: '#6B7280', lineHeight: 18, marginTop: 2 },
+	subtitle: {
+		fontSize: typography.size.xs,
+		color: colors.gray500,
+		lineHeight: 18,
+		marginTop: 2,
+		fontFamily: typography.family.regular,
+	},
 	section: { marginTop: 12 },
 	habitsCardTop: {
 		marginTop: 12,
-		backgroundColor: '#FFFFFF',
+		backgroundColor: colors.white,
 		borderWidth: 2,
-		borderColor: '#E5E7EB',
+		borderColor: colors.gray200,
 		borderTopLeftRadius: 16,
 		borderTopRightRadius: 16,
 		paddingVertical: 8,
 		paddingHorizontal: 12,
 	},
 	habitsCardBottom: {
-		backgroundColor: '#FFFFFF',
-		borderColor: '#E5E7EB',
+		backgroundColor: colors.white,
+		borderColor: colors.gray200,
 		borderBottomLeftRadius: 16,
 		borderBottomRightRadius: 16,
 		paddingBottom: 12,
 	},
 	sectionTitle: {
-		fontSize: 18,
-		fontWeight: '800',
+		fontSize: typography.size.lg,
+		fontFamily: typography.family.extrabold,
 		lineHeight: 22,
-		color: '#111827',
+		color: colors.black,
 		marginBottom: 8,
 	},
 	kpisRow: { flexDirection: 'row', gap: 10 },
@@ -310,10 +325,10 @@ const styles = StyleSheet.create({
 		marginTop: -2,
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#F9FAFB',
+		backgroundColor: colors.gray50,
 		borderTopWidth: 1,
 		borderBottomWidth: 1,
-		borderColor: '#E5E7EB',
+		borderColor: colors.gray200,
 		paddingVertical: 12,
 		paddingHorizontal: 12,
 		gap: 12,
@@ -321,7 +336,7 @@ const styles = StyleSheet.create({
 		position: 'relative',
 	},
 	rowPressed: {
-		backgroundColor: '#e8eaed',
+		backgroundColor: colors.gray200,
 	},
 	innerTopShadow: {
 		position: 'absolute',
@@ -339,17 +354,22 @@ const styles = StyleSheet.create({
 		backgroundColor: 'rgba(0,0,0,0.03)',
 	},
 	habitTitle: {
-		fontSize: 16,
-		fontWeight: '700',
+		fontSize: typography.size.md,
+		fontFamily: typography.family.bold,
 		lineHeight: 20,
-		color: '#111827',
+		color: colors.black,
 	},
-	meta: { fontSize: 12, color: '#4B5563', lineHeight: 18, marginTop: 4 },
+	meta: {
+		fontSize: typography.size.xs,
+		color: colors.gray600,
+		lineHeight: 18,
+		marginTop: 4,
+	},
 	insightBox: {
-		backgroundColor: '#FFFFFF',
+		backgroundColor: colors.white,
 		borderWidth: 2,
-		borderColor: '#E5E7EB',
-		borderRadius: 16,
+		borderColor: colors.gray200,
+		borderRadius: radii.lg,
 		padding: 12,
 		marginTop: 6,
 	},
@@ -358,8 +378,12 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		paddingVertical: 4,
 	},
-	insightTitle: { fontSize: 13, color: '#374151' },
-	insightValue: { fontSize: 13, color: '#10B981', fontWeight: '700' },
+	insightTitle: { fontSize: typography.size.sm, color: colors.gray700 },
+	insightValue: {
+		fontSize: typography.size.sm,
+		color: colors.green,
+		fontFamily: typography.family.bold,
+	},
 	habitLoadingRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -369,19 +393,23 @@ const styles = StyleSheet.create({
 	badge: {
 		paddingHorizontal: 10,
 		paddingVertical: 6,
-		borderRadius: 999,
+		borderRadius: radii.full,
 		alignSelf: 'flex-start',
 	},
-	badgeText: { color: 'white', fontWeight: '800', fontSize: 12 },
+	badgeText: {
+		color: 'white',
+		fontFamily: typography.family.extrabold,
+		fontSize: typography.size.xs,
+	},
 	progressBarContainer: {
 		marginTop: 8,
 		height: 8,
-		borderRadius: 999,
-		backgroundColor: '#F3F4F6',
+		borderRadius: radii.full,
+		backgroundColor: colors.gray100,
 		overflow: 'hidden',
 	},
 	progressBarFill: {
 		height: '100%',
-		backgroundColor: '#10B981',
+		backgroundColor: colors.green,
 	},
 })

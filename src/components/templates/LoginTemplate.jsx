@@ -75,7 +75,7 @@ export function LoginTemplate({
 				activeOpacity={0.8}
 			>
 				<LinearGradient
-					colors={['#4facfe', '#43e97b']}
+					colors={require('../../styles/theme').gradients.cta}
 					style={styles.gradientButton}
 					start={{ x: 0, y: 0 }}
 					end={{ x: 1, y: 0 }}
@@ -129,6 +129,8 @@ export function LoginTemplate({
 	)
 }
 
+const { typography, colors, radii } = require('../../styles/theme')
+
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
@@ -140,7 +142,7 @@ const styles = StyleSheet.create({
 	},
 	floatingEmoji: {
 		position: 'absolute',
-		fontSize: 48,
+		fontSize: typography.size.xxxl,
 		opacity: 0.2,
 	},
 	scrollContent: {
@@ -150,10 +152,10 @@ const styles = StyleSheet.create({
 		paddingVertical: 40,
 	},
 	card: {
-		backgroundColor: '#fff',
-		borderRadius: 32,
+		backgroundColor: colors.white,
+		borderRadius: radii.xxl,
 		padding: 32,
-		shadowColor: '#000',
+		shadowColor: colors.black,
 		shadowOffset: { width: 0, height: 10 },
 		shadowOpacity: 0.3,
 		shadowRadius: 20,
@@ -166,7 +168,7 @@ const styles = StyleSheet.create({
 		left: 0,
 		right: 0,
 		height: 4,
-		backgroundColor: '#E5E7EB',
+		backgroundColor: colors.gray200,
 		borderTopLeftRadius: 32,
 		borderTopRightRadius: 32,
 	},
@@ -186,7 +188,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		alignItems: 'center',
 		marginBottom: 16,
-		shadowColor: '#4facfe',
+		shadowColor: colors.lightBlue,
 		shadowOffset: { width: 0, height: 4 },
 		shadowOpacity: 0.3,
 		shadowRadius: 8,
@@ -197,23 +199,33 @@ const styles = StyleSheet.create({
 		alignItems: 'flex-end',
 		gap: 4,
 	},
-	bar1: { width: 6, height: 24, backgroundColor: '#fff', borderRadius: 3 },
+	bar1: {
+		width: 6,
+		height: 24,
+		backgroundColor: colors.white,
+		borderRadius: radii.xxs,
+	},
 	bar2: {
 		width: 6,
 		height: 18,
-		backgroundColor: '#fff',
-		borderRadius: 3,
+		backgroundColor: colors.white,
+		borderRadius: radii.xxs,
 		marginTop: 6,
 	},
-	bar3: { width: 6, height: 30, backgroundColor: '#fff', borderRadius: 3 },
+	bar3: {
+		width: 6,
+		height: 30,
+		backgroundColor: colors.white,
+		borderRadius: radii.xxs,
+	},
 	title: {
-		fontSize: 32,
-		fontWeight: 'bold',
-		color: '#1F2937',
+		fontSize: typography.size.xxl,
+		fontFamily: typography.family.bold,
+		color: colors.gray800,
 	},
 	subtitle: {
-		fontSize: 14,
-		color: '#6B7280',
+		fontSize: typography.size.sm,
+		color: colors.gray500,
 		marginTop: 4,
 	},
 	form: {
@@ -223,29 +235,30 @@ const styles = StyleSheet.create({
 		gap: 8,
 	},
 	label: {
-		fontSize: 14,
-		fontWeight: '600',
-		color: '#374151',
+		fontFamily: typography.family.semibold,
+		fontSize: typography.size.sm,
+		color: colors.gray700,
 	},
 	input: {
-		backgroundColor: '#F9FAFB',
+		fontFamily: typography.family.regular,
+		backgroundColor: colors.gray50,
 		borderWidth: 2,
-		borderColor: '#E5E7EB',
-		borderRadius: 16,
+		borderColor: colors.gray200,
+		borderRadius: radii.lg,
 		padding: 14,
-		fontSize: 16,
-		color: '#1F2937',
+		fontSize: typography.size.md,
+		color: colors.gray800,
 	},
 	errorText: {
-		fontSize: 12,
-		color: '#EF4444',
+		fontSize: typography.size.xs,
+		color: colors.red,
 		marginTop: 4,
 	},
 	mainButton: {
 		marginTop: 8,
-		borderRadius: 16,
+		borderRadius: radii.lg,
 		overflow: 'hidden',
-		shadowColor: '#4facfe',
+		shadowColor: colors.lightBlue,
 		shadowOffset: { width: 0, height: 4 },
 		shadowOpacity: 0.3,
 		shadowRadius: 8,
@@ -257,9 +270,9 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 	mainButtonText: {
-		color: '#fff',
-		fontSize: 16,
-		fontWeight: '700',
+		fontFamily: typography.family.bold,
+		color: colors.white,
+		fontSize: typography.size.md,
 	},
 	divider: {
 		flexDirection: 'row',
@@ -269,12 +282,12 @@ const styles = StyleSheet.create({
 	dividerLine: {
 		flex: 1,
 		height: 1,
-		backgroundColor: '#E5E7EB',
+		backgroundColor: colors.gray200,
 	},
 	dividerText: {
 		marginHorizontal: 16,
-		fontSize: 12,
-		color: '#9CA3AF',
+		fontSize: typography.size.xs,
+		color: colors.gray400,
 	},
 	socialButtons: {
 		flexDirection: 'row',
@@ -286,11 +299,11 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		paddingVertical: 12,
-		borderRadius: 12,
+		borderRadius: radii.md,
 		gap: 8,
-		backgroundColor: '#fff',
+		backgroundColor: colors.white,
 		borderWidth: 2,
-		borderColor: '#E5E7EB',
+		borderColor: colors.gray200,
 	},
 	appleButton: {
 		flex: 1,
@@ -298,28 +311,28 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		paddingVertical: 12,
-		borderRadius: 12,
+		borderRadius: radii.md,
 		gap: 8,
-		backgroundColor: '#000',
+		backgroundColor: colors.black,
 	},
 	googleIcon: {
-		fontSize: 18,
-		fontWeight: 'bold',
-		color: '#4285F4',
+		fontSize: typography.size.lg,
+		fontFamily: typography.family.bold,
+		color: colors.blue,
 	},
 	appleIcon: {
-		fontSize: 18,
-		color: '#fff',
+		fontSize: typography.size.lg,
+		color: colors.white,
 	},
 	socialButtonText: {
-		fontSize: 14,
-		fontWeight: '600',
-		color: '#374151',
+		fontSize: typography.size.sm,
+		fontFamily: typography.family.semibold,
+		color: colors.gray700,
 	},
 	socialButtonTextWhite: {
-		fontSize: 14,
-		fontWeight: '600',
-		color: '#fff',
+		fontSize: typography.size.sm,
+		fontFamily: typography.family.semibold,
+		color: colors.white,
 	},
 	footer: {
 		flexDirection: 'row',
@@ -328,12 +341,12 @@ const styles = StyleSheet.create({
 		marginTop: 8,
 	},
 	footerText: {
-		fontSize: 14,
-		color: '#6B7280',
+		fontSize: typography.size.sm,
+		color: colors.gray500,
 	},
 	footerLink: {
-		fontSize: 14,
-		fontWeight: '600',
-		color: '#4facfe',
+		fontFamily: typography.family.semibold,
+		fontSize: typography.size.sm,
+		color: colors.lightBlue,
 	},
 })

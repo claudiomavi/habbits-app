@@ -41,6 +41,8 @@ export function HeaderBar({
 	)
 }
 
+const { colors, radii, typography } = require('../../styles/theme')
+
 const styles = StyleSheet.create({
 	header: {
 		flexDirection: 'row',
@@ -48,13 +50,17 @@ const styles = StyleSheet.create({
 		marginBottom: 16,
 		gap: 12,
 	},
-	welcome: { color: '#fff', fontSize: 16, fontWeight: '600' },
-	level: { color: '#E5E7EB', fontSize: 12, marginTop: 2 },
+	welcome: {
+		color: colors.black,
+		fontSize: typography.size.md,
+		fontFamily: typography.family.semibold,
+	},
+	level: { color: colors.gray500, fontSize: typography.size.xs, marginTop: 2 },
 	logoutBtn: {
 		paddingHorizontal: 12,
 		paddingVertical: 8,
-		backgroundColor: 'rgba(0,0,0,0.2)',
-		borderRadius: 10,
+		backgroundColor: colors.gray100,
+		borderRadius: radii.md,
 	},
-	logoutText: { color: '#fff', fontWeight: '700' },
+	logoutText: { color: colors.black, fontFamily: typography.family.bold },
 })

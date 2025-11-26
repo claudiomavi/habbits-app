@@ -27,8 +27,9 @@ export function HabitModal({
 		setForm((f) => ({
 			...f,
 			frequency: fr,
-			days_of_week: fr === 'weekly' ? (f.days_of_week || []) : [],
-			day_of_month: fr === 'monthly' ? (f.day_of_month || 1) : f.day_of_month ?? null,
+			days_of_week: fr === 'weekly' ? f.days_of_week || [] : [],
+			day_of_month:
+				fr === 'monthly' ? f.day_of_month || 1 : f.day_of_month ?? null,
 		}))
 	const setDays = (arr) => setForm((f) => ({ ...f, days_of_week: arr }))
 
@@ -135,7 +136,7 @@ export function HabitModal({
 						/>
 					)}
 					{form.frequency === 'monthly' && (
-						<View style={[styles.row, { marginTop: 8 }]}> 
+						<View style={[styles.row, { marginTop: 8 }]}>
 							<Text style={styles.label}>Día del mes</Text>
 							<TextInput
 								keyboardType="number-pad"
@@ -172,6 +173,8 @@ export function HabitModal({
 	)
 }
 
+const { typography, colors, radii } = require('../../styles/theme')
+
 const styles = StyleSheet.create({
 	modalBg: {
 		flex: 1,
@@ -181,17 +184,26 @@ const styles = StyleSheet.create({
 		padding: 16,
 	},
 	modalCard: {
-		backgroundColor: '#fff',
-		borderRadius: 16,
+		backgroundColor: colors.white,
+		borderRadius: radii.lg,
 		padding: 16,
 		width: '100%',
 	},
-	modalTitle: { fontSize: 18, fontWeight: '700', marginBottom: 8 },
-	label: { marginTop: 8, fontWeight: '600', color: '#111827' },
+	modalTitle: {
+		fontSize: typography.size.lg,
+		marginBottom: 8,
+		fontFamily: typography.family.bold,
+	},
+	label: {
+		marginTop: 8,
+		color: colors.black,
+		fontFamily: typography.family.semibold,
+	},
 	input: {
+		fontFamily: typography.family.regular,
 		borderWidth: 1,
-		borderColor: '#E5E7EB',
-		borderRadius: 8,
+		borderColor: colors.gray200,
+		borderRadius: radii.sm,
 		padding: 10,
 		marginTop: 4,
 	},
@@ -199,10 +211,13 @@ const styles = StyleSheet.create({
 	btn: {
 		paddingVertical: 10,
 		paddingHorizontal: 14,
-		borderRadius: 10,
+		borderRadius: radii.sm,
 		marginLeft: 8,
 	},
-	cancel: { backgroundColor: '#6B7280' },
-	save: { backgroundColor: '#10B981' },
-	btnText: { color: '#fff', fontWeight: '700' },
+	cancel: { backgroundColor: colors.gray500 },
+	save: { backgroundColor: colors.green },
+	btnText: {
+		color: colors.white,
+		fontFamily: typography.family.bold,
+	},
 })

@@ -251,6 +251,8 @@ export function HabitsTodayModal({
 	)
 }
 
+const { colors, typography } = require('../../styles/theme')
+
 const styles = StyleSheet.create({
 	backdrop: {
 		position: 'absolute',
@@ -273,7 +275,16 @@ const styles = StyleSheet.create({
 		padding: 16,
 	},
 	header: { flexDirection: 'row', alignItems: 'center' },
-	title: { flex: 1, fontSize: 18, fontWeight: '700', color: '#111827' },
+	title: {
+		flex: 1,
+		fontSize: typography.size.lg,
+		color: colors.black,
+		fontFamily: typography.family.bold,
+	},
 	closeBtn: { paddingHorizontal: 8, paddingVertical: 4 },
-	closeTxt: { fontSize: 18, color: '#6B7280', fontWeight: '700' },
+	closeTxt: {
+		fontSize: typography.size.lg,
+		color: colors.gray500,
+		fontFamily: typography.family.bold,
+	},
 })

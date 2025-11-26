@@ -105,6 +105,8 @@ export function HabitsTemplate({
 	)
 }
 
+const { colors, typography, radii } = require('../../styles/theme')
+
 const styles = StyleSheet.create({
 	container: { flex: 1, padding: 16 },
 	headerRowCentered: {
@@ -113,39 +115,56 @@ const styles = StyleSheet.create({
 		marginBottom: 8,
 	},
 	title: {
-		fontSize: 20,
-		fontWeight: '700',
-		color: '#1F2937',
+		fontSize: typography.size.xl,
+		fontFamily: typography.family.bold,
+		color: colors.gray800,
 		textAlign: 'center',
 	},
 	center: { alignItems: 'center', justifyContent: 'center' },
 	row: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#F9FAFB',
+		backgroundColor: colors.gray50,
 		borderWidth: 2,
-		borderColor: '#E5E7EB',
-		borderRadius: 16,
+		borderColor: colors.gray200,
+		borderRadius: radii.lg,
 		padding: 12,
 		gap: 12,
 	},
-	habitTitle: { fontSize: 16, fontWeight: '600', color: '#111827' },
-	meta: { fontSize: 12, color: '#6B7280', marginTop: 4 },
-	actionBtn: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 },
-	edit: { backgroundColor: '#4F46E5' },
-	delete: { backgroundColor: '#EF4444' },
-	actionText: { color: '#fff', fontWeight: '700' },
+	habitTitle: {
+		fontSize: typography.size.md,
+		fontFamily: typography.family.semibold,
+		color: colors.black,
+	},
+	meta: {
+		fontSize: typography.size.xs,
+		color: colors.gray500,
+		marginTop: 4,
+	},
+	actionBtn: {
+		paddingHorizontal: 10,
+		paddingVertical: 6,
+		borderRadius: radii.sm,
+	},
+	edit: { backgroundColor: colors.orange },
+	delete: { backgroundColor: colors.red },
+	actionText: { color: colors.white, fontFamily: typography.family.bold },
 	fab: {
 		position: 'absolute',
 		right: 24,
 		bottom: 24,
 		width: 56,
 		height: 56,
-		borderRadius: 28,
-		backgroundColor: '#4F46E5',
+		borderRadius: radii.xxl,
+		backgroundColor: colors.orange,
 		alignItems: 'center',
 		justifyContent: 'center',
 		elevation: 3,
 	},
-	fabText: { color: '#fff', fontSize: 28, lineHeight: 28, fontWeight: '700' },
+	fabText: {
+		color: colors.white,
+		fontSize: typography.size.h1,
+		lineHeight: 28,
+		fontFamily: typography.family.bold,
+	},
 })
