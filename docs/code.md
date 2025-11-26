@@ -27,8 +27,6 @@
 
 ## IDEAS DESARROLLO
 
-- [ ] Poner el correo de confirmación personalizado que ha mandado Miguel
-
 - [ ] Aplicar colores que ha mandado Miguel
 
 - [ ] Modificar pantalla de creación personaje (todavía me tienen que decir cosas):
