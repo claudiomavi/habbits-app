@@ -31,16 +31,21 @@ export function DaysOfWeekSelector({ value = [], onChange }) {
 	)
 }
 
+const { colors, radii, typography } = require('../../styles/theme')
 const styles = StyleSheet.create({
-	label: { marginTop: 8, fontWeight: '600', color: '#111827' },
+	label: {
+		marginTop: 8,
+		fontWeight: typography.weight.semibold,
+		color: colors.black,
+	},
 	row: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 },
 	chip: {
 		paddingVertical: 6,
 		paddingHorizontal: 10,
-		borderRadius: 999,
-		backgroundColor: '#E5E7EB',
+		borderRadius: radii.full,
+		backgroundColor: colors.gray200,
 	},
-	active: { backgroundColor: '#4F46E5' },
-	text: { color: '#111827' },
-	textActive: { color: '#fff', fontWeight: '700' },
+	active: { backgroundColor: colors.orange },
+	text: { color: colors.black },
+	textActive: { color: colors.white, fontWeight: typography.weight.bold },
 })

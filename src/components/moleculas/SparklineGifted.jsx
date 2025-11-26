@@ -97,7 +97,10 @@ export function SparklineGifted({
 					startOpacity={0.15}
 					endOpacity={0.01}
 					yAxisTextStyle={{ display: 'none' }}
-					xAxisLabelTextStyle={{ color: '#9CA3AF', fontSize: 10 }}
+					xAxisLabelTextStyle={{
+						color: require('../../styles/theme').colors.gray400,
+						fontSize: 10,
+					}}
 					focusEnabled={false}
 					showStrip={false}
 					animateOnDataChange={animate}
@@ -159,22 +162,26 @@ export function SparklineGifted({
 	)
 }
 
+const { typography, colors } = require('../../styles/theme')
+
 const styles = StyleSheet.create({
 	vacuumContainer: {
-		backgroundColor: '#F3F4F6',
+		backgroundColor: colors.gray100,
 		borderRadius: 12,
 		borderWidth: 2,
-		borderColor: '#E5E7EB',
+		borderColor: colors.gray200,
 	},
 	container: { overflow: 'visible', paddingBottom: 8 },
 	labelContainer: {
-		backgroundColor: '#111827',
+		fontFamily: typography.family.regular,
+		backgroundColor: colors.black,
 		paddingHorizontal: 8,
 		paddingVertical: 6,
 		borderRadius: 6,
 	},
 	dataLabel: {
-		color: '#D1D5DB',
+		fontFamily: typography.family.light,
+		color: colors.gray300,
 		fontSize: 10,
 		marginBottom: 2,
 	},
@@ -188,5 +195,9 @@ const styles = StyleSheet.create({
 		height: 10,
 		borderRadius: 2,
 	},
-	textLabel: { color: 'white', fontSize: 12 },
+	textLabel: {
+		fontFamily: typography.family.regular,
+		color: colors.white,
+		fontSize: typography.size.xs,
+	},
 })

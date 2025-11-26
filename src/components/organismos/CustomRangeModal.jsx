@@ -163,6 +163,8 @@ export function CustomRangeModal({
 	)
 }
 
+const { colors, typography, radii } = require('../../styles/theme')
+
 const styles = StyleSheet.create({
 	backdrop: {
 		flex: 1,
@@ -172,14 +174,23 @@ const styles = StyleSheet.create({
 		padding: 16,
 	},
 	sheet: {
-		backgroundColor: '#fff',
-		borderRadius: 16,
+		backgroundColor: colors.white,
+		borderRadius: radii.lg,
 		padding: 16,
 		width: '100%',
 		maxWidth: 400,
 	},
-	title: { fontSize: 18, fontWeight: '700', color: '#111827' },
-	subtitle: { fontSize: 12, color: '#6B7280', marginTop: 4 },
+	title: {
+		fontSize: typography.size.lg,
+		color: colors.black,
+		fontFamily: typography.family.bold,
+	},
+	subtitle: {
+		fontSize: typography.size.xs,
+		color: colors.gray500,
+		marginTop: 4,
+		fontFamily: typography.family.regular,
+	},
 	stepperRow: {
 		gap: 8,
 		flexDirection: 'row',
@@ -190,38 +201,44 @@ const styles = StyleSheet.create({
 	stepBtn: {
 		width: 56,
 		height: 56,
-		borderRadius: 14,
+		borderRadius: radii.md,
 		alignItems: 'center',
 		justifyContent: 'center',
 		borderWidth: 2,
-		borderColor: '#E5E7EB',
-		backgroundColor: '#F9FAFB',
+		borderColor: colors.gray200,
+		backgroundColor: colors.gray50,
 	},
-	stepMinus: {},
-	stepPlus: {},
-	stepText: { fontSize: 28, color: '#111827', fontWeight: '700' },
+	stepText: {
+		fontSize: typography.size.h1,
+		color: colors.black,
+		fontFamily: typography.family.bold,
+	},
 	daysBox: {
 		flex: 1,
 		alignItems: 'center',
 		justifyContent: 'center',
 		paddingVertical: 10,
-		borderRadius: 12,
+		borderRadius: radii.md,
 		borderWidth: 2,
-		borderColor: '#E5E7EB',
-		backgroundColor: '#F3F4F6',
+		borderColor: colors.gray200,
+		backgroundColor: colors.gray100,
 	},
 	input: {
+		fontFamily: typography.family.bold,
 		minWidth: 64,
 		textAlign: 'center',
-		fontSize: 18,
-		fontWeight: '700',
-		color: '#111827',
+		fontSize: typography.size.lg,
+		color: colors.black,
 		paddingVertical: 6,
 		paddingHorizontal: 10,
-		backgroundColor: '#fff',
-		borderRadius: 10,
+		backgroundColor: colors.white,
+		borderRadius: radii.sm,
 		borderWidth: 2,
-		borderColor: '#E5E7EB',
+		borderColor: colors.gray200,
 	},
-	daysSuffix: { fontSize: 16, color: '#6B7280', marginLeft: 4 },
+	daysSuffix: {
+		fontSize: typography.size.md,
+		color: colors.gray500,
+		marginLeft: 4,
+	},
 })

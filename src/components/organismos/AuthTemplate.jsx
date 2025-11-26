@@ -11,10 +11,11 @@ export function AuthTemplate({
 }) {
 	return (
 		<LinearGradient
-			colors={['#667eea', '#764ba2', '#f093fb', '#4facfe']}
+			colors={require('../../styles/theme').gradients.backgroundSoft}
 			style={styles.container}
 			start={{ x: 0, y: 0 }}
-			end={{ x: 1, y: 1 }}
+			end={{ x: 0, y: 1 }}
+			locations={[0, 0.85, 1]}
 		>
 			<View
 				style={styles.decorativeContainer}
@@ -42,7 +43,7 @@ export function AuthTemplate({
 				<View style={styles.card}>
 					<View style={styles.progressBarContainer}>
 						<LinearGradient
-							colors={['#4facfe', '#00f2fe', '#43e97b']}
+							colors={require('../../styles/theme').gradients.accent}
 							style={[styles.progressFill, { width: progressWidth }]}
 							start={{ x: 0, y: 0 }}
 							end={{ x: 1, y: 0 }}
@@ -51,7 +52,7 @@ export function AuthTemplate({
 
 					<View style={styles.logoContainer}>
 						<LinearGradient
-							colors={['#4facfe', '#43e97b']}
+							colors={require('../../styles/theme').gradients.cta}
 							style={styles.logo}
 							start={{ x: 0, y: 0 }}
 							end={{ x: 1, y: 1 }}
@@ -74,10 +75,15 @@ export function AuthTemplate({
 	)
 }
 
+const { colors, radii, shadows, typography } = require('../../styles/theme')
 const styles = StyleSheet.create({
 	container: { flex: 1 },
 	decorativeContainer: { position: 'absolute', width: '100%', height: '100%' },
-	floatingEmoji: { position: 'absolute', fontSize: 48, opacity: 0.2 },
+	floatingEmoji: {
+		position: 'absolute',
+		fontSize: typography.size.xxxl,
+		opacity: 0.2,
+	},
 	scrollContent: {
 		flexGrow: 1,
 		justifyContent: 'center',
@@ -85,14 +91,10 @@ const styles = StyleSheet.create({
 		paddingVertical: 40,
 	},
 	card: {
-		backgroundColor: '#fff',
-		borderRadius: 32,
+		backgroundColor: colors.white,
+		borderRadius: radii.xxl,
 		padding: 32,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 10 },
-		shadowOpacity: 0.3,
-		shadowRadius: 20,
-		elevation: 10,
+		...shadows.soft,
 		overflow: 'hidden',
 	},
 	progressBarContainer: {
@@ -101,36 +103,54 @@ const styles = StyleSheet.create({
 		left: 0,
 		right: 0,
 		height: 4,
-		backgroundColor: '#E5E7EB',
-		borderTopLeftRadius: 32,
-		borderTopRightRadius: 32,
+		backgroundColor: colors.gray200,
+		borderTopLeftRadius: radii.xxl,
+		borderTopRightRadius: radii.xxl,
 	},
 	progressFill: { height: '100%' },
 	logoContainer: { alignItems: 'center', marginBottom: 24, marginTop: 8 },
 	logo: {
 		width: 72,
 		height: 72,
-		borderRadius: 20,
+		borderRadius: radii.xl,
 		justifyContent: 'center',
 		alignItems: 'center',
 		marginBottom: 16,
-		shadowColor: '#4facfe',
+		shadowColor: colors.orange,
 		shadowOffset: { width: 0, height: 4 },
 		shadowOpacity: 0.3,
 		shadowRadius: 8,
 		elevation: 5,
 	},
 	logoInner: { flexDirection: 'row', alignItems: 'flex-end', gap: 4 },
-	bar1: { width: 6, height: 24, backgroundColor: '#fff', borderRadius: 3 },
+	bar1: {
+		width: 6,
+		height: 24,
+		backgroundColor: colors.white,
+		borderRadius: radii.xxs,
+	},
 	bar2: {
 		width: 6,
 		height: 18,
-		backgroundColor: '#fff',
-		borderRadius: 3,
+		backgroundColor: colors.white,
+		borderRadius: radii.xxs,
 		marginTop: 6,
 	},
-	bar3: { width: 6, height: 30, backgroundColor: '#fff', borderRadius: 3 },
-	title: { fontSize: 32, fontWeight: 'bold', color: '#1F2937' },
-	subtitle: { fontSize: 14, color: '#6B7280', marginTop: 4 },
+	bar3: {
+		width: 6,
+		height: 30,
+		backgroundColor: colors.white,
+		borderRadius: radii.xxs,
+	},
+	title: {
+		fontSize: typography.size.xxl,
+		fontFamily: typography.family.bold,
+		color: colors.black,
+	},
+	subtitle: {
+		fontSize: typography.size.sm,
+		color: colors.gray500,
+		marginTop: 4,
+	},
 	form: { gap: 16 },
 })

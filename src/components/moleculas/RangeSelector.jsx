@@ -38,7 +38,7 @@ export function RangeSelector({ value = '30', onChange, onOpenCustom }) {
 					<View style={[styles.pill, selected && styles.pillSelected]}>
 						{selected ? (
 							<LinearGradient
-								colors={['#4facfe', '#43e97b']}
+								colors={require('../../styles/theme').gradients.cta}
 								start={{ x: 0, y: 0 }}
 								end={{ x: 1, y: 0 }}
 								style={styles.gradientBg}
@@ -72,29 +72,31 @@ export function RangeSelector({ value = '30', onChange, onOpenCustom }) {
 	)
 }
 
+const { typography, radii, colors } = require('../../styles/theme')
+
 const styles = StyleSheet.create({
 	wrapper: {
 		flexDirection: 'row',
 		gap: 8,
-		backgroundColor: '#F3F4F6',
+		backgroundColor: colors.gray100,
 		padding: 6,
-		borderRadius: 16,
+		borderRadius: radii.lg,
 		borderWidth: 2,
-		borderColor: '#E5E7EB',
+		borderColor: colors.gray200,
 		alignItems: 'center',
 	},
 	pill: {
-		borderRadius: 12,
+		borderRadius: radii.md,
 		overflow: 'hidden',
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
-	gradientBg: { padding: 10, borderRadius: 12 },
+	gradientBg: { padding: 10, borderRadius: radii.md },
 	label: {
+		fontFamily: typography.family.semibold,
 		textAlign: 'center',
 		paddingVertical: 10,
-		fontWeight: '700',
-		color: '#374151',
+		color: colors.gray700,
 	},
-	labelSelected: { color: '#fff' },
+	labelSelected: { color: colors.white },
 })

@@ -14,6 +14,7 @@ export function XPBar({ percent = 0.45 }) {
 	)
 }
 
+const { colors } = require('../../styles/theme')
 const styles = StyleSheet.create({
 	wrapper: { height: 8, marginTop: 6, borderRadius: 6, overflow: 'hidden' },
 	bg: {
@@ -22,7 +23,7 @@ const styles = StyleSheet.create({
 		right: 0,
 		top: 0,
 		bottom: 0,
-		backgroundColor: 'rgba(0,0,0,0.1)',
+		backgroundColor: colors.gray200,
 	},
-	fill: { height: '100%', backgroundColor: '#43e97b' },
+	fill: { height: '100%', backgroundColor: colors.green },
 })

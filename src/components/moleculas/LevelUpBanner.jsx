@@ -1,6 +1,6 @@
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native'
 
-export function LevelUpBanner({ level, onAccept }) {
+export function LevelUpBanner({ level, onAccept, imageUri }) {
 	return (
 		<View style={styles.banner}>
 			<Text style={styles.congrats}>¡Enhorabuena!</Text>
@@ -9,7 +9,7 @@ export function LevelUpBanner({ level, onAccept }) {
 			<View style={styles.pill}>
 				<Text style={styles.pillText}>Nivel {level}</Text>
 			</View>
-			{/* image removed intentionally */ false ? (
+			{imageUri ? (
 				<>
 					<View style={{ height: 12 }} />
 					<Image
@@ -20,7 +20,8 @@ export function LevelUpBanner({ level, onAccept }) {
 				</>
 			) : null}
 			<View style={{ height: 16 }} />
-			<Pressable hitSlop={12}
+			<Pressable
+				hitSlop={12}
 				style={styles.btn}
 				onPress={onAccept}
 				accessibilityLabel="Aceptar"
@@ -31,30 +32,46 @@ export function LevelUpBanner({ level, onAccept }) {
 	)
 }
 
+const { colors, typography, radii } = require('../../styles/theme')
+
 const styles = StyleSheet.create({
 	banner: {
 		alignItems: 'center',
-		backgroundColor: '#fff',
-		borderRadius: 16,
+		backgroundColor: colors.white,
+		borderRadius: radii.lg,
 		padding: 16,
 		borderWidth: 2,
-		borderColor: '#E5E7EB',
 	},
-	congrats: { fontSize: 14, color: '#059669', fontWeight: '700' },
-	title: { fontSize: 18, color: '#111827', fontWeight: '800', marginTop: 2 },
+	congrats: {
+		fontSize: typography.size.sm,
+		color: colors.green,
+		fontFamily: typography.family.semibold,
+	},
+	title: {
+		fontSize: typography.size.lg,
+		color: colors.black,
+		marginTop: 2,
+		fontFamily: typography.family.extrabold,
+	},
 	pill: {
 		marginTop: 8,
 		paddingHorizontal: 12,
 		paddingVertical: 6,
-		borderRadius: 999,
-		backgroundColor: '#EEF2FF',
+		borderRadius: radii.full,
+		backgroundColor: 'rgba(250, 204, 21, 0.18)',
 	},
-	pillText: { color: '#4F46E5', fontWeight: '800' },
+	pillText: {
+		color: colors.yellow,
+		fontFamily: typography.family.extrabold,
+	},
 	btn: {
-		backgroundColor: '#4F46E5',
+		backgroundColor: colors.orange,
 		paddingHorizontal: 16,
 		paddingVertical: 10,
-		borderRadius: 12,
+		borderRadius: radii.md,
 	},
-	btnText: { color: '#fff', fontWeight: '800' },
+	btnText: {
+		color: colors.white,
+		fontFamily: typography.family.extrabold,
+	},
 })

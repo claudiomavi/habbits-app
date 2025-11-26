@@ -11,7 +11,7 @@ export function SummaryKPI({
 	return (
 		<View style={styles.card}>
 			<LinearGradient
-				colors={['#4facfe', '#43e97b']}
+				colors={require('../../styles/theme').gradients.accent}
 				start={{ x: 0, y: 0 }}
 				end={{ x: 1, y: 0 }}
 				style={styles.gradient}
@@ -37,10 +37,12 @@ export function SummaryKPI({
 	)
 }
 
+const { typography, colors, radii } = require('../../styles/theme')
+
 const styles = StyleSheet.create({
 	card: { flex: 1, gap: 6 },
 	gradient: {
-		borderRadius: 16,
+		borderRadius: radii.lg,
 		paddingVertical: 14,
 		paddingHorizontal: 12,
 		alignItems: 'center',
@@ -48,35 +50,36 @@ const styles = StyleSheet.create({
 		minHeight: 90,
 	},
 	value: {
-		color: '#fff',
-		fontSize: 20,
-		fontWeight: '800',
+		fontFamily: typography.family.extrabold,
+		color: colors.white,
+		fontSize: typography.size.xl,
 	},
 	sublabel: {
-		color: '#E5E7EB',
-		fontSize: 12,
+		color: colors.gray200,
+		fontFamily: typography.family.light,
+		fontSize: typography.size.xs,
 		marginTop: 2,
 	},
 	suffix: {
-		color: '#fff',
-		fontSize: 14,
-		fontWeight: '600',
+		fontFamily: typography.family.semibold,
+		color: colors.white,
+		fontSize: typography.size.sm,
 		opacity: 0.9,
 	},
 	delta: {
-		fontSize: 11,
-		fontWeight: '700',
+		fontFamily: typography.family.bold,
+		fontSize: typography.size.xs,
 		marginTop: 4,
 	},
 	deltaPositive: {
-		color: '#D1FAE5',
+		color: colors.lightGreen,
 	},
 	deltaNegative: {
-		color: '#FEE2E2',
+		color: colors.lightRed,
 	},
 	label: {
-		fontSize: 12,
-		color: '#6B7280',
+		fontSize: typography.size.xs,
+		color: colors.gray500,
 		marginLeft: 4,
 	},
 })

@@ -10,7 +10,7 @@ export function CardContainer({
 		<View style={[styles.card, { marginTop: marginTop }]}>
 			<View style={styles.progressBarContainer}>
 				<LinearGradient
-					colors={['#4facfe', '#00f2fe', '#43e97b']}
+					colors={require('../../styles/theme').gradients.accent}
 					style={[styles.progressFill, { width: progressWidth }]}
 					start={{ x: 0, y: 0 }}
 					end={{ x: 1, y: 0 }}
@@ -21,16 +21,13 @@ export function CardContainer({
 	)
 }
 
+const { colors, radii, shadows } = require('../../styles/theme')
 const styles = StyleSheet.create({
 	card: {
-		backgroundColor: '#fff',
-		borderRadius: 24,
+		backgroundColor: colors.white,
+		borderRadius: radii.xl,
 		padding: 16,
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 10 },
-		shadowOpacity: 0.2,
-		shadowRadius: 16,
-		elevation: 6,
+		...shadows.soft,
 	},
 	progressBarContainer: {
 		position: 'absolute',
@@ -38,9 +35,9 @@ const styles = StyleSheet.create({
 		left: 15,
 		right: 0,
 		height: 4,
-		backgroundColor: '#E5E7EB',
-		borderTopLeftRadius: 48,
-		borderTopRightRadius: 48,
+		backgroundColor: colors.gray200,
+		borderTopLeftRadius: radii.xxl,
+		borderTopRightRadius: radii.xxl,
 		width: '100%',
 	},
 	progressFill: { height: '100%' },
