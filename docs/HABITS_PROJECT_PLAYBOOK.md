@@ -1,5 +1,6 @@
 # HABITS – Project Playbook
 
+
 Este documento resume la visión, reglas, estilos, convenciones de desarrollo y estructura de datos del proyecto HABITS. Sirve para compartir con otras IAs y con cualquier persona del equipo para alinear criterios y acelerar el onboarding.
 
 ---
@@ -73,6 +74,99 @@ AutoBarrel: `src/autoBarrell.js` reexporta los módulos clave para imports corto
 ---
 
 ## 4) Estilos y guía de UI
+
+### Update: Identidad visual y theming (última actualización)
+
+Resumen de cambios implementados en la app para alinear con el Manual de Identidad de Marca:
+
+- Tipografía global: Poppins (300/400/500/600/700/800) cargada con expo-font.
+- Paleta y tokens centralizados en `src/styles/theme.js`.
+- Colores de marca: naranja (CTA), verde (progreso), amarillo (logros), neutros y rojo (errores) ahora referenciados por tokens.
+- Gradiente de fondo más consistente y con mayor contraste.
+- Migración de componentes a tema: botones, badges, chips, barras de progreso, headers, cards, modales y estadísticas.
+- Correcciones de bugs: return en `StatisticsTemplate` y prop `imageUri` en `LevelUpBanner`.
+
+#### 4.1 Tipografía: Poppins
+
+- Carga de fuentes: `src/styles/FontsProvider.jsx` envuelve la app (ver App.js) y carga Poppins con fallback a System si no hay dependencia instalada.
+- Instalación recomendada:
+
+```
+expo install expo-font @expo-google-fonts/poppins
+```
+
+- Uso en theme:
+
+```
+typography: {
+  family: {
+    light: 'Poppins_300',
+    regular: 'Poppins_400',
+    medium: 'Poppins_500',
+    semibold: 'Poppins_600',
+    bold: 'Poppins_700',
+    extrabold: 'Poppins_800',
+  },
+}
+```
+
+- Aplicación: títulos y CTA usan `semibold/bold`, cuerpo `regular`, microtexto `light`.
+
+#### 4.2 Tema y tokens (`src/styles/theme.js`)
+
+- Colores principales:
+  - `colors.orange = #FF6A00` (CTA, acciones)
+  - `colors.green = #22C55E` (progreso)
+  - `colors.yellow = #FACC15` (logros/acento)
+  - Neutrales: `white`, `black`, `gray50..900`
+  - Nuevo: `colors.red = #EF4444` (errores/alerta)
+  - Nuevo: `colors.bgBase = #FFF8F1` (base cálida bajo gradiente)
+
+- Gradientes:
+  - `gradients.cta = ['#FF6A00', '#FF8C1A']`
+  - `gradients.accent = ['#22C55E', '#86EFAC']`
+  - `gradients.backgroundSoft = ['#FFD3A1', '#FFEBCC', '#FFFFFF']`
+
+- Sombra y radios:
+  - `shadows.soft` para cards (sombra suave y elevation)
+  - `radii` unificados (`md=12`, `lg=16`, `xl=24`, `xxl=32`)
+
+#### 4.3 Fondo gradiente consistente
+
+- `GradientBackground` y `AuthTemplate` usan ahora `gradients.backgroundSoft` con `locations={[0, 0.85, 1]}` y `backgroundColor=colors.bgBase` para mantener un tono cálido y diferenciar las cards blancas.
+
+#### 4.4 Migraciones de componentes a tokens
+
+- Botón primario (`PrimaryButton`): CTA naranja (gradiente), Poppins bold.
+- XPBar: fondo `gray200`, relleno `green`.
+- Badges y chips (DaysOfWeekSelector / FrequencySelector / DifficultyBadge): activos `orange`, base `gray200`.
+- CardContainer: card blanca con sombra suave; barra superior `gradients.accent` (verde).
+- HeaderBar: textos `black/gray500`, botón de salida en `gray100`.
+- Auth/Login/Register/CreateProfile: fondos y gradientes migrados; labels/inputs Poppins; placeholders `gray400`.
+- HabitCard: racha con badge amarillo más contrastado (fondo rgba más intenso + borde `yellow`, texto `black`).
+- HabitModal/HabitsTodayModal: botones y textos a tokens, Poppins.
+- LevelUpBanner: `imageUri` como prop opcional; CTA naranja; pastilla/logros amarillo.
+- SummaryKPI/RangeSelector/SparklineGifted: gradientes y labels tokenizados.
+- StatisticsTemplate: neutrales a tokens; lógica de badge (%): `gray400` (default) / `green` (>=80) / `yellow` (>=50) / `red` (low); fix del `return` en `renderHabit`.
+
+#### 4.5 Convenciones de estilo (obligatorias)
+
+- No usar hex sueltos; siempre usar tokens de `theme.colors` o `theme.gradients`.
+- CTA: naranja, Progreso: verde, Logros: amarillo, Neutros: grises/blanco; Errores: rojo.
+- Títulos/botones: Poppins semibold/bold; cuerpo: regular; micro: light.
+- Sombra: `shadows.soft` en cards.
+- Bordes: usar `gray200` por defecto; fondos neutros: `white`, `gray50/100` según contexto.
+
+#### 4.6 Cómo aplicar Poppins globalmente
+
+- Ya está integrado en App.js con `FontsProvider`. Tras instalar dependencias, la familia se aplica mediante `typography.family` en estilos locales. Si necesitas fuente por defecto en todo `Text`, crea un wrapper `ThemedText` que aplique `fontFamily` desde el theme.
+
+#### 4.7 Tareas futuras (opcional)
+
+- Revisión completa de hex neutrales residuales (si aparece alguno en nuevos PRs) → reemplazar por tokens.
+- Añadir `theme.dark` manteniendo CTA naranja y ajustando neutros.
+- Token `warning` separado de `yellow` si se requiere semántica distinta.
+
 
 ### Patrones de interacción (modales)
 
