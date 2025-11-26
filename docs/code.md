@@ -27,8 +27,6 @@
 
 ## IDEAS DESARROLLO
 
-- [ ] Aplicar colores que ha mandado Miguel
-
 - [ ] Modificar pantalla de creación personaje (todavía me tienen que decir cosas):
 
   - [ ] Añadir fecha nacimiento
