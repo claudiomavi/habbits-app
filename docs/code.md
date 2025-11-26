@@ -27,4 +27,16 @@
 
 ## IDEAS DESARROLLO
 
+- [ ] Poner el correo de confirmación personalizado que ha mandado Miguel
+
 - [ ] Aplicar colores que ha mandado Miguel
+
+- [ ] Modificar pantalla de creación personaje (todavía me tienen que decir cosas):
+
+  - [ ] Añadir fecha nacimiento
+  - [ ] Ver si creamos un username o usamos email/código uuid (a lo mejor solo ultimos 6 caracteres) para que se pueda buscar en modo coperativo
+  - [ ] Preguntas de los socios...
+
+- [ ] Crear archivo de prerequisitos de Cooperativo
+
+- [ ] Empezar con Cooperativo
