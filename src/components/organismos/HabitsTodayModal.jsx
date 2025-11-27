@@ -211,7 +211,7 @@ export function HabitsTodayModal({
 				<Animated.View style={[styles.sheet, { transform: [{ translateY }] }]}>
 					<CardContainer>
 						<View style={styles.header}>
-							<Text style={styles.title}>Hábitos de hoy</Text>
+							<Text style={styles.title}>Objetivos diarios</Text>
 							<Pressable
 								onPress={handleClose}
 								style={styles.closeBtn}

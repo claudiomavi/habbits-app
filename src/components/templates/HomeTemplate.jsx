@@ -87,7 +87,7 @@ export function HomeTemplate({
 						<Text style={styles.title}>Acciones</Text>
 						<FlatList
 							data={[
-								{ id: 'today', label: 'Hábitos de hoy', action: 'today' },
+								{ id: 'today', label: 'Objetivos diarios', action: 'today' },
 								{ id: 'coop', label: 'Cooperativo', action: 'coop' },
 							]}
 							keyExtractor={(item) => item.id}

@@ -164,7 +164,6 @@ const styles = StyleSheet.create({
 	fabText: {
 		color: colors.white,
 		fontSize: typography.size.h1,
-		lineHeight: 28,
-		fontFamily: typography.family.bold,
+		fontFamily: typography.family.semibold,
 	},
 })
