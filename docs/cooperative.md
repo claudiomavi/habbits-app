@@ -1,4 +1,74 @@
-# PLAN DE IMPLEMENTACIÓN — Cooperativo
+# Cooperativo · Lista de tareas
+
+Cronograma por días
+
+- Día 1 (completado)
+  - Estructura base de Cooperativo y navegación.
+  - Pantalla Cooperativo inicial (placeholder) y wiring de stores.
+  - CRUD base en Supabase (tablas: groups, group_members, group_invitations) y RLS inicial.
+  - Hooks/Stores mínimos para cargar perfil, grupos y hábitos (infra ya existente en el proyecto adaptada).
+
+- Día 2 (completado)
+  - UI Notificaciones (banner superior): invitaciones entrantes (aceptar/rechazar) y actividad del owner (aceptadas/rechazadas con X).
+  - Desnormalización group_name en invitaciones y formato fecha dd/mm/aa hh:mm.
+  - Crear grupos, listar “Mis grupos”, invitar por email desde la app.
+  - RPCs: accept_group_invitation / reject_group_invitation.
+  - RLS inline (sin funciones): groups, group_invitations, group_members.
+  - Realtime: desactivado por flag en app por inestabilidad; fetch automático al entrar/enfocar + botón Actualizar.
+
+- Próximos días (plan)
+  - Día 3: Pantalla “Detalle de grupo” (tabs: Hábitos, Clasificatorio, Ajustes). Wiring de navegación desde “Mis grupos”.
+  - Día 4: Clasificatorio (leaderboard simple por XP/puntos) y ajustes de grupo (renombrar, roles admin/owner, expulsar).
+  - Día 5: Mejoras UX (toasts, loaders finos, estados vacíos), tests básicos y documentación final.
+
+
+
+Hecho (✅)
+
+- ✅ UI Notificaciones (banner superior):
+  - ✅ Invitaciones entrantes con botones Aceptar/Rechazar (compactos, verde/rojo)
+  - ✅ Actividad del owner (aceptadas/rechazadas) con botón X (owner_seen=true)
+  - ✅ Mostrar nombre del grupo (group_name) con fallback a nombre del store
+  - ✅ Formato fecha dd/mm/aa hh:mm
+- ✅ CRUD grupos e invitaciones (client): crear grupo, listar “Mis grupos”, invitar por email
+- ✅ Auto-refresh al entrar/enfocar Cooperativo (sin Realtime):
+  - ✅ fetchInvitations(email, { status: 'pending' })
+  - ✅ fetchOwnerNotifications(userId)
+  - ✅ fetchGroups(userId)
+  - ✅ Botón “Actualizar” manual en la sección Notificaciones
+- ✅ RPCs Supabase:
+  - ✅ accept_group_invitation(invitation_id)
+  - ✅ reject_group_invitation(invitation_id)
+- ✅ RLS sin funciones (inline EXISTS) para evitar recursión:
+  - ✅ group_invitations: SELECT / INSERT (owner/admin) / UPDATE owner_seen / UPDATE invitee
+  - ✅ group_members: SELECT self/owner, INSERT owner, INSERT invitee con invitation accepted
+  - ✅ groups: SELECT owner y SELECT member
+- ✅ Denormalización de group_name en group_invitations (+ script y trigger opcional)
+- ✅ RPC get_groups_for_user(user_id) para listar grupos (owner o member) evitando bloqueos RLS
+- ✅ Configuración de feature flag para Realtime en app:
+  - ✅ .env → EXPO_PUBLIC_ENABLE_REALTIME=false (desactivado)
+  - ✅ CooperativeTemplate.jsx lee la variable y no abre suscripciones cuando es false
+
+Pendiente (🟡)
+
+- 🟡 Rehabilitar Realtime cuando la instancia esté estable:
+  - 🟡 Asegurar PK en group_invitations + REPLICA IDENTITY FULL (docs/cooperative_realtime_updates_fix.sql)
+  - 🟡 Confirmar tabla en publicación supabase_realtime (docs/cooperative_realtime_fix_step4.sql)
+  - 🟡 Mantener policies inline (sin is_group_owner)
+  - 🟡 Volver a poner EXPO_PUBLIC_ENABLE_REALTIME=true en .env
+- 🟡 Pantalla “Detalle de grupo” con tabs:
+  - 🟡 Hábitos compartidos (máx. 5 por grupo)
+  - 🟡 Clasificatorio (puntos/XP por usuario)
+  - 🟡 Ajustes (renombrar grupo, roles admin/owner, expulsar miembros)
+- 🟡 Roles y permisos avanzados:
+  - 🟡 Elevar a admin, revocar admin
+  - 🟡 Límite de invitaciones, revocar invitaciones
+- 🟡 UX/Feedback:
+  - 🟡 Toast al aceptar/rechazar
+  - 🟡 Loading/empty states refinados
+- 🟡 Integraciones opcionales:
+  - 🟡 Email de invitación (plantilla + deeplink)
+  - 🟡 Tests e2e/units básicos y documentación final
 
 ## Objetivos
 
