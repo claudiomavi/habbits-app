@@ -34,6 +34,7 @@ function formatDateTime(ts) {
 }
 
 export function CooperativeTemplate() {
+	const ENABLE_REALTIME = String(process.env.EXPO_PUBLIC_ENABLE_REALTIME || '').toLowerCase() === 'true'
 	const navigation = useNavigation()
 	const { user } = useAuthStore()
 	const {
@@ -82,22 +83,29 @@ export function CooperativeTemplate() {
 	// Re-subscribe on screen focus (covers account switch and navigation)
 	useFocusEffect(
 		useCallback(() => {
-			if (user?.email) startInvitationsRealtime(user.email)
+			if (user?.email) fetchInvitations(user.email, { status: 'pending' })
 			if (user?.id) {
-				startOwnerNotificationsRealtime(user.id)
 				fetchOwnerNotifications(user.id)
+				fetchGroups(user.id)
+			}
+			if (ENABLE_REALTIME) {
+				if (user?.id) startOwnerNotificationsRealtime(user.id)
+				if (user?.email) startInvitationsRealtime(user.email)
 			}
 			return () => {
-				stopInvitationsRealtime()
-				stopOwnerNotificationsRealtime()
+				if (ENABLE_REALTIME) {
+					stopInvitationsRealtime()
+					stopOwnerNotificationsRealtime()
+				}
 			}
-		}, [user?.email, user?.id])
+		}, [user?.email, user?.id, ENABLE_REALTIME])
 	)
 
 	// Re-subscribe when owned groups count changes
 	useEffect(() => {
+		if (!ENABLE_REALTIME) return
 		if (user?.id) startOwnerNotificationsRealtime(user.id)
-	}, [user?.id, groups?.length])
+	}, [user?.id, groups?.length, ENABLE_REALTIME])
 
 	// Si cambia la lista de grupos (p. ej., al crear uno), re-suscribir realtime de owner
 	useEffect(() => {
