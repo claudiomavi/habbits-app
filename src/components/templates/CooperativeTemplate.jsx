@@ -72,7 +72,7 @@ export function CooperativeTemplate() {
 			fetchOwnerNotifications(uid)
 			startOwnerNotificationsRealtime(uid)
 		}
-		const unsub = startInvitationsRealtime(email)
+		startInvitationsRealtime(email)
 		return () => {
 			stopInvitationsRealtime()
 			stopOwnerNotificationsRealtime()
