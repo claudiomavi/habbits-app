@@ -41,58 +41,16 @@ export async function listInvitationsByGroups({ group_ids = [], status = null, o
 }
 
 // Accept invitation: mark accepted and add to group_members
-export async function acceptInvitation({ invitation_id, user_id }) {
-  if (!invitation_id || !user_id) throw new Error('invitation_id and user_id are required')
-  // Fetch invitation to get group_id
-  const { data: inv, error: invErr } = await supabase
-    .from('group_invitations')
-    .select('*')
-    .eq('id', invitation_id)
-    .maybeSingle()
-  if (invErr) throw invErr
-  if (!inv) throw new Error('Invitation not found')
-  if (inv.status !== 'pending') return inv
-
-  // First, update invitation status (invitee should be allowed by RLS)
-  const { data: updated, error: updErr } = await supabase
-    .from('group_invitations')
-    .update({ status: 'accepted', acted_at: new Date().toISOString() })
-    .eq('id', invitation_id)
-    .select()
-    .single()
-  if (updErr) throw updErr
-
-  // Then, try to ensure membership exists (may be restricted by RLS)
-  let exists = null
-  try {
-    const res = await supabase
-      .from('group_members')
-      .select('id')
-      .eq('group_id', inv.group_id)
-      .eq('user_id', user_id)
-      .maybeSingle()
-    exists = res.data || null
-  } catch (_) {
-    // If SELECT is not permitted by RLS, try to insert anyway
-  }
-  if (!exists) {
-    const { error: addErr } = await supabase
-      .from('group_members')
-      .insert({ group_id: inv.group_id, user_id, role: 'member' })
-    if (addErr) throw addErr
-  }
-
-  return updated
+export async function acceptInvitation({ invitation_id }) {
+  if (!invitation_id) throw new Error('invitation_id is required')
+  const { data, error } = await supabase.rpc('accept_group_invitation', { invitation_id })
+  if (error) throw error
+  return data
 }
 
 export async function rejectInvitation({ invitation_id }) {
   if (!invitation_id) throw new Error('invitation_id is required')
-  const { data, error } = await supabase
-    .from('group_invitations')
-    .update({ status: 'rejected', acted_at: new Date().toISOString() })
-    .eq('id', invitation_id)
-    .select()
-    .single()
+  const { data, error } = await supabase.rpc('reject_group_invitation', { invitation_id })
   if (error) throw error
   return data
 }

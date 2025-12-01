@@ -31,7 +31,7 @@ export const useCooperativeStore = create((set, get) => ({
 
   // Accept one invitation and refresh
   acceptInvitation: async (invitation_id, user_id, email) => {
-    await acceptInv({ invitation_id, user_id })
+    await acceptInv({ invitation_id })
     await get().fetchInvitations(email, { status: 'pending' })
     // Refresh groups since membership may have changed
     if (user_id) await get().fetchGroups(user_id)
