@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons'
-import { useNavigation } from '@react-navigation/native'
-import { useEffect, useState } from 'react'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
+import { useCallback, useEffect, useState } from 'react'
 import {
 	ActivityIndicator,
 	Alert,
@@ -78,6 +78,26 @@ export function CooperativeTemplate() {
 			stopOwnerNotificationsRealtime()
 		}
 	}, [user?.email, user?.id])
+
+	// Re-subscribe on screen focus (covers account switch and navigation)
+	useFocusEffect(
+		useCallback(() => {
+			if (user?.email) startInvitationsRealtime(user.email)
+			if (user?.id) {
+				startOwnerNotificationsRealtime(user.id)
+				fetchOwnerNotifications(user.id)
+			}
+			return () => {
+				stopInvitationsRealtime()
+				stopOwnerNotificationsRealtime()
+			}
+		}, [user?.email, user?.id])
+	)
+
+	// Re-subscribe when owned groups count changes
+	useEffect(() => {
+		if (user?.id) startOwnerNotificationsRealtime(user.id)
+	}, [user?.id, groups?.length])
 
 	// Si cambia la lista de grupos (p. ej., al crear uno), re-suscribir realtime de owner
 	useEffect(() => {
