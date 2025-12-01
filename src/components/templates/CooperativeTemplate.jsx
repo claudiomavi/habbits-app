@@ -79,6 +79,12 @@ export function CooperativeTemplate() {
 		}
 	}, [user?.email, user?.id])
 
+	// Si cambia la lista de grupos (p. ej., al crear uno), re-suscribir realtime de owner
+	useEffect(() => {
+		if (!user?.id) return
+		startOwnerNotificationsRealtime(user.id)
+	}, [user?.id, groups?.length])
+
 	const onCreateGroup = async () => {
 		try {
 			if (!groupName.trim()) return Alert.alert('Nombre requerido')
