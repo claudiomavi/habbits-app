@@ -45,7 +45,22 @@ export function AppRouter() {
 			<Stack.Screen
 				name="Cooperative"
 				component={Cooperative}
-				options={{ headerShown: false }}
+				options={({ navigation }) => ({
+					headerShown: true,
+					title: 'Cooperativo',
+					headerBackTitle: 'Home',
+					headerLeft: () => (
+						require('react').createElement(
+							require('react-native').TouchableOpacity,
+							{ onPress: () => navigation.navigate('AppStack', { screen: 'Home' }), style: { paddingHorizontal: 12, paddingVertical: 6 } },
+							require('react').createElement(
+								require('react-native').Text,
+								{ style: { color: '#2563EB', fontWeight: '600' } },
+								'← Home'
+							)
+						)
+					),
+				})}
 			/>
 		</Stack.Navigator>
 	)
