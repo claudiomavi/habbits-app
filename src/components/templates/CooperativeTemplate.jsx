@@ -10,6 +10,7 @@ import {
 	TextInput,
 	TouchableOpacity,
 	View,
+	RefreshControl,
 } from 'react-native'
 import {
 	CardContainer,
@@ -35,6 +36,7 @@ function formatDateTime(ts) {
 
 export function CooperativeTemplate() {
 	const ENABLE_REALTIME = String(process.env.EXPO_PUBLIC_ENABLE_REALTIME || '').toLowerCase() === 'true'
+
 	const navigation = useNavigation()
 	const { user } = useAuthStore()
 	const {
@@ -57,6 +59,7 @@ export function CooperativeTemplate() {
 		fetchOwnerNotifications,
 		dismissedNotificationIds,
 		dismissOwnerNotification,
+		refreshAllCoop,
 	} = useCooperativeStore()
 
 	const [groupName, setGroupName] = useState('')
@@ -83,11 +86,7 @@ export function CooperativeTemplate() {
 	// Re-subscribe on screen focus (covers account switch and navigation)
 	useFocusEffect(
 		useCallback(() => {
-			if (user?.email) fetchInvitations(user.email, { status: 'pending' })
-			if (user?.id) {
-				fetchOwnerNotifications(user.id)
-				fetchGroups(user.id)
-			}
+			if (user?.email || user?.id) refreshAllCoop(user?.email, user?.id)
 			if (ENABLE_REALTIME) {
 				if (user?.id) startOwnerNotificationsRealtime(user.id)
 				if (user?.email) startInvitationsRealtime(user.email)
@@ -146,7 +145,12 @@ export function CooperativeTemplate() {
 
 	return (
 		<GradientBackground style={styles.container}>
-			<ScrollView contentContainerStyle={styles.scrollContent}>
+			<ScrollView contentContainerStyle={styles.scrollContent} refreshControl={(
+			<RefreshControl
+				refreshing={!!(loadingInvites || loadingNotifications || loadingGroups)}
+				onRefresh={() => refreshAllCoop(user?.email, user?.id)}
+			/>
+      )}>
 				<CardContainer>
 					<Text style={styles.title}>Modo cooperativo</Text>
 					<Text style={styles.subtitle}>
