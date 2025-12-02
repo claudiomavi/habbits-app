@@ -1,21 +1,20 @@
 import Ionicons from '@expo/vector-icons/Ionicons'
-import { useFocusEffect, useNavigation } from '@react-navigation/native'
+import { useFocusEffect } from '@react-navigation/native'
 import { useCallback, useEffect, useState } from 'react'
 import {
 	ActivityIndicator,
 	Alert,
+	RefreshControl,
 	ScrollView,
 	StyleSheet,
 	Text,
 	TextInput,
 	TouchableOpacity,
 	View,
-	RefreshControl,
 } from 'react-native'
 import {
 	CardContainer,
 	GradientBackground,
-	PrimaryButton,
 	useAuthStore,
 	useCooperativeStore,
 } from '../../autoBarrell'
@@ -35,37 +34,31 @@ function formatDateTime(ts) {
 }
 
 export function CooperativeTemplate() {
-	const ENABLE_REALTIME = String(process.env.EXPO_PUBLIC_ENABLE_REALTIME || '').toLowerCase() === 'true'
+	// const ENABLE_REALTIME =
+	// 	String(process.env.EXPO_PUBLIC_ENABLE_REALTIME || '').toLowerCase() ===
+	// 	'true'
 
-	const navigation = useNavigation()
 	const { user } = useAuthStore()
 	const {
 		invitations,
 		loadingInvites,
-		fetchInvitations,
 		acceptInvitation,
+		fetchInvitations,
 		rejectInvitation,
-		startInvitationsRealtime,
-		stopInvitationsRealtime,
-		startOwnerNotificationsRealtime,
-		stopOwnerNotificationsRealtime,
 		groups,
 		loadingGroups,
 		fetchGroups,
 		createGroup,
 		inviteToGroup,
-		notificationsOwner,
-		loadingNotifications,
-		fetchOwnerNotifications,
-		dismissedNotificationIds,
-		dismissOwnerNotification,
-		refreshAllCoop,
+		refreshAllCoopFast,
+		lastUpdatedAt,
 	} = useCooperativeStore()
 
 	const [groupName, setGroupName] = useState('')
 	const [inviteEmail, setInviteEmail] = useState('')
 	const [selectedGroupId, setSelectedGroupId] = useState(null)
 
+	// Carga únicamente al enfocar mediante refreshAllCoopFast para evitar duplicados
 	useEffect(() => {
 		const email = user?.email
 		const uid = user?.id
@@ -73,44 +66,16 @@ export function CooperativeTemplate() {
 		fetchInvitations(email, { status: 'pending' })
 		if (uid) {
 			fetchGroups(uid)
-			fetchOwnerNotifications(uid)
-			startOwnerNotificationsRealtime(uid)
-		}
-		startInvitationsRealtime(email)
-		return () => {
-			stopInvitationsRealtime()
-			stopOwnerNotificationsRealtime()
 		}
 	}, [user?.email, user?.id])
 
 	// Re-subscribe on screen focus (covers account switch and navigation)
 	useFocusEffect(
 		useCallback(() => {
-			if (user?.email || user?.id) refreshAllCoop(user?.email, user?.id)
-			if (ENABLE_REALTIME) {
-				if (user?.id) startOwnerNotificationsRealtime(user.id)
-				if (user?.email) startInvitationsRealtime(user.email)
-			}
-			return () => {
-				if (ENABLE_REALTIME) {
-					stopInvitationsRealtime()
-					stopOwnerNotificationsRealtime()
-				}
-			}
-		}, [user?.email, user?.id, ENABLE_REALTIME])
+			if (user?.email || user?.id) refreshAllCoopFast(user?.email, user?.id)
+			return () => {}
+		}, [user?.email, user?.id])
 	)
-
-	// Re-subscribe when owned groups count changes
-	useEffect(() => {
-		if (!ENABLE_REALTIME) return
-		if (user?.id) startOwnerNotificationsRealtime(user.id)
-	}, [user?.id, groups?.length, ENABLE_REALTIME])
-
-	// Si cambia la lista de grupos (p. ej., al crear uno), re-suscribir realtime de owner
-	useEffect(() => {
-		if (!user?.id) return
-		startOwnerNotificationsRealtime(user.id)
-	}, [user?.id, groups?.length])
 
 	const onCreateGroup = async () => {
 		try {
@@ -145,12 +110,19 @@ export function CooperativeTemplate() {
 
 	return (
 		<GradientBackground style={styles.container}>
-			<ScrollView contentContainerStyle={styles.scrollContent} refreshControl={(
-			<RefreshControl
-				refreshing={!!(loadingInvites || loadingNotifications || loadingGroups)}
-				onRefresh={() => refreshAllCoop(user?.email, user?.id)}
-			/>
-      )}>
+			<ScrollView
+				contentContainerStyle={styles.scrollContent}
+				refreshControl={
+					<RefreshControl
+						refreshing={
+!!(loadingInvites || loadingGroups)
+						}
+						onRefresh={() => {
+							refreshAllCoopFast(user?.email, user?.id)
+						}}
+					/>
+				}
+			>
 				<CardContainer>
 					<Text style={styles.title}>Modo cooperativo</Text>
 					<Text style={styles.subtitle}>
@@ -159,24 +131,44 @@ export function CooperativeTemplate() {
 
 					{/* Notificaciones */}
 					<View style={styles.section}>
-						<View style={[styles.row, { justifyContent: 'space-between' }]}>
-							<Text style={styles.sectionTitle}>Notificaciones</Text>
-							<TouchableOpacity
-								onPress={() => {
-									if (user?.email)
-										fetchInvitations(user.email, { status: 'pending' })
-									if (user?.id) fetchOwnerNotifications(user.id)
-								}}
-							>
-								<Text
-									style={[
-										styles.helperText,
-										{ textDecorationLine: 'underline' },
-									]}
+						<View
+							style={[
+								styles.row,
+								{ justifyContent: 'space-between', alignItems: 'flex-end' },
+							]}
+						>
+							<Text style={styles.sectionTitle}>Invitaciones</Text>
+							<View style={[styles.row, { gap: 12 }]}>
+								{lastUpdatedAt ? (
+									<Text style={styles.updatedAt}>
+										Actualizado a las{' '}
+										{(() => {
+											try {
+												const d = new Date(lastUpdatedAt)
+												const hh = String(d.getHours()).padStart(2, '0')
+												const mm = String(d.getMinutes()).padStart(2, '0')
+												return `${hh}:${mm}`
+											} catch {
+												return ''
+											}
+										})()}
+									</Text>
+								) : null}
+								<TouchableOpacity
+									onPress={() => {
+										refreshAllCoopFast(user?.email, user?.id)
+									}}
 								>
-									Actualizar
-								</Text>
-							</TouchableOpacity>
+									<Text
+										style={[
+											styles.helperText,
+											{ textDecorationLine: 'underline' },
+										]}
+									>
+										Actualizar
+									</Text>
+								</TouchableOpacity>
+							</View>
 						</View>
 
 						{/* Entrantes: invitaciones pendientes */}
@@ -252,63 +244,6 @@ export function CooperativeTemplate() {
 										</View>
 									</View>
 								))}
-							</View>
-						) : null}
-
-						{/* Salientes: estado de nuestras invitaciones (aceptadas/rechazadas) */}
-						{loadingNotifications ? (
-							<View style={[styles.banner, { marginTop: 8 }]}>
-								<ActivityIndicator />
-							</View>
-						) : notificationsOwner?.filter(
-								(n) => !dismissedNotificationIds?.has?.(n.id)
-						  )?.length ? (
-							<View style={[styles.banner, { marginTop: 8 }]}>
-								<Text style={styles.bannerTitle}>
-									Actividad de tus invitaciones
-								</Text>
-								{notificationsOwner
-									.filter((n) => !dismissedNotificationIds?.has?.(n.id))
-									.map((n) => (
-										<View
-											key={n.id}
-											style={[styles.inviteRow, { alignItems: 'center' }]}
-										>
-											<View style={{ flex: 1 }}>
-												<Text style={styles.inviteText}>
-													{n.status === 'accepted'
-														? '✅ Aceptada'
-														: n.status === 'rejected'
-														? '❌ Rechazada'
-														: n.status}
-												</Text>
-												<Text style={styles.inviteMeta}>
-													Grupo:{' '}
-													{n.group_name ||
-														groups?.find?.((g) => g.id === n.group_id)?.name ||
-														n.group_id?.slice?.(0, 8) ||
-														'—'}{' '}
-													· Destinatario: {n.email}
-												</Text>
-											</View>
-											<TouchableOpacity
-												onPress={() => dismissOwnerNotification(n.id)}
-												style={[
-													styles.inviteBtn,
-													{ backgroundColor: colors.gray300 },
-												]}
-											>
-												<Text
-													style={[
-														styles.inviteBtnText,
-														{ color: colors.black },
-													]}
-												>
-													X
-												</Text>
-											</TouchableOpacity>
-										</View>
-									))}
 							</View>
 						) : null}
 					</View>
@@ -393,12 +328,6 @@ export function CooperativeTemplate() {
 							</Text>
 						)}
 					</View>
-
-					<PrimaryButton
-						title="Volver"
-						onPress={() => navigation.goBack()}
-						style={{ marginTop: 16 }}
-					/>
 				</CardContainer>
 			</ScrollView>
 		</GradientBackground>
@@ -513,4 +442,9 @@ const styles = StyleSheet.create({
 	groupName: { color: colors.black, fontFamily: typography.family.semibold },
 	groupMeta: { color: colors.gray500, fontSize: typography.size.xs },
 	helperText: { color: colors.gray500, fontSize: typography.size.xs },
+	updatedAt: {
+		color: colors.gray400,
+		fontSize: typography.size.xs,
+		marginTop: 2,
+	},
 })
