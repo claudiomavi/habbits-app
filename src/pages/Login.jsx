@@ -10,7 +10,7 @@ export function Login() {
 	const [loading, setLoading] = useState(false)
 
 	const { signIn } = useAuthStore()
-	const { profileByMail } = useUsersStore()
+	const { fetchProfile } = useUsersStore()
 
 	const onSubmit = async ({ email, password }) => {
 		try {
@@ -29,7 +29,7 @@ export function Login() {
 
 			let profile = null
 			try {
-				profile = await profileByMail(user.email)
+				profile = await fetchProfile(user.id)
 			} catch (err) {
 				profile = null
 				return err
