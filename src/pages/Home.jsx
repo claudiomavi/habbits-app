@@ -31,16 +31,18 @@ export function Home() {
 	}
 	const todayISO = makeLocalISO(new Date())
 
+	const actorId = (profile?.character_id || user?.id)
+
 	const { data: habits = [], isLoading: habitsLoading } = useQuery({
-		queryKey: ['habits', user?.id],
-		queryFn: () => getHabitsByUser(user.id),
-		enabled: !!user?.id,
+		queryKey: ['habits', actorId],
+		queryFn: () => getHabitsByUser(actorId),
+		enabled: !!actorId,
 	})
 
 	const { data: progress = [], isLoading: progressLoading } = useQuery({
-		queryKey: ['progress', user?.id, todayISO],
-		queryFn: () => getProgressForDate(user.id, todayISO),
-		enabled: !!user?.id,
+		queryKey: ['progress', actorId, todayISO],
+		queryFn: () => getProgressForDate(actorId, todayISO),
+		enabled: !!actorId,
 	})
 
 	const progressMap = useMemo(() => {
@@ -53,8 +55,8 @@ export function Home() {
 		onMutate: async (payload) => {
 			const habit = payload?.habit || payload
 			const desired = payload?.desired
-			await qc.cancelQueries({ queryKey: ['progress', user?.id, todayISO] })
-			const previous = qc.getQueryData(['progress', user?.id, todayISO]) || []
+			await qc.cancelQueries({ queryKey: ['progress', actorId, todayISO] })
+			const previous = qc.getQueryData(['progress', actorId, todayISO]) || []
 			const cached = Array.isArray(previous) ? previous : []
 			const existing = cached.find((p) => p.habit_id === habit.id)
 			const newCompleted =
@@ -85,7 +87,7 @@ export function Home() {
 					copy.push({
 						id: `tmp_${habit.id}_${todayISO}`,
 						habit_id: habit.id,
-						user_id: user.id,
+						user_id: actorId,
 						date: todayISO,
 						completed: newCompleted,
 						xp_awarded: newCompleted ? Math.round(earned) : 0,
@@ -93,7 +95,7 @@ export function Home() {
 				}
 				return copy
 			})()
-			qc.setQueryData(['progress', user?.id, todayISO], next)
+			qc.setQueryData(['progress', actorId, todayISO], next)
 			try {
 				useUsersStore.getState().optimisticUpdateXp(deltaXp)
 			} catch {}
@@ -121,7 +123,7 @@ export function Home() {
 			let streakDays = 0
 			try {
 				const history = await getProgressHistoryForHabit(
-					user.id,
+					actorId,
 					habit.id,
 					todayISO,
 					60
@@ -183,8 +185,8 @@ export function Home() {
 				? Math.round(earned)
 				: -(existing?.xp_awarded || 0)
 			const res = await upsertProgress({
-				habit_id: habit.id,
-				user_id: user.id,
+habit_id: habit.id,
+user_id: actorId,
 				dateISO: todayISO,
 				completed: newCompleted,
 				xp_awarded: newCompleted ? Math.round(earned) : 0,
@@ -193,7 +195,7 @@ export function Home() {
 			return { res, deltaXp }
 		},
 		onSuccess: async ({ res, deltaXp }, _vars, context) => {
-			await qc.invalidateQueries({ queryKey: ['progress', user?.id, todayISO] })
+			await qc.invalidateQueries({ queryKey: ['progress', actorId, todayISO] })
 			const serverDelta =
 				typeof res?.xp_delta === 'number' ? res.xp_delta : deltaXp
 			if (serverDelta) {
@@ -231,7 +233,7 @@ export function Home() {
 		},
 		onError: (err, habit, context) => {
 			if (context?.previous) {
-				qc.setQueryData(['progress', user?.id, todayISO], context.previous)
+				qc.setQueryData(['progress', actorId, todayISO], context.previous)
 			}
 			// rollback xp
 			if (context?.deltaXp) {
@@ -302,8 +304,8 @@ export function Home() {
 			habitsLoading={habitsLoading}
 			progressLoading={progressLoading}
 			todaysHabits={todaysHabits}
-renderHabit={renderHabit}
-todayProgress={progress}
+			renderHabit={renderHabit}
+			todayProgress={progress}
 			xpPercent={xpPercent}
 			showLevelUpBanner={!!levelUpBanner?.visible}
 			onAcceptLevelUp={acceptLevelUpBanner}
