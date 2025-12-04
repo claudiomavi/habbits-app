@@ -2,7 +2,9 @@ import { supabase } from '../autoBarrell'
 
 // Habits CRUD
 export async function getHabitsByUser(user_id) {
-	const ids = Array.isArray(user_id) ? user_id.filter(Boolean) : [user_id].filter(Boolean)
+	const ids = Array.isArray(user_id)
+		? user_id.filter(Boolean)
+		: [user_id].filter(Boolean)
 	const { data, error } = await supabase
 		.from('habits')
 		.select('*')
@@ -40,7 +42,9 @@ export async function deleteHabit(id) {
 
 // Progress
 export async function getProgressForDate(user_id, dateISO) {
-	const ids = Array.isArray(user_id) ? user_id.filter(Boolean) : [user_id].filter(Boolean)
+	const ids = Array.isArray(user_id)
+		? user_id.filter(Boolean)
+		: [user_id].filter(Boolean)
 	const { data, error } = await supabase
 		.from('progress_entries')
 		.select('*')
@@ -58,7 +62,9 @@ export async function getProgressHistoryForHabit(
 	untilISO,
 	limit = 60
 ) {
-	const ids = Array.isArray(user_id) ? user_id.filter(Boolean) : [user_id].filter(Boolean)
+	const ids = Array.isArray(user_id)
+		? user_id.filter(Boolean)
+		: [user_id].filter(Boolean)
 	const { data, error } = await supabase
 		.from('progress_entries')
 		.select('*')
@@ -72,7 +78,9 @@ export async function getProgressHistoryForHabit(
 }
 
 export async function getProgressRange(user_id, fromISO, toISO) {
-	const ids = Array.isArray(user_id) ? user_id.filter(Boolean) : [user_id].filter(Boolean)
+	const ids = Array.isArray(user_id)
+		? user_id.filter(Boolean)
+		: [user_id].filter(Boolean)
 	const { data, error } = await supabase
 		.from('progress_entries')
 		.select('*')
@@ -85,6 +93,36 @@ export async function getProgressRange(user_id, fromISO, toISO) {
 	return data || []
 }
 
+export async function getProgressHistoryForHabits(
+	user_id,
+	habit_ids,
+	untilISO,
+	windowDays = 365
+) {
+	const ids = Array.isArray(user_id)
+		? user_id.filter(Boolean)
+		: [user_id].filter(Boolean)
+	const habits = Array.isArray(habit_ids)
+		? habit_ids.filter(Boolean)
+		: [habit_ids].filter(Boolean)
+	if (habits.length === 0 || ids.length === 0) return []
+	const d = new Date(untilISO)
+	const from = new Date(d)
+	from.setDate(d.getDate() - Math.max(0, windowDays - 1))
+	const fromISO = from.toISOString().slice(0, 10)
+	const { data, error } = await supabase
+		.from('progress_entries')
+		.select('*')
+		[ids.length > 1 ? 'in' : 'eq']('user_id', ids.length > 1 ? ids : ids[0])
+		.in('habit_id', habits)
+		.gte('date', fromISO)
+		.lte('date', untilISO)
+		.order('habit_id', { ascending: true })
+		.order('date', { ascending: false })
+	if (error) throw error
+	return data || []
+}
+
 export async function upsertProgress({
 	habit_id,
 	user_id,
@@ -93,7 +131,9 @@ export async function upsertProgress({
 	xp_awarded = 0,
 	client_awarded = null,
 }) {
-	const ids = Array.isArray(user_id) ? user_id.filter(Boolean) : [user_id].filter(Boolean)
+	const ids = Array.isArray(user_id)
+		? user_id.filter(Boolean)
+		: [user_id].filter(Boolean)
 	// try existing across candidate ids
 	const { data: existing, error: findErr } = await supabase
 		.from('progress_entries')
@@ -151,7 +191,13 @@ export async function upsertProgress({
 		for (const candidate of ids) {
 			const res = await supabase
 				.from('progress_entries')
-				.insert({ habit_id, user_id: candidate, date: dateISO, completed: true, xp_awarded })
+				.insert({
+					habit_id,
+					user_id: candidate,
+					date: dateISO,
+					completed: true,
+					xp_awarded,
+				})
 				.select()
 				.single()
 			if (!res.error) {

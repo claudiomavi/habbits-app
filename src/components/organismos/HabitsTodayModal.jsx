@@ -17,6 +17,7 @@ import {
 	getProgressForDate,
 	getProgressHistoryForHabit,
 	useAuthStore,
+	useUsersStore,
 } from '../../autoBarrell'
 
 export function HabitsTodayModal({
@@ -87,6 +88,7 @@ export function HabitsTodayModal({
 	}
 
 	const { user } = useAuthStore()
+	const { profile } = useUsersStore()
 	const [streaks, setStreaks] = React.useState({})
 
 	const makeLocalISO = (d) => {
@@ -106,7 +108,9 @@ export function HabitsTodayModal({
 				let progressToday = Array.isArray(todayProgress) ? todayProgress : []
 				if (!progressToday.length) {
 					try {
-						progressToday = await getProgressForDate(user.id, todayISO)
+						const actorId = profile?.character_id || user?.id
+						const ids = Array.from(new Set([actorId, user?.id].filter(Boolean)))
+						progressToday = await getProgressForDate(ids, todayISO)
 					} catch {}
 				}
 				const todayDoneMap = new Map(
@@ -160,7 +164,7 @@ export function HabitsTodayModal({
 					// Si hoy no está completado, arrancar el cómputo desde ayer
 					if (!todayCompleted) cursor.setDate(cursor.getDate() - 1)
 					const debugTrace = []
-					for (let i = 0; i < 365; i++) {
+					for (let i = 0; i < 730; i++) {
 						// saltar días no programados
 						if (!isScheduled(cursor)) {
 							debugTrace.push({ i, iso: fmt(cursor), scheduled: false })
