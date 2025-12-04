@@ -119,9 +119,12 @@ export function HabitsTodayModal({
 		// Pequeño debounce y guard contra reentradas
 		const todayISO = makeLocalISO(new Date())
 		const runKey = `${todayISO}|${habitIdsKey}|${JSON.stringify(idsForQueries)}`
-		if (!visible || !user?.id || !actorId || (todaysHabits || []).length === 0) return
-		if (lastRunKeyRef.current === runKey || inFlightRef.current) return
-		lastRunKeyRef.current = runKey
+		if (!internalVisible) return
+		if (!user?.id) return
+		if (!actorId) return
+		if ((todaysHabits || []).length === 0) return
+		if (lastRunKeyRef.current === runKey) return
+		if (inFlightRef.current) return
 		inFlightRef.current = true
 
 		const calcAll = async () => {
@@ -202,11 +205,12 @@ export function HabitsTodayModal({
 				if (!cancelled) setStreaks({})
 			} finally {
 				inFlightRef.current = false
+				lastRunKeyRef.current = runKey
 			}
 		}
-		const t = setTimeout(() => { if (!cancelled) calcAll() }, 150)
+		const t = setTimeout(() => { if (!cancelled) { calcAll() } }, 150)
 		return () => { cancelled = true; clearTimeout(t) }
-	}, [visible, user?.id, actorId, habitIdsKey, todayProgress, idsForQueries])
+	}, [internalVisible, user?.id, actorId, habitIdsKey, todayProgress, idsForQueries])
 
 	if (!internalVisible) return null
 
