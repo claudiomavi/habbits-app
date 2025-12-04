@@ -56,7 +56,7 @@ export function Home() {
 			const habit = payload?.habit || payload
 			const desired = payload?.desired
 			await qc.cancelQueries({
-				queryKey: ['progress', JSON.stringify(idCandidates), todayISO],
+				queryKey: ['progress', actorId, todayISO],
 			})
 			const previous =
 				qc.getQueryData(['progress', actorId, todayISO]) ||
