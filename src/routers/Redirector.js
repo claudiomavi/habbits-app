@@ -4,7 +4,7 @@ import { useAuthStore, useUsersStore } from '../autoBarrell'
 
 export function Redirector({ navigation }) {
 	const { user, loading } = useAuthStore()
-	const { profileByMail } = useUsersStore()
+	const { fetchProfile } = useUsersStore()
 
 	useEffect(() => {
 		const checkProfile = async () => {
@@ -16,8 +16,8 @@ export function Redirector({ navigation }) {
 				return
 			}
 
-			// Si hay usuario → comprobar si tiene perfil
-			const profile = await profileByMail(user.email)
+			// Si hay usuario → comprobar si tiene perfil por id_auth
+			const profile = await fetchProfile(user.id)
 			if (!profile) {
 				navigation.replace('CreateProfile', { email: user.email })
 				return

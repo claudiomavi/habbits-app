@@ -17,6 +17,7 @@ import {
 	GradientBackground,
 	useAuthStore,
 	useCooperativeStore,
+	useUsersStore,
 } from '../../autoBarrell'
 
 function formatDateTime(ts) {
@@ -34,6 +35,7 @@ function formatDateTime(ts) {
 }
 
 export function CooperativeTemplate() {
+	const { profile } = useUsersStore()
 	// const ENABLE_REALTIME =
 	// 	String(process.env.EXPO_PUBLIC_ENABLE_REALTIME || '').toLowerCase() ===
 	// 	'true'
@@ -61,28 +63,38 @@ export function CooperativeTemplate() {
 	// Carga únicamente al enfocar mediante refreshAllCoopFast para evitar duplicados
 	useEffect(() => {
 		const email = user?.email
-		const uid = user?.id
+		const actorId = (profile?.character_id || user?.id)
+		const uid = actorId
 		if (!email) return
 		fetchInvitations(email, { status: 'pending' })
 		if (uid) {
 			fetchGroups(uid)
 		}
-	}, [user?.email, user?.id])
+	}, [user?.email, profile?.character_id, user?.id])
 
 	// Re-subscribe on screen focus (covers account switch and navigation)
 	useFocusEffect(
 		useCallback(() => {
-			if (user?.email || user?.id) refreshAllCoopFast(user?.email, user?.id)
+			const actorId = (profile?.character_id || user?.id)
+			const uid = actorId
+			if (user?.email || uid) refreshAllCoopFast(user?.email, uid)
 			return () => {}
-		}, [user?.email, user?.id])
+		}, [user?.email, profile?.character_id, user?.id])
 	)
+
+	// Pull-to-refresh usa actorId
+	const onRefresh = () => {
+		const actorId = (profile?.character_id || user?.id)
+		refreshAllCoopFast(user?.email, actorId)
+	}
 
 	const onCreateGroup = async () => {
 		try {
 			if (!groupName.trim()) return Alert.alert('Nombre requerido')
+			const actorId = profile?.character_id || user?.id
 			const g = await createGroup({
 				name: groupName.trim(),
-				owner_id: user?.id,
+				owner_id: actorId,
 			})
 			setGroupName('')
 			if (g?.id) setSelectedGroupId(g.id)
@@ -117,9 +129,7 @@ export function CooperativeTemplate() {
 						refreshing={
 !!(loadingInvites || loadingGroups)
 						}
-						onRefresh={() => {
-							refreshAllCoopFast(user?.email, user?.id)
-						}}
+						onRefresh={onRefresh}
 					/>
 				}
 			>

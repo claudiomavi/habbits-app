@@ -13,14 +13,32 @@ export const addProfile = async (data) => {
 
 // Buscar perfil por email
 export async function getProfileByMail(email) {
-	const { data, error } = await supabase
-		.from('profiles')
-		.select('*')
-		.eq('email', email)
-		.maybeSingle()
+	if (!email) return null
+	const TIMEOUT_MS = 8000
+	let timer = null
+	try {
+		const queryPromise = supabase
+			.from('profiles')
+			.select('id_auth,user_id,email,xp,level,character_id,avatar')
+			.eq('email', email)
+			.maybeSingle()
 
-	if (error) throw error
-	return data // puede ser null si no hay perfil
+		const timed = new Promise((resolve) => {
+			timer = setTimeout(
+				() => resolve({ data: null, error: { message: 'timeout' } }),
+				TIMEOUT_MS
+			)
+		})
+
+		const res = await Promise.race([queryPromise, timed])
+		if (res?.error) throw res.error
+		return res?.data || null
+	} catch (e) {
+		console.warn('getProfileByMail timeout/error', e?.message || e)
+		return null
+	} finally {
+		if (timer) clearTimeout(timer)
+	}
 }
 
 // Buscar perfil por ID de usuario
@@ -29,7 +47,7 @@ export const getProfileByUserId = async (userId) => {
 	let { data, error } = await supabase
 		.from('profiles')
 		.select('*')
-		.eq('user_id', userId)
+		.eq('character_id', userId)
 		.maybeSingle()
 	if (!error && data) return data
 	;({ data, error } = await supabase
@@ -53,58 +71,58 @@ export async function updateIdAuth(email, id_auth) {
 
 // XP/Level helpers
 export async function getProfileById(userId) {
-  // Try by user_id, fallback to id_auth
-  let { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('user_id', userId)
-    .maybeSingle()
-  if (!error && data) return data
-  ;({ data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id_auth', userId)
-    .maybeSingle())
-  if (error) throw error
-  return data
+	// Try by user_id, fallback to id_auth
+	let { data, error } = await supabase
+		.from('profiles')
+		.select('*')
+		.eq('user_id', userId)
+		.maybeSingle()
+	if (!error && data) return data
+	;({ data, error } = await supabase
+		.from('profiles')
+		.select('*')
+		.eq('id_auth', userId)
+		.maybeSingle())
+	if (error) throw error
+	return data
 }
 
 export function computeLevel(totalXP) {
-  const safe = Math.max(0, totalXP || 0)
-  return Math.floor(Math.sqrt(safe / 100)) + 1
+	const safe = Math.max(0, totalXP || 0)
+	return Math.floor(Math.sqrt(safe / 100)) + 1
 }
 
 export async function updateProfileFields(userId, fields) {
-  if (!userId) throw new Error('userId is required')
-  const { data, error } = await supabase
-    .from('profiles')
-    .update(fields)
-    .eq('id_auth', userId)
-    .select()
-    .single()
-  if (error) throw error
-  return data
+	if (!userId) throw new Error('userId is required')
+	const { data, error } = await supabase
+		.from('profiles')
+		.update(fields)
+		.eq('id_auth', userId)
+		.select()
+		.single()
+	if (error) throw error
+	return data
 }
 
 export async function updateProfileXpAndLevel(userId, delta) {
-  if (!delta) return null
-  const current = await getProfileById(userId)
-  const newXp = Math.max(0, (current?.xp || 0) + delta)
-  const newLevel = computeLevel(newXp)
-  // Try update by user_id, if no row, fallback to id_auth
-  let { data, error } = await supabase
-    .from('profiles')
-    .update({ xp: newXp, level: newLevel })
-    .eq('user_id', userId)
-    .select()
-    .maybeSingle()
-  if (!error && data) return data
-  ;({ data, error } = await supabase
-    .from('profiles')
-    .update({ xp: newXp, level: newLevel })
-    .eq('id_auth', userId)
-    .select()
-    .single())
-  if (error) throw error
-  return data
+	if (!delta) return null
+	const current = await getProfileById(userId)
+	const newXp = Math.max(0, (current?.xp || 0) + delta)
+	const newLevel = computeLevel(newXp)
+	// Try update by user_id, if no row, fallback to id_auth
+	let { data, error } = await supabase
+		.from('profiles')
+		.update({ xp: newXp, level: newLevel })
+		.eq('user_id', userId)
+		.select()
+		.maybeSingle()
+	if (!error && data) return data
+	;({ data, error } = await supabase
+		.from('profiles')
+		.update({ xp: newXp, level: newLevel })
+		.eq('id_auth', userId)
+		.select()
+		.single())
+	if (error) throw error
+	return data
 }
