@@ -15,7 +15,7 @@ import {
 import {
 	CardContainer,
 	getProgressForDate,
-	getProgressHistoryForHabit,
+	getProgressHistoryForHabits,
 	useAuthStore,
 	useUsersStore,
 } from '../../autoBarrell'
@@ -121,7 +121,7 @@ export function HabitsTodayModal({
 					// obtener hasta 365 días de historial para cómputos por día/semana/mes
 					let history = []
 					try {
-						history = await getProgressHistoryForHabit(
+						history = await getProgressHistoryForHabits(
 							user.id,
 							h.id,
 							todayISO,
