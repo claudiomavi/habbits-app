@@ -1,14 +1,12 @@
 import { supabase } from '../autoBarrell'
 
-// Habits CRUD
+// Habits CRUD (actor = id_auth = user.id)
 export async function getHabitsByUser(user_id) {
-	const ids = Array.isArray(user_id)
-		? user_id.filter(Boolean)
-		: [user_id].filter(Boolean)
+	if (!user_id) return []
 	const { data, error } = await supabase
 		.from('habits')
 		.select('*')
-		[ids.length > 1 ? 'in' : 'eq']('created_by', ids.length > 1 ? ids : ids[0])
+		.eq('created_by', user_id)
 		.order('created_at', { ascending: true })
 	if (error) throw error
 	return data || []
@@ -40,15 +38,13 @@ export async function deleteHabit(id) {
 	if (error) throw error
 }
 
-// Progress
+// Progress (actor = id_auth)
 export async function getProgressForDate(user_id, dateISO) {
-	const ids = Array.isArray(user_id)
-		? user_id.filter(Boolean)
-		: [user_id].filter(Boolean)
+	if (!user_id || !dateISO) return []
 	const { data, error } = await supabase
 		.from('progress_entries')
 		.select('*')
-		[ids.length > 1 ? 'in' : 'eq']('user_id', ids.length > 1 ? ids : ids[0])
+		.eq('user_id', user_id)
 		.eq('date', dateISO)
 		.order('created_at', { ascending: true })
 		.order('id', { ascending: true })
@@ -60,15 +56,13 @@ export async function getProgressHistoryForHabit(
 	user_id,
 	habit_id,
 	untilISO,
-	limit = 60
+	limit = 730 // cubrir hasta dos años por defecto
 ) {
-	const ids = Array.isArray(user_id)
-		? user_id.filter(Boolean)
-		: [user_id].filter(Boolean)
+	if (!user_id || !habit_id || !untilISO) return []
 	const { data, error } = await supabase
 		.from('progress_entries')
 		.select('*')
-		[ids.length > 1 ? 'in' : 'eq']('user_id', ids.length > 1 ? ids : ids[0])
+		.eq('user_id', user_id)
 		.eq('habit_id', habit_id)
 		.lte('date', untilISO)
 		.order('date', { ascending: false })
@@ -78,47 +72,15 @@ export async function getProgressHistoryForHabit(
 }
 
 export async function getProgressRange(user_id, fromISO, toISO) {
-	const ids = Array.isArray(user_id)
-		? user_id.filter(Boolean)
-		: [user_id].filter(Boolean)
+	if (!user_id || !fromISO || !toISO) return []
 	const { data, error } = await supabase
 		.from('progress_entries')
 		.select('*')
-		[ids.length > 1 ? 'in' : 'eq']('user_id', ids.length > 1 ? ids : ids[0])
+		.eq('user_id', user_id)
 		.gte('date', fromISO)
 		.lte('date', toISO)
 		.order('date', { ascending: true })
 		.order('id', { ascending: true })
-	if (error) throw error
-	return data || []
-}
-
-export async function getProgressHistoryForHabits(
-	user_id,
-	habit_ids,
-	untilISO,
-	windowDays = 365
-) {
-	const ids = Array.isArray(user_id)
-		? user_id.filter(Boolean)
-		: [user_id].filter(Boolean)
-	const habits = Array.isArray(habit_ids)
-		? habit_ids.filter(Boolean)
-		: [habit_ids].filter(Boolean)
-	if (habits.length === 0 || ids.length === 0) return []
-	const d = new Date(untilISO)
-	const from = new Date(d)
-	from.setDate(d.getDate() - Math.max(0, windowDays - 1))
-	const fromISO = from.toISOString().slice(0, 10)
-	const { data, error } = await supabase
-		.from('progress_entries')
-		.select('*')
-		[ids.length > 1 ? 'in' : 'eq']('user_id', ids.length > 1 ? ids : ids[0])
-		.in('habit_id', habits)
-		.gte('date', fromISO)
-		.lte('date', untilISO)
-		.order('habit_id', { ascending: true })
-		.order('date', { ascending: false })
 	if (error) throw error
 	return data || []
 }
@@ -131,86 +93,41 @@ export async function upsertProgress({
 	xp_awarded = 0,
 	client_awarded = null,
 }) {
-	const ids = Array.isArray(user_id)
-		? user_id.filter(Boolean)
-		: [user_id].filter(Boolean)
-	// try existing across candidate ids
+	if (!habit_id || !user_id || !dateISO) throw new Error('Missing fields for upsertProgress')
+
+	// 1) Look for existing entry for (user, habit, date)
 	const { data: existing, error: findErr } = await supabase
 		.from('progress_entries')
 		.select('*')
 		.eq('habit_id', habit_id)
-		[ids.length > 1 ? 'in' : 'eq']('user_id', ids.length > 1 ? ids : ids[0])
+		.eq('user_id', user_id)
 		.eq('date', dateISO)
 		.maybeSingle()
 	if (findErr) throw findErr
 
-	// If unchecking, delete entry instead of storing completed=false
-	if (!completed) {
-		let removedXp = 0
-		if (existing) {
-			removedXp = existing.xp_awarded || 0
-			const { error: delErr } = await supabase
-				.from('progress_entries')
-				.delete()
-				.eq('id', existing.id)
-			if (delErr) throw delErr
-		}
-		// Fallback: if not found, use client_awarded as last known awarded value
-		const toRemove =
-			removedXp || (client_awarded ? Math.round(client_awarded) : 0)
-		// Return a synthetic response to update cache/UI coherently
-		return {
-			id: existing?.id || `tmp_${habit_id}_${dateISO}`,
-			habit_id,
-			user_id,
-			date: dateISO,
-			completed: false,
-			xp_awarded: 0,
-			xp_delta: -toRemove,
-		}
-	}
-
-	// When checking as completed, upsert/insert
-	let updated
+	let updated = null
 	if (existing) {
+		// update toggle
 		const { data, error } = await supabase
 			.from('progress_entries')
-			.update({ completed: true, xp_awarded })
+			.update({ completed, xp_awarded })
 			.eq('id', existing.id)
 			.select()
 			.single()
 		if (error) throw error
-		updated = {
-			...data,
-			xp_delta: Math.round(xp_awarded - (existing.xp_awarded || 0)),
-		}
+		updated = { ...data, xp_delta: Math.round((completed ? 1 : -1) * xp_awarded) }
 	} else {
-		// attempt insert with preferred id, fallback to others if provided
-		let data = null
-		let error = null
-		for (const candidate of ids) {
-			const res = await supabase
-				.from('progress_entries')
-				.insert({
-					habit_id,
-					user_id: candidate,
-					date: dateISO,
-					completed: true,
-					xp_awarded,
-				})
-				.select()
-				.single()
-			if (!res.error) {
-				data = res.data
-				break
-			}
-			error = res.error
-		}
-		if (error && !data) throw error
+		// insert new completed entry
+		const { data, error } = await supabase
+			.from('progress_entries')
+			.insert({ habit_id, user_id, date: dateISO, completed: true, xp_awarded })
+			.select()
+			.single()
+		if (error) throw error
 		updated = { ...data, xp_delta: Math.round(xp_awarded) }
 	}
 
-	// Cleanup duplicates for same (user, habit, date)
+	// 2) Cleanup accidental duplicates
 	try {
 		const { data: dupes } = await supabase
 			.from('progress_entries')
@@ -228,7 +145,7 @@ export async function upsertProgress({
 	return updated
 }
 
-// XP helper: increment profile XP
+// XP helper (se mantiene como estaba)
 export async function addXpToProfile(email, delta) {
 	if (!delta) return
 	const { error } = await supabase.rpc('increment_profile_xp', {
@@ -236,8 +153,7 @@ export async function addXpToProfile(email, delta) {
 		delta_param: delta,
 	})
 	if (error) {
-		// fallback: direct update by email
+		// fallback: noop marker (ajustar si hace falta)
 		await supabase.from('profiles').update({ xp: supabase.rpc('noop') })
-		// If you want, replace with a select-update sequence
 	}
 }

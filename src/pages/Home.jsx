@@ -31,19 +31,18 @@ export function Home() {
 	}
 	const todayISO = makeLocalISO(new Date())
 
-	const actorId = profile?.character_id || user?.id
-	const idCandidates = Array.from(new Set([actorId, user?.id].filter(Boolean)))
+	const actorId = user?.id
 
 	const { data: habits = [], isLoading: habitsLoading } = useQuery({
-		queryKey: ['habits', JSON.stringify(idCandidates)],
-		queryFn: () => getHabitsByUser(idCandidates),
-		enabled: idCandidates.length > 0,
+		queryKey: ['habits', actorId],
+		queryFn: () => getHabitsByUser(actorId),
+		enabled: !!actorId,
 	})
 
 	const { data: progress = [], isLoading: progressLoading } = useQuery({
-		queryKey: ['progress', JSON.stringify(idCandidates), todayISO],
-		queryFn: () => getProgressForDate(idCandidates, todayISO),
-		enabled: idCandidates.length > 0,
+		queryKey: ['progress', actorId, todayISO],
+		queryFn: () => getProgressForDate(actorId, todayISO),
+		enabled: !!actorId,
 	})
 
 	const progressMap = useMemo(() => {
@@ -60,7 +59,7 @@ export function Home() {
 				queryKey: ['progress', JSON.stringify(idCandidates), todayISO],
 			})
 			const previous =
-				qc.getQueryData(['progress', JSON.stringify(idCandidates), todayISO]) ||
+				qc.getQueryData(['progress', actorId, todayISO]) ||
 				[]
 			const cached = Array.isArray(previous) ? previous : []
 			const existing = cached.find((p) => p.habit_id === habit.id)
@@ -101,7 +100,7 @@ export function Home() {
 				return copy
 			})()
 			qc.setQueryData(
-				['progress', JSON.stringify(idCandidates), todayISO],
+				['progress', actorId, todayISO],
 				next
 			)
 			try {
@@ -121,7 +120,7 @@ export function Home() {
 			const desired = payload?.desired
 			// IMPORTANT: read latest cache, not render-time progressMap, to avoid stale flips on rapid toggles
 			const cached =
-				qc.getQueryData(['progress', JSON.stringify(idCandidates), todayISO]) ||
+				qc.getQueryData(['progress', actorId, todayISO]) ||
 				[]
 			const existing = Array.isArray(cached)
 				? cached.find((p) => p.habit_id === habit.id)
@@ -133,7 +132,7 @@ export function Home() {
 			let streakDays = 0
 			try {
 				const history = await getProgressHistoryForHabit(
-					idCandidates,
+					actorId,
 					habit.id,
 					todayISO,
 					730
@@ -196,7 +195,7 @@ export function Home() {
 				: -(existing?.xp_awarded || 0)
 			const res = await upsertProgress({
 				habit_id: habit.id,
-				user_id: idCandidates,
+				user_id: actorId,
 				dateISO: todayISO,
 				completed: newCompleted,
 				xp_awarded: newCompleted ? Math.round(earned) : 0,
@@ -206,7 +205,7 @@ export function Home() {
 		},
 		onSuccess: async ({ res, deltaXp }, _vars, context) => {
 			await qc.invalidateQueries({
-				queryKey: ['progress', JSON.stringify(idCandidates), todayISO],
+				queryKey: ['progress', actorId, todayISO],
 			})
 			const serverDelta =
 				typeof res?.xp_delta === 'number' ? res.xp_delta : deltaXp
