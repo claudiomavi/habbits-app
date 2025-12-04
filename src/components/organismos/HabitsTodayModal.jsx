@@ -91,6 +91,22 @@ export function HabitsTodayModal({
 	const { profile } = useUsersStore()
 	const [streaks, setStreaks] = React.useState({})
 
+	// IDs estables para consultas
+	const actorId = React.useMemo(
+		() => profile?.character_id || user?.id,
+		[profile?.character_id, user?.id]
+	)
+	const idsForQueries = React.useMemo(
+		() => Array.from(new Set([actorId, user?.id].filter(Boolean))),
+		[actorId, user?.id]
+	)
+	const habitIdsKey = React.useMemo(
+		() => JSON.stringify((todaysHabits || []).map((h) => h.id).sort()),
+		[todaysHabits]
+	)
+	const lastRunKeyRef = React.useRef('')
+	const inFlightRef = React.useRef(false)
+
 	const makeLocalISO = (d) => {
 		const y = d.getFullYear()
 		const m = String(d.getMonth() + 1).padStart(2, '0')
@@ -100,41 +116,57 @@ export function HabitsTodayModal({
 
 	React.useEffect(() => {
 		let cancelled = false
+		// Pequeño debounce y guard contra reentradas
+		const todayISO = makeLocalISO(new Date())
+		const runKey = `${todayISO}|${habitIdsKey}|${JSON.stringify(idsForQueries)}`
+		if (!visible || !user?.id || !actorId || (todaysHabits || []).length === 0) return
+		if (lastRunKeyRef.current === runKey || inFlightRef.current) return
+		lastRunKeyRef.current = runKey
+		inFlightRef.current = true
+
 		const calcAll = async () => {
 			try {
-				if (!user?.id || todaysHabits.length === 0) return
-				const todayISO = makeLocalISO(new Date())
-				// Usar progreso de hoy si viene por props para reactividad inmediata; si no, cargarlo
 				let progressToday = Array.isArray(todayProgress) ? todayProgress : []
 				if (!progressToday.length) {
 					try {
-						const actorId = profile?.character_id || user?.id
-						const ids = Array.from(new Set([actorId, user?.id].filter(Boolean)))
-						progressToday = await getProgressForDate(ids, todayISO)
+						progressToday = await getProgressForDate(idsForQueries, todayISO)
 					} catch {}
 				}
 				const todayDoneMap = new Map(
 					(progressToday || []).map((p) => [p.habit_id, !!p.completed])
 				)
-				const results = {}
-				for (const h of todaysHabits) {
-					// obtener hasta 365 días de historial para cómputos por día/semana/mes
-					let history = []
-					try {
-						history = await getProgressHistoryForHabits(
-							user.id,
-							h.id,
+				let historyBulk = []
+				try {
+					const habitIds = JSON.parse(habitIdsKey)
+					if (Array.isArray(habitIds) && habitIds.length) {
+						historyBulk = await getProgressHistoryForHabits(
+							idsForQueries,
+							habitIds,
 							todayISO,
-							365
+							730
 						)
-					} catch {}
+					}
+				} catch {}
+				const historyByHabit = new Map()
+				for (const r of historyBulk || []) {
+					if (!historyByHabit.has(r.habit_id)) historyByHabit.set(r.habit_id, [])
+					historyByHabit.get(r.habit_id).push(r)
+				}
+				const results = {}
+				const fmt = (d) => {
+					const y = d.getFullYear()
+					const m = String(d.getMonth() + 1).padStart(2, '0')
+					const day = String(d.getDate()).padStart(2, '0')
+					return `${y}-${m}-${day}`
+				}
+				for (const h of todaysHabits || []) {
+					const history = historyByHabit.get(h.id) || []
 					const completedDates = new Set(
 						Array.isArray(history)
 							? history.filter((r) => r.completed && r.date).map((r) => r.date)
 							: []
 					)
 					const today = new Date(todayISO)
-					const fmt = (d) => makeLocalISO(d)
 					const isScheduled = (date) => {
 						if (h.frequency === 'weekly') {
 							const wdSun0 = date.getDay()
@@ -154,47 +186,27 @@ export function HabitsTodayModal({
 					}
 					const todayCompleted = !!todayDoneMap.get(h.id)
 					let value = 0
-					let unit =
-						h.frequency === 'weekly'
-							? 'día'
-							: h.frequency === 'monthly'
-							? 'mes'
-							: 'día'
+					let unit = h.frequency === 'weekly' ? 'día' : h.frequency === 'monthly' ? 'mes' : 'día'
 					let cursor = new Date(today)
-					// Si hoy no está completado, arrancar el cómputo desde ayer
 					if (!todayCompleted) cursor.setDate(cursor.getDate() - 1)
-					const debugTrace = []
 					for (let i = 0; i < 730; i++) {
-						// saltar días no programados
-						if (!isScheduled(cursor)) {
-							debugTrace.push({ i, iso: fmt(cursor), scheduled: false })
-							cursor.setDate(cursor.getDate() - 1)
-							continue
-						}
+						if (!isScheduled(cursor)) { cursor.setDate(cursor.getDate() - 1); continue }
 						const iso = fmt(cursor)
 						const done = completedDates.has(iso)
-						debugTrace.push({ i, iso, scheduled: true, done })
-						if (done) {
-							value += 1
-							cursor.setDate(cursor.getDate() - 1)
-						} else {
-							break
-						}
+						if (done) { value += 1; cursor.setDate(cursor.getDate() - 1) } else { break }
 					}
 					results[h.id] = { value, unit }
 				}
-				if (!cancelled) {
-					setStreaks(results)
-				}
+				if (!cancelled) setStreaks(results)
 			} catch (e) {
 				if (!cancelled) setStreaks({})
+			} finally {
+				inFlightRef.current = false
 			}
 		}
-		if (visible) calcAll()
-		return () => {
-			cancelled = true
-		}
-	}, [visible, user?.id, todaysHabits, todayProgress])
+		const t = setTimeout(() => { if (!cancelled) calcAll() }, 150)
+		return () => { cancelled = true; clearTimeout(t) }
+	}, [visible, user?.id, actorId, habitIdsKey, todayProgress, idsForQueries])
 
 	if (!internalVisible) return null
 
