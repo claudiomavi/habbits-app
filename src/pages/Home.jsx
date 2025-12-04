@@ -32,17 +32,18 @@ export function Home() {
 	const todayISO = makeLocalISO(new Date())
 
 	const actorId = (profile?.character_id || user?.id)
+	const idCandidates = Array.from(new Set([actorId, user?.id].filter(Boolean)))
 
 	const { data: habits = [], isLoading: habitsLoading } = useQuery({
-		queryKey: ['habits', actorId],
-		queryFn: () => getHabitsByUser(actorId),
-		enabled: !!actorId,
+		queryKey: ['habits', JSON.stringify(idCandidates)],
+		queryFn: () => getHabitsByUser(idCandidates),
+		enabled: idCandidates.length > 0,
 	})
 
 	const { data: progress = [], isLoading: progressLoading } = useQuery({
-		queryKey: ['progress', actorId, todayISO],
-		queryFn: () => getProgressForDate(actorId, todayISO),
-		enabled: !!actorId,
+		queryKey: ['progress', JSON.stringify(idCandidates), todayISO],
+		queryFn: () => getProgressForDate(idCandidates, todayISO),
+		enabled: idCandidates.length > 0,
 	})
 
 	const progressMap = useMemo(() => {
@@ -55,8 +56,8 @@ export function Home() {
 		onMutate: async (payload) => {
 			const habit = payload?.habit || payload
 			const desired = payload?.desired
-			await qc.cancelQueries({ queryKey: ['progress', actorId, todayISO] })
-			const previous = qc.getQueryData(['progress', actorId, todayISO]) || []
+			await qc.cancelQueries({ queryKey: ['progress', JSON.stringify(idCandidates), todayISO] })
+			const previous = qc.getQueryData(['progress', JSON.stringify(idCandidates), todayISO]) || []
 			const cached = Array.isArray(previous) ? previous : []
 			const existing = cached.find((p) => p.habit_id === habit.id)
 			const newCompleted =
@@ -95,7 +96,7 @@ export function Home() {
 				}
 				return copy
 			})()
-			qc.setQueryData(['progress', actorId, todayISO], next)
+			qc.setQueryData(['progress', JSON.stringify(idCandidates), todayISO], next)
 			try {
 				useUsersStore.getState().optimisticUpdateXp(deltaXp)
 			} catch {}
@@ -112,7 +113,7 @@ export function Home() {
 			const habit = payload?.habit || payload
 			const desired = payload?.desired
 			// IMPORTANT: read latest cache, not render-time progressMap, to avoid stale flips on rapid toggles
-			const cached = qc.getQueryData(['progress', user?.id, todayISO]) || []
+			const cached = qc.getQueryData(['progress', JSON.stringify(idCandidates), todayISO]) || []
 			const existing = Array.isArray(cached)
 				? cached.find((p) => p.habit_id === habit.id)
 				: undefined
@@ -123,7 +124,7 @@ export function Home() {
 			let streakDays = 0
 			try {
 				const history = await getProgressHistoryForHabit(
-					actorId,
+					idCandidates,
 					habit.id,
 					todayISO,
 					60
@@ -186,7 +187,7 @@ export function Home() {
 				: -(existing?.xp_awarded || 0)
 			const res = await upsertProgress({
 habit_id: habit.id,
-user_id: actorId,
+user_id: idCandidates,
 				dateISO: todayISO,
 				completed: newCompleted,
 				xp_awarded: newCompleted ? Math.round(earned) : 0,
@@ -195,7 +196,7 @@ user_id: actorId,
 			return { res, deltaXp }
 		},
 		onSuccess: async ({ res, deltaXp }, _vars, context) => {
-			await qc.invalidateQueries({ queryKey: ['progress', actorId, todayISO] })
+			await qc.invalidateQueries({ queryKey: ['progress', JSON.stringify(idCandidates), todayISO] })
 			const serverDelta =
 				typeof res?.xp_delta === 'number' ? res.xp_delta : deltaXp
 			if (serverDelta) {
@@ -233,7 +234,7 @@ user_id: actorId,
 		},
 		onError: (err, habit, context) => {
 			if (context?.previous) {
-				qc.setQueryData(['progress', actorId, todayISO], context.previous)
+				qc.setQueryData(['progress', JSON.stringify(idCandidates), todayISO], context.previous)
 			}
 			// rollback xp
 			if (context?.deltaXp) {
