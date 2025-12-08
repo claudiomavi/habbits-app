@@ -136,19 +136,8 @@ export function CooperativeTemplate() {
 				<CardContainer>
 					<Text style={styles.title}>Modo cooperativo</Text>
 					<Text style={styles.subtitle}>
-						Invitaciones y gestión básica de grupos (Día 2).
+						Gestión básica de grupos.
 					</Text>
-
-					{/* Notificaciones */}
-					<View style={styles.section}>
-						<View
-							style={[
-								styles.row,
-								{ justifyContent: 'space-between', alignItems: 'flex-end' },
-							]}
-						>
-							<Text style={styles.sectionTitle}>Invitaciones</Text>
-							<View style={[styles.row, { gap: 12 }]}>
 								{lastUpdatedAt ? (
 									<Text style={styles.updatedAt}>
 										Actualizado a las{' '}
