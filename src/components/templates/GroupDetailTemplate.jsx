@@ -54,15 +54,21 @@ export function GroupDetailTemplate({ groupId }) {
 					})}
 					initialRouteName="Ajustes"
 				>
-					<Tab.Screen name="Hábitos" component={GroupHabitsTab} initialParams={{ groupId }}>
-						{/* provided via component + initialParams */}
-					</Tab.Screen>
-					<Tab.Screen name="Clasificatorio" component={GroupLeaderboardTab} initialParams={{ groupId }}>
-						<GroupLeaderboardTab route={{ params: { groupId } }} />
-					</Tab.Screen>
-					<Tab.Screen name="Ajustes" component={GroupSettingsTab} initialParams={{ groupId }}>
-						<GroupSettingsTab route={{ params: { groupId } }} />
-					</Tab.Screen>
+					<Tab.Screen
+						name="Hábitos"
+						component={GroupHabitsTab}
+						initialParams={{ groupId }}
+					/>
+					<Tab.Screen
+						name="Clasificatorio"
+						component={GroupLeaderboardTab}
+						initialParams={{ groupId }}
+					/>
+					<Tab.Screen
+						name="Ajustes"
+						component={GroupSettingsTab}
+						initialParams={{ groupId }}
+					/>
 				</Tab.Navigator>
 			</View>
 		</View>
