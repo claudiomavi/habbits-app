@@ -1,21 +1,55 @@
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import {
+	getAvatarUriForProfile,
+	getXpPercentForProfile,
 	GroupHabitsTab,
 	GroupLeaderboardTab,
 	GroupSettingsTab,
+	HeaderBar,
+	useCooperativeStore,
+	useUsersStore,
 } from '../../autoBarrell'
 
 const Tab = createBottomTabNavigator()
 
 export function GroupDetailTemplate({ groupId }) {
+	const { profile } = useUsersStore()
+	const { groups } = useCooperativeStore()
+	const groupName =
+		(groups || []).find?.((g) => g.id === groupId)?.name || 'Grupo'
+
+	const [avatarUri, setAvatarUri] = useState(
+		profile?.avatar?.uri || profile?.avatar || null
+	)
+	const xpPercent = useMemo(
+		() => getXpPercentForProfile(profile),
+		[profile?.xp, profile?.level]
+	)
+	useEffect(() => {
+		let mounted = true
+		;(async () => {
+			const uri = await getAvatarUriForProfile(profile)
+			if (mounted) setAvatarUri(uri)
+		})()
+		return () => {
+			mounted = false
+		}
+	}, [profile?.character_id, profile?.level, profile?.avatar])
+
 	const Title = useMemo(
 		() => (
-			<View style={{ padding: 16 }}>
-				<Text style={styles.title}>Grupo</Text>
-				<Text style={styles.subtitle}>{groupId?.slice?.(0, 8)}</Text>
+			<View style={{ padding: 16, backgroundColor: '#FFD3A1', gap: 32 }}>
+				<HeaderBar
+					name={profile?.display_name}
+					initial={profile?.display_name}
+					xpPercent={xpPercent}
+					level={profile?.level ?? 1}
+					avatarUri={avatarUri}
+				/>
+				<Text style={styles.title}>Grupo: {groupName}</Text>
 			</View>
 		),
 		[groupId]
@@ -76,7 +110,7 @@ export function GroupDetailTemplate({ groupId }) {
 }
 
 const styles = StyleSheet.create({
-	title: { fontSize: 20, fontWeight: '700' },
+	title: { fontSize: 20, fontWeight: '700', textAlign: 'center' },
 	subtitle: { fontSize: 12, color: '#6B7280' },
 	sectionTitle: { fontSize: 16, fontWeight: '700', marginBottom: 8 },
 	helper: { color: '#6B7280' },
