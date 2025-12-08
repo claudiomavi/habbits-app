@@ -1,11 +1,12 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import {
 	AppStack,
+	Cooperative,
 	CreateProfile,
+	GroupDetail,
 	Login,
 	Redirector,
 	Register,
-	Cooperative,
 } from '../autoBarrell'
 
 const Stack = createNativeStackNavigator()
@@ -49,18 +50,26 @@ export function AppRouter() {
 					headerShown: true,
 					title: 'Cooperativo',
 					headerBackTitle: 'Home',
-					headerLeft: () => (
+					headerLeft: () =>
 						require('react').createElement(
 							require('react-native').TouchableOpacity,
-							{ onPress: () => navigation.navigate('AppStack', { screen: 'Home' }), style: { paddingHorizontal: 12, paddingVertical: 6 } },
+							{
+								onPress: () =>
+									navigation.navigate('AppStack', { screen: 'Home' }),
+								style: { paddingHorizontal: 12, paddingVertical: 6 },
+							},
 							require('react').createElement(
 								require('react-native').Text,
 								{ style: { color: '#2563EB', fontWeight: '600' } },
 								'← Home'
 							)
-						)
-					),
+						),
 				})}
+			/>
+			<Stack.Screen
+				name="GroupDetail"
+				component={GroupDetail}
+				options={{ headerShown: true, title: 'Grupo' }}
 			/>
 		</Stack.Navigator>
 	)

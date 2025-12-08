@@ -290,7 +290,7 @@ export function CooperativeTemplate() {
 											styles.groupRow,
 											selectedGroupId === g.id && styles.groupRowSelected,
 										]}
-										onPress={() => setSelectedGroupId(g.id)}
+										onPress={() => navigation.navigate('GroupDetail', { groupId: g.id })}
 									>
 										<Text style={styles.groupName}>
 											{g.name || g.id?.slice?.(0, 8)}
