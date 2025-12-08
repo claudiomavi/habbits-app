@@ -26,51 +26,43 @@ export function GroupDetailTemplate({ groupId }) {
 			{Title}
 			<View style={{ flex: 1 }}>
 				<Tab.Navigator
-					screenOptions={{ headerShown: false }}
-					initialRouteName="Hábitos"
+					screenOptions={({ route }) => ({
+						headerShown: false,
+						tabBarShowLabel: true,
+						tabBarActiveTintColor: '#4F46E5',
+						tabBarInactiveTintColor: '#6B7280',
+						tabBarStyle: {
+							backgroundColor: '#fff',
+							borderTopColor: '#E5E7EB',
+							height: 60,
+							paddingBottom: 6,
+						},
+						tabBarIcon: ({ color, size }) => {
+							let iconName = 'list-outline'
+							if (route.name === 'Hábitos') iconName = 'list-outline'
+							if (route.name === 'Clasificatorio')
+								iconName = 'stats-chart-outline'
+							if (route.name === 'Ajustes') iconName = 'settings-outline'
+							return (
+								<Ionicons
+									name={iconName}
+									size={size}
+									color={color}
+								/>
+							)
+						},
+					})}
+					initialRouteName="Ajustes"
 				>
-					<Tab.Screen
-						name="Hábitos"
-						component={GroupHabitsTab}
-						initialParams={{ groupId }}
-						options={{
-							tabBarIcon: ({ color, size }) => (
-								<Ionicons
-									name="list-outline"
-									size={size}
-									color={color}
-								/>
-							),
-						}}
-					/>
-					<Tab.Screen
-						name="Clasificatorio"
-						component={GroupLeaderboardTab}
-						initialParams={{ groupId }}
-						options={{
-							tabBarIcon: ({ color, size }) => (
-								<Ionicons
-									name="stats-chart-outline"
-									size={size}
-									color={color}
-								/>
-							),
-						}}
-					/>
-					<Tab.Screen
-						name="Ajustes"
-						component={GroupSettingsTab}
-						initialParams={{ groupId }}
-						options={{
-							tabBarIcon: ({ color, size }) => (
-								<Ionicons
-									name="settings-outline"
-									size={size}
-									color={color}
-								/>
-							),
-						}}
-					/>
+					<Tab.Screen name="Hábitos" component={GroupHabitsTab} initialParams={{ groupId }}>
+						{/* provided via component + initialParams */}
+					</Tab.Screen>
+					<Tab.Screen name="Clasificatorio" component={GroupLeaderboardTab} initialParams={{ groupId }}>
+						<GroupLeaderboardTab route={{ params: { groupId } }} />
+					</Tab.Screen>
+					<Tab.Screen name="Ajustes" component={GroupSettingsTab} initialParams={{ groupId }}>
+						<GroupSettingsTab route={{ params: { groupId } }} />
+					</Tab.Screen>
 				</Tab.Navigator>
 			</View>
 		</View>

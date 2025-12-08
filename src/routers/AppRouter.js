@@ -1,12 +1,12 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import {
 	AppStack,
-	Cooperative,
 	CreateProfile,
-	GroupDetail,
 	Login,
 	Redirector,
 	Register,
+	Cooperative,
+	GroupDetail,
 } from '../autoBarrell'
 
 const Stack = createNativeStackNavigator()
