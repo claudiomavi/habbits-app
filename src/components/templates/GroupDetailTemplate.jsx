@@ -1,64 +1,106 @@
-import React, { useMemo, useState } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { useMemo } from 'react'
+import { StyleSheet, Text, View } from 'react-native'
+import {
+	GroupHabitsTab,
+	GroupLeaderboardTab,
+	GroupSettingsTab,
+} from '../../autoBarrell'
 
-function TabButton({ label, active, onPress }) {
-  return (
-    <TouchableOpacity onPress={onPress} style={[styles.tabBtn, active && styles.tabBtnActive]}>
-      <Text style={[styles.tabLbl, active && styles.tabLblActive]}>{label}</Text>
-    </TouchableOpacity>
-  )
-}
+const Tab = createBottomTabNavigator()
 
-export function GroupDetailTemplate({ groupId, navigation }) {
-  const [tab, setTab] = useState('habits') // habits | leaderboard | settings
+export function GroupDetailTemplate({ groupId }) {
+	const Title = useMemo(
+		() => (
+			<View style={{ padding: 16 }}>
+				<Text style={styles.title}>Grupo</Text>
+				<Text style={styles.subtitle}>{groupId?.slice?.(0, 8)}</Text>
+			</View>
+		),
+		[groupId]
+	)
 
-  const Title = useMemo(() => (
-    <View style={{ padding: 16 }}>
-      <Text style={styles.title}>Grupo</Text>
-      <Text style={styles.subtitle}>{groupId?.slice?.(0, 8)}</Text>
-    </View>
-  ), [groupId])
-
-  return (
-    <View style={{ flex: 1 }}>
-      {Title}
-      <View style={styles.tabsRow}>
-        <TabButton label="Hábitos" active={tab === 'habits'} onPress={() => setTab('habits')} />
-        <TabButton label="Clasificatorio" active={tab === 'leaderboard'} onPress={() => setTab('leaderboard')} />
-        <TabButton label="Ajustes" active={tab === 'settings'} onPress={() => setTab('settings')} />
-      </View>
-      <ScrollView contentContainerStyle={{ padding: 16 }}>
-        {tab === 'habits' && (
-          <View>
-            <Text style={styles.sectionTitle}>Hábitos del grupo (máx. 5)</Text>
-            <Text style={styles.helper}>TODO: listar/crear/limitar a 5 y completar</Text>
-          </View>
-        )}
-        {tab === 'leaderboard' && (
-          <View>
-            <Text style={styles.sectionTitle}>Clasificatorio</Text>
-            <Text style={styles.helper}>TODO: ranking por XP del grupo</Text>
-          </View>
-        )}
-        {tab === 'settings' && (
-          <View>
-            <Text style={styles.sectionTitle}>Ajustes del grupo</Text>
-            <Text style={styles.helper}>TODO: añadir/expulsar miembros, roles, renombrar, eliminar</Text>
-          </View>
-        )}
-      </ScrollView>
-    </View>
-  )
+	return (
+		<View style={{ flex: 1 }}>
+			{Title}
+			<View style={{ flex: 1 }}>
+				<Tab.Navigator
+					screenOptions={{ headerShown: false }}
+					initialRouteName="Hábitos"
+				>
+					<Tab.Screen
+						name="Hábitos"
+						component={GroupHabitsTab}
+						initialParams={{ groupId }}
+						options={{
+							tabBarIcon: ({ color, size }) => (
+								<Ionicons
+									name="list-outline"
+									size={size}
+									color={color}
+								/>
+							),
+						}}
+					/>
+					<Tab.Screen
+						name="Clasificatorio"
+						component={GroupLeaderboardTab}
+						initialParams={{ groupId }}
+						options={{
+							tabBarIcon: ({ color, size }) => (
+								<Ionicons
+									name="stats-chart-outline"
+									size={size}
+									color={color}
+								/>
+							),
+						}}
+					/>
+					<Tab.Screen
+						name="Ajustes"
+						component={GroupSettingsTab}
+						initialParams={{ groupId }}
+						options={{
+							tabBarIcon: ({ color, size }) => (
+								<Ionicons
+									name="settings-outline"
+									size={size}
+									color={color}
+								/>
+							),
+						}}
+					/>
+				</Tab.Navigator>
+			</View>
+		</View>
+	)
 }
 
 const styles = StyleSheet.create({
-  title: { fontSize: 20, fontWeight: '700' },
-  subtitle: { fontSize: 12, color: '#6B7280' },
-  tabsRow: { flexDirection: 'row', paddingHorizontal: 8, gap: 8 },
-  tabBtn: { paddingVertical: 10, paddingHorizontal: 12, borderRadius: 8, backgroundColor: '#F3F4F6' },
-  tabBtnActive: { backgroundColor: '#E0E7FF' },
-  tabLbl: { color: '#374151', fontWeight: '600' },
-  tabLblActive: { color: '#4338CA' },
-  sectionTitle: { fontSize: 16, fontWeight: '700', marginBottom: 8 },
-  helper: { color: '#6B7280' },
+	title: { fontSize: 20, fontWeight: '700' },
+	subtitle: { fontSize: 12, color: '#6B7280' },
+	sectionTitle: { fontSize: 16, fontWeight: '700', marginBottom: 8 },
+	helper: { color: '#6B7280' },
+	row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+	input: {
+		borderWidth: 1,
+		borderColor: '#E5E7EB',
+		backgroundColor: '#F9FAFB',
+		borderRadius: 8,
+		paddingHorizontal: 12,
+		paddingVertical: 10,
+	},
+	actionBtn: { paddingHorizontal: 12, paddingVertical: 10, borderRadius: 8 },
+	primary: { backgroundColor: '#4F46E5' },
+	actionText: { color: '#fff', fontWeight: '700' },
+	memberRow: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		padding: 12,
+		backgroundColor: '#F3F4F6',
+		borderRadius: 8,
+	},
+	memberName: { color: '#111827', fontWeight: '600' },
+	memberRole: { color: '#6B7280', fontWeight: '600' },
 })
