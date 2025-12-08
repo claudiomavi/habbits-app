@@ -63,19 +63,19 @@ export function CooperativeTemplate() {
 	// Carga únicamente al enfocar mediante refreshAllCoopFast para evitar duplicados
 	useEffect(() => {
 		const email = user?.email
-		const actorId = (profile?.character_id || user?.id)
+		const actorId = profile?.character_id || user?.id
 		const uid = actorId
 		if (!email) return
 		fetchInvitations(email, { status: 'pending' })
 		if (uid) {
-			fetchGroups(uid)
+			fetchGroups(user?.id)
 		}
 	}, [user?.email, profile?.character_id, user?.id])
 
 	// Re-subscribe on screen focus (covers account switch and navigation)
 	useFocusEffect(
 		useCallback(() => {
-			const actorId = (profile?.character_id || user?.id)
+			const actorId = profile?.character_id || user?.id
 			const uid = actorId
 			if (user?.email || uid) refreshAllCoopFast(user?.email, uid)
 			return () => {}
@@ -84,14 +84,14 @@ export function CooperativeTemplate() {
 
 	// Pull-to-refresh usa actorId
 	const onRefresh = () => {
-		const actorId = (profile?.character_id || user?.id)
-		refreshAllCoopFast(user?.email, actorId)
+		const actorId = profile?.character_id || user?.id
+		refreshAllCoopFast(user?.email, user?.id)
 	}
 
 	const onCreateGroup = async () => {
 		try {
 			if (!groupName.trim()) return Alert.alert('Nombre requerido')
-			const actorId = profile?.character_id || user?.id
+			const actorId = user?.id
 			const g = await createGroup({
 				name: groupName.trim(),
 				owner_id: actorId,
@@ -126,9 +126,7 @@ export function CooperativeTemplate() {
 				contentContainerStyle={styles.scrollContent}
 				refreshControl={
 					<RefreshControl
-						refreshing={
-!!(loadingInvites || loadingGroups)
-						}
+						refreshing={!!(loadingInvites || loadingGroups)}
 						onRefresh={onRefresh}
 					/>
 				}
@@ -292,7 +290,7 @@ export function CooperativeTemplate() {
 											styles.groupRow,
 											selectedGroupId === g.id && styles.groupRowSelected,
 										]}
-										onPress={() => setSelectedGroupId(g.id)}
+										onPress={() => navigation.navigate('GroupDetail', { groupId: g.id })}
 									>
 										<Text style={styles.groupName}>
 											{g.name || g.id?.slice?.(0, 8)}

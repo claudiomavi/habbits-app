@@ -91,15 +91,35 @@ export function HabitsTodayModal({
 	const { profile } = useUsersStore()
 	const [streaks, setStreaks] = React.useState({})
 
+	/* removed fallback scheduling helper */
+	/* const isScheduledFor = React.useCallback((h, date) => {
+		if (h?.frequency === 'weekly') {
+			const wdSun0 = date.getDay()
+			const wdMon0 = (wdSun0 + 6) % 7
+			const days = Array.isArray(h?.days_of_week)
+				? h.days_of_week.map(Number)
+				: []
+			if (days.length === 0) return true
+			return days.includes(wdMon0)
+		}
+		if (h?.frequency === 'monthly') {
+			const dom = date.getDate()
+			const wanted = h?.day_of_month || 1
+			return dom === wanted
+		}
+		return true
+	}, [])
+
+	/* removed fallback list */
+	/* const today = React.useMemo(() => new Date(), [])
+	const todaysHabitsEffective = React.useMemo(() => {
+		if (Array.isArray(todaysHabits) && todaysHabits.length > 0) return todaysHabits
+		if (!Array.isArray(allHabits) || allHabits.length === 0) return []
+		return allHabits.filter((h) => isScheduledFor(h, today))
+	}, [todaysHabits, allHabits, isScheduledFor, today]) */
+
 	// IDs estables para consultas
-	const actorId = React.useMemo(
-		() => profile?.character_id || user?.id,
-		[profile?.character_id, user?.id]
-	)
-	const idsForQueries = React.useMemo(
-		() => Array.from(new Set([actorId, user?.id].filter(Boolean))),
-		[actorId, user?.id]
-	)
+	const actorId = React.useMemo(() => user?.id, [user?.id])
 	const habitIdsKey = React.useMemo(
 		() => JSON.stringify((todaysHabits || []).map((h) => h.id).sort()),
 		[todaysHabits]
@@ -118,7 +138,7 @@ export function HabitsTodayModal({
 		let cancelled = false
 		// Pequeño debounce y guard contra reentradas
 		const todayISO = makeLocalISO(new Date())
-		const runKey = `${todayISO}|${habitIdsKey}|${JSON.stringify(idsForQueries)}`
+		const runKey = `${todayISO}|${habitIdsKey}|${actorId}`
 		if (!internalVisible) return
 		if (!user?.id) return
 		if (!actorId) return
@@ -132,7 +152,7 @@ export function HabitsTodayModal({
 				let progressToday = Array.isArray(todayProgress) ? todayProgress : []
 				if (!progressToday.length) {
 					try {
-						progressToday = await getProgressForDate(idsForQueries, todayISO)
+						progressToday = await getProgressForDate(actorId, todayISO)
 					} catch {}
 				}
 				const todayDoneMap = new Map(
@@ -143,7 +163,7 @@ export function HabitsTodayModal({
 					const habitIds = JSON.parse(habitIdsKey)
 					if (Array.isArray(habitIds) && habitIds.length) {
 						historyBulk = await getProgressHistoryForHabits(
-							idsForQueries,
+							actorId,
 							habitIds,
 							todayISO,
 							730
@@ -152,7 +172,8 @@ export function HabitsTodayModal({
 				} catch {}
 				const historyByHabit = new Map()
 				for (const r of historyBulk || []) {
-					if (!historyByHabit.has(r.habit_id)) historyByHabit.set(r.habit_id, [])
+					if (!historyByHabit.has(r.habit_id))
+						historyByHabit.set(r.habit_id, [])
 					historyByHabit.get(r.habit_id).push(r)
 				}
 				const results = {}
@@ -189,14 +210,27 @@ export function HabitsTodayModal({
 					}
 					const todayCompleted = !!todayDoneMap.get(h.id)
 					let value = 0
-					let unit = h.frequency === 'weekly' ? 'día' : h.frequency === 'monthly' ? 'mes' : 'día'
+					let unit =
+						h.frequency === 'weekly'
+							? 'día'
+							: h.frequency === 'monthly'
+							? 'mes'
+							: 'día'
 					let cursor = new Date(today)
 					if (!todayCompleted) cursor.setDate(cursor.getDate() - 1)
 					for (let i = 0; i < 730; i++) {
-						if (!isScheduled(cursor)) { cursor.setDate(cursor.getDate() - 1); continue }
+						if (!isScheduled(cursor)) {
+							cursor.setDate(cursor.getDate() - 1)
+							continue
+						}
 						const iso = fmt(cursor)
 						const done = completedDates.has(iso)
-						if (done) { value += 1; cursor.setDate(cursor.getDate() - 1) } else { break }
+						if (done) {
+							value += 1
+							cursor.setDate(cursor.getDate() - 1)
+						} else {
+							break
+						}
 					}
 					results[h.id] = { value, unit }
 				}
@@ -208,9 +242,16 @@ export function HabitsTodayModal({
 				lastRunKeyRef.current = runKey
 			}
 		}
-		const t = setTimeout(() => { if (!cancelled) { calcAll() } }, 150)
-		return () => { cancelled = true; clearTimeout(t) }
-	}, [internalVisible, user?.id, actorId, habitIdsKey, todayProgress, idsForQueries])
+		const t = setTimeout(() => {
+			if (!cancelled) {
+				calcAll()
+			}
+		}, 150)
+		return () => {
+			cancelled = true
+			clearTimeout(t)
+		}
+	}, [internalVisible, user?.id, actorId, habitIdsKey, todayProgress])
 
 	if (!internalVisible) return null
 
