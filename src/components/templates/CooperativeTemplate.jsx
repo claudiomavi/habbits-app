@@ -53,13 +53,11 @@ export function CooperativeTemplate() {
 		loadingGroups,
 		fetchGroups,
 		createGroup,
-		inviteToGroup,
 		refreshAllCoopFast,
 		lastUpdatedAt,
 	} = useCooperativeStore()
 
 	const [groupName, setGroupName] = useState('')
-	const [inviteEmail, setInviteEmail] = useState('')
 	const [selectedGroupId, setSelectedGroupId] = useState(null)
 
 	// Carga únicamente al enfocar mediante refreshAllCoopFast para evitar duplicados
@@ -103,22 +101,6 @@ export function CooperativeTemplate() {
 		} catch (e) {
 			console.error('createGroup', e)
 			Alert.alert('Error', 'No se pudo crear el grupo')
-		}
-	}
-
-	const onInvite = async () => {
-		try {
-			if (!selectedGroupId) return Alert.alert('Selecciona un grupo')
-			if (!inviteEmail.trim()) return Alert.alert('Email requerido')
-			await inviteToGroup({
-				group_id: selectedGroupId,
-				email: inviteEmail.trim(),
-			})
-			setInviteEmail('')
-			Alert.alert('Invitación enviada')
-		} catch (e) {
-			console.error('inviteToGroup', e)
-			Alert.alert('Error', 'No se pudo enviar la invitación')
 		}
 	}
 
@@ -299,7 +281,7 @@ export function CooperativeTemplate() {
 										<Text style={styles.groupName}>
 											{g.name || g.id?.slice?.(0, 8)}
 										</Text>
-										<Text style={styles.groupMeta}>ID: {g.id}</Text>
+										{/* <Text style={styles.groupMeta}>ID: {g.id}</Text> */}
 									</TouchableOpacity>
 								))}
 							</View>
@@ -310,36 +292,7 @@ export function CooperativeTemplate() {
 						)}
 					</View>
 
-					{/* Invitar por email */}
-					<View style={styles.section}>
-						<Text style={styles.sectionTitle}>Invitar por email</Text>
-						<View style={styles.row}>
-							<TextInput
-								placeholder="correo@ejemplo.com"
-								keyboardType="email-address"
-								autoCapitalize="none"
-								value={inviteEmail}
-								onChangeText={setInviteEmail}
-								style={[styles.input, { flex: 1 }]}
-							/>
-							<TouchableOpacity
-								style={[styles.actionBtn, styles.invite]}
-								onPress={onInvite}
-							>
-								<Text style={styles.actionText}>Enviar</Text>
-							</TouchableOpacity>
-						</View>
-						{!selectedGroupId ? (
-							<Text style={styles.helperText}>
-								Selecciona un grupo de la lista para enviar invitaciones
-							</Text>
-						) : (
-							<Text style={styles.helperText}>
-								Enviando invitación para el grupo:{' '}
-								{selectedGroupId?.slice?.(0, 8)}
-							</Text>
-						)}
-					</View>
+					{/* Invitaciones por email se gestionan desde Ajustes del grupo */}
 				</CardContainer>
 			</ScrollView>
 		</GradientBackground>
