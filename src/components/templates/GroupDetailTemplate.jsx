@@ -39,20 +39,17 @@ export function GroupDetailTemplate({ groupId }) {
 		}
 	}, [profile?.character_id, profile?.level, profile?.avatar])
 
-	const Title = useMemo(
-		() => (
-			<View style={{ padding: 16, backgroundColor: '#FFD3A1', gap: 32 }}>
-				<HeaderBar
-					name={profile?.display_name}
-					initial={profile?.display_name}
-					xpPercent={xpPercent}
-					level={profile?.level ?? 1}
-					avatarUri={avatarUri}
-				/>
-				<Text style={styles.title}>Grupo: {groupName}</Text>
-			</View>
-		),
-		[groupId]
+	const Title = (
+		<View style={{ padding: 16, backgroundColor: '#FFD3A1', gap: 32 }}>
+			<HeaderBar
+				name={profile?.display_name}
+				initial={profile?.display_name}
+				xpPercent={xpPercent}
+				level={profile?.level ?? 1}
+				avatarUri={avatarUri}
+			/>
+			<Text style={styles.title}>Grupo: {groupName}</Text>
+		</View>
 	)
 
 	return (
