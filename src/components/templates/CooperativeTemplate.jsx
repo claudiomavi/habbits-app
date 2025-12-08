@@ -1,5 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons'
-import { useFocusEffect } from '@react-navigation/native'
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { useCallback, useEffect, useState } from 'react'
 import {
 	ActivityIndicator,
@@ -39,6 +39,8 @@ export function CooperativeTemplate() {
 	// const ENABLE_REALTIME =
 	// 	String(process.env.EXPO_PUBLIC_ENABLE_REALTIME || '').toLowerCase() ===
 	// 	'true'
+
+	const navigation = useNavigation()
 
 	const { user } = useAuthStore()
 	const {
@@ -290,7 +292,9 @@ export function CooperativeTemplate() {
 											styles.groupRow,
 											selectedGroupId === g.id && styles.groupRowSelected,
 										]}
-										onPress={() => navigation.navigate('GroupDetail', { groupId: g.id })}
+										onPress={() =>
+											navigation.navigate('GroupDetail', { groupId: g.id })
+										}
 									>
 										<Text style={styles.groupName}>
 											{g.name || g.id?.slice?.(0, 8)}
