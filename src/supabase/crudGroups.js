@@ -70,9 +70,3 @@ export async function listGroupMembers(group_id) {
 export async function inviteToGroup({ group_id, email, token = null }) {
   return createInvitation({ group_id, email, token })
 }
-
-export async function updateGroupName(group_id, name) {
-  if (!group_id || !name?.trim()) throw new Error('group_id and name are required')
-  const { error } = await supabase.from('groups').update({ name: name.trim() }).eq('id', group_id)
-  if (error) throw error
-}
