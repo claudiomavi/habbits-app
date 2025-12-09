@@ -83,7 +83,7 @@ export function GroupDetailTemplate({ groupId }) {
 							)
 						},
 					})}
-					initialRouteName="Ajustes"
+					initialRouteName="Hábitos"
 				>
 					<Tab.Screen
 						name="Hábitos"
@@ -106,11 +106,21 @@ export function GroupDetailTemplate({ groupId }) {
 	)
 }
 
+const { colors, typography, radii } = require('../../styles/theme')
+
 const styles = StyleSheet.create({
-	title: { fontSize: 20, fontWeight: '700', textAlign: 'center' },
-	subtitle: { fontSize: 12, color: '#6B7280' },
-	sectionTitle: { fontSize: 16, fontWeight: '700', marginBottom: 8 },
-	helper: { color: '#6B7280' },
+	title: {
+		fontSize: typography.size.xl,
+		fontFamily: typography.family.bold,
+		textAlign: 'center',
+	},
+	subtitle: { fontSize: typography.size.xs, color: colors.gray500 },
+	sectionTitle: {
+		fontSize: 16,
+		fontFamily: typography.family.bold,
+		marginBottom: 8,
+	},
+	helper: { color: colors.gray500 },
 	row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
 	input: {
 		borderWidth: 1,
@@ -122,7 +132,7 @@ const styles = StyleSheet.create({
 	},
 	actionBtn: { paddingHorizontal: 12, paddingVertical: 10, borderRadius: 8 },
 	primary: { backgroundColor: '#4F46E5' },
-	actionText: { color: '#fff', fontWeight: '700' },
+	actionText: { color: '#fff', fontFamily: typography.family.bold },
 	memberRow: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
@@ -131,5 +141,5 @@ const styles = StyleSheet.create({
 		borderRadius: 8,
 	},
 	memberName: { color: '#111827', fontWeight: '600' },
-	memberRole: { color: '#6B7280', fontWeight: '600' },
+	memberRole: { color: colors.gray500, fontWeight: '600' },
 })

@@ -47,14 +47,8 @@ export const getProfileByUserId = async (userId) => {
 	let { data, error } = await supabase
 		.from('profiles')
 		.select('*')
-		.eq('character_id', userId)
-		.maybeSingle()
-	if (!error && data) return data
-	;({ data, error } = await supabase
-		.from('profiles')
-		.select('*')
 		.eq('id_auth', userId)
-		.maybeSingle())
+		.maybeSingle()
 	if (error) throw error
 	return data
 }
