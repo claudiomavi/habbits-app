@@ -10,7 +10,18 @@ import {
 import { DifficultyBadge } from '../moleculas/DifficultyBadge'
 import { FrequencyBadge } from '../moleculas/FrequencyBadge'
 
-export function HabitCard({ habit, done, onToggle, streak, streakUnit }) {
+import { MaterialIcons } from '@expo/vector-icons'
+
+export function HabitCard({
+	habit,
+	done,
+	onToggle,
+	streak,
+	streakUnit,
+	canManage = false,
+	onEdit,
+	onDelete,
+}) {
 	const [titleLayout, setTitleLayout] = React.useState({ w: 0, h: 0 })
 	const checkedAnim = React.useRef(new Animated.Value(done ? 1 : 0)).current
 	const lineWidthAnim = React.useRef(new Animated.Value(done ? 0 : 0)).current
@@ -196,9 +207,45 @@ export function HabitCard({ habit, done, onToggle, streak, streakUnit }) {
 							<Text style={styles.habitMeta}>⏰ {habit.reminder_time}</Text>
 						)}
 
-						<View style={styles.badgesRow}>
-							<FrequencyBadge value={habit.frequency || 'daily'} />
-							<DifficultyBadge value={habit.difficulty || 1} />
+						<View style={styles.badgesRowWrap}>
+							<View style={styles.badgesRow}>
+								<FrequencyBadge value={habit.frequency || 'daily'} />
+								<DifficultyBadge value={habit.difficulty || 1} />
+							</View>
+							<View style={styles.badgesRow}>
+								{canManage && (
+									<View style={styles.actionsRow}>
+										<TouchableOpacity
+											style={[styles.iconBtn, styles.edit]}
+											onPress={(e) => {
+												e?.stopPropagation?.()
+												onEdit?.(habit)
+											}}
+											accessibilityLabel="Editar hábito"
+										>
+											<MaterialIcons
+												name="edit"
+												size={18}
+												color={colors.white}
+											/>
+										</TouchableOpacity>
+										<TouchableOpacity
+											style={[styles.iconBtn, styles.delete]}
+											onPress={(e) => {
+												e?.stopPropagation?.()
+												onDelete?.(habit)
+											}}
+											accessibilityLabel="Eliminar hábito"
+										>
+											<MaterialIcons
+												name="delete"
+												size={18}
+												color={colors.white}
+											/>
+										</TouchableOpacity>
+									</View>
+								)}
+							</View>
 						</View>
 					</View>
 				</View>
@@ -280,7 +327,16 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		marginTop: 2,
 	},
+	badgesRowWrap: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+	},
 	badgesRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+	actionsRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+	iconBtn: { paddingHorizontal: 8, paddingVertical: 6, borderRadius: radii.sm },
+	edit: { backgroundColor: colors.orange },
+	delete: { backgroundColor: colors.red },
 	streakPill: {
 		backgroundColor: colors.yellowBg,
 		marginTop: 4,

@@ -13,7 +13,6 @@ import {
 	useUsersStore,
 } from '../../autoBarrell'
 
-import { MaterialIcons } from '@expo/vector-icons'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import {
@@ -259,37 +258,14 @@ export function GroupHabitsTab({ route }) {
 					<HabitCard
 						habit={item}
 						done={done}
+						canManage={canManage}
+						onEdit={openEdit}
+						onDelete={onDelete}
 						onToggle={() =>
 							toggleMutation.mutate({ habit: item, desired: !done })
 						}
 					/>
 				</View>
-				{canManage && (
-					<View style={styles.actionsRow}>
-						<TouchableOpacity
-							style={[styles.iconBtn, styles.edit]}
-							onPress={() => openEdit(item)}
-							accessibilityLabel="Editar hábito"
-						>
-							<MaterialIcons
-								name="edit"
-								size={20}
-								color={colors.white}
-							/>
-						</TouchableOpacity>
-						<TouchableOpacity
-							style={[styles.iconBtn, styles.delete]}
-							onPress={() => onDelete(item)}
-							accessibilityLabel="Eliminar hábito"
-						>
-							<MaterialIcons
-								name="delete"
-								size={20}
-								color={colors.white}
-							/>
-						</TouchableOpacity>
-					</View>
-				)}
 			</View>
 		)
 	}
@@ -297,7 +273,6 @@ export function GroupHabitsTab({ route }) {
 	return (
 		<GradientBackground
 			style={{
-				flex: 1,
 				paddingTop: 0,
 				paddingBottom: 16,
 				paddingHorizontal: 16,
