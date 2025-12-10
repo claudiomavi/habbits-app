@@ -40,7 +40,14 @@ export function GroupDetailTemplate({ groupId }) {
 	}, [profile?.character_id, profile?.level, profile?.avatar])
 
 	const Title = (
-		<View style={{ padding: 16, backgroundColor: '#FFD3A1', gap: 32 }}>
+		<View
+			style={{
+				paddingTop: 16,
+				paddingHorizontal: 16,
+				backgroundColor: '#FFD3A1',
+				gap: 16,
+			}}
+		>
 			<HeaderBar
 				name={profile?.display_name}
 				initial={profile?.display_name}
@@ -48,7 +55,25 @@ export function GroupDetailTemplate({ groupId }) {
 				level={profile?.level ?? 1}
 				avatarUri={avatarUri}
 			/>
-			<Text style={styles.title}>Grupo: {groupName}</Text>
+			<View style={styles.groupHeader}>
+				<View style={styles.groupIconCircle}>
+					<Ionicons
+						name="people"
+						size={20}
+						color={colors.white}
+					/>
+				</View>
+				<View style={{ flex: 1 }}>
+					<Text style={styles.groupLabel}>GRUPO</Text>
+					<Text
+						style={styles.groupNameTitle}
+						numberOfLines={2}
+					>
+						{groupName}
+					</Text>
+					<View style={styles.groupAccent} />
+				</View>
+			</View>
 		</View>
 	)
 
@@ -109,10 +134,42 @@ export function GroupDetailTemplate({ groupId }) {
 const { colors, typography, radii } = require('../../styles/theme')
 
 const styles = StyleSheet.create({
-	title: {
-		fontSize: typography.size.xl,
+	groupHeader: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 12,
+	},
+	groupIconCircle: {
+		width: 36,
+		height: 36,
+		borderRadius: 18,
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: colors.orange,
+		shadowColor: 'rgba(0,0,0,0.2)',
+		shadowOpacity: 0.2,
+		shadowRadius: 4,
+		shadowOffset: { width: 0, height: 2 },
+		elevation: 2,
+	},
+	groupLabel: {
+		fontSize: typography.size.xs,
 		fontFamily: typography.family.bold,
-		textAlign: 'center',
+		letterSpacing: 1.5,
+		color: colors.gray600,
+	},
+	groupNameTitle: {
+		fontSize: typography.size.h2,
+		fontFamily: typography.family.extrabold,
+		color: colors.black,
+		marginTop: -2,
+	},
+	groupAccent: {
+		marginTop: 6,
+		width: 42,
+		height: 3,
+		backgroundColor: colors.orange,
+		borderRadius: radii.full,
 	},
 	subtitle: { fontSize: typography.size.xs, color: colors.gray500 },
 	sectionTitle: {
