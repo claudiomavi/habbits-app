@@ -60,7 +60,7 @@ export function GroupLeaderboardTab({ route }) {
 						style={styles.level}
 						numberOfLines={1}
 					>
-						{item.level ? `Nivel ${item.level}` : ' '}
+						{item.level ? `Nivel ${item.level}` : '0'}
 					</Text>
 				</View>
 				<Text style={styles.xp}>{item.xp} XP</Text>
@@ -107,7 +107,13 @@ const styles = StyleSheet.create({
 		paddingVertical: 8,
 	},
 	pos: { width: 24, textAlign: 'center', color: colors.gray600 },
-	middle: { flex: 1, justifyContent: 'center' },
+	middle: {
+		flex: 1,
+		flexDirection: 'row',
+
+		alignItems: 'center',
+		gap: 8,
+	},
 	name: {
 		fontFamily: typography.family.semibold,
 		color: colors.black,
