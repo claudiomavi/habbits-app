@@ -2,13 +2,13 @@ import {
 	CardContainer,
 	createHabit,
 	deleteHabit,
-	getGroupProgressForDate,
+	getProgressForDate,
 	getHabitsByGroup,
 	GradientBackground,
 	HabitCard,
 	HabitModal,
 	listGroupMembers,
-	upsertGroupProgress,
+	upsertProgress,
 	useAuthStore,
 	useUsersStore,
 } from '../../autoBarrell'
@@ -74,9 +74,11 @@ export function GroupHabitsTab({ route }) {
 	})
 
 	const { data: progress = [], isLoading: progressLoading } = useQuery({
-		queryKey: ['group_progress', groupId, user?.id, todayISO],
-		queryFn: () => getGroupProgressForDate(groupId, user?.id, todayISO),
-		enabled: !!groupId && !!user?.id,
+		queryKey: ['progress', user?.id, todayISO],
+		queryFn: () => getProgressForDate(user?.id, todayISO),
+		enabled: !!user?.id,
+		staleTime: 30_000,
+		gcTime: 5 * 60_000,
 	})
 
 	const progressMap = useMemo(() => {
@@ -173,10 +175,9 @@ export function GroupHabitsTab({ route }) {
 	const toggleMutation = useMutation({
 		onMutate: async ({ habit, desired }) => {
 			await qc.cancelQueries({
-				queryKey: ['group_progress', groupId, user?.id, todayISO],
+				queryKey: ['progress', user?.id, todayISO],
 			})
-			const previous =
-				qc.getQueryData(['group_progress', groupId, user?.id, todayISO]) || []
+			const previous = qc.getQueryData(['progress', user?.id, todayISO]) || []
 			const cached = Array.isArray(previous) ? previous : []
 			const existing = cached.find((p) => p.habit_id === habit.id)
 			const newCompleted =
@@ -208,7 +209,7 @@ export function GroupHabitsTab({ route }) {
 				}
 				return copy
 			})()
-			qc.setQueryData(['group_progress', groupId, user?.id, todayISO], next)
+			qc.setQueryData(['progress', user?.id, todayISO], next)
 			try {
 				optimisticUpdateXp(deltaXp)
 			} catch {}
@@ -216,8 +217,7 @@ export function GroupHabitsTab({ route }) {
 		},
 		mutationFn: async ({ habit, desired }) => {
 			// servidor
-			const cached =
-				qc.getQueryData(['group_progress', groupId, user?.id, todayISO]) || []
+			const cached = qc.getQueryData(['progress', user?.id, todayISO]) || []
 			const existing = Array.isArray(cached)
 				? cached.find((p) => p.habit_id === habit.id)
 				: undefined
@@ -225,9 +225,8 @@ export function GroupHabitsTab({ route }) {
 				typeof desired === 'boolean' ? desired : !(existing?.completed ?? false)
 			const baseXP = 10
 			const earned = baseXP * (habit.difficulty || 1)
-			const res = await upsertGroupProgress({
+			const res = await upsertProgress({
 				habit_id: habit.id,
-				group_id: groupId,
 				user_id: user?.id,
 				dateISO: todayISO,
 				completed: newCompleted,
@@ -238,10 +237,7 @@ export function GroupHabitsTab({ route }) {
 		},
 		onError: (_e, _vars, ctx) => {
 			if (ctx?.previous)
-				qc.setQueryData(
-					['group_progress', groupId, user?.id, todayISO],
-					ctx.previous
-				)
+				qc.setQueryData(['progress', user?.id, todayISO], ctx.previous)
 		},
 		onSettled: () => {
 			qc.invalidateQueries({
