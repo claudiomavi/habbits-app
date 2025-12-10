@@ -1,6 +1,16 @@
 import { useEffect, useState } from 'react'
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native'
-import { CardContainer, GradientBackground, listGroupMembers } from '../../autoBarrell'
+import {
+	ActivityIndicator,
+	FlatList,
+	StyleSheet,
+	Text,
+	View,
+} from 'react-native'
+import {
+	CardContainer,
+	GradientBackground,
+	listGroupMembers,
+} from '../../autoBarrell'
 
 export function GroupLeaderboardTab({ route }) {
 	const { groupId } = route.params || {}
@@ -38,13 +48,19 @@ export function GroupLeaderboardTab({ route }) {
 		return (
 			<View style={styles.row}>
 				<Text style={styles.pos}>{index + 1}</Text>
-				<View style={{ flex: 1 }}>
-					<Text style={styles.name} numberOfLines={1}>
+				<View style={styles.middle}>
+					<Text
+						style={styles.name}
+						numberOfLines={1}
+					>
 						{item.name}
 						{item.iamOwner ? ' (owner)' : ''}
 					</Text>
-					<Text style={styles.level} numberOfLines={1}>
-						{item.level ? `Nivel ${item.level}` : ' '} 
+					<Text
+						style={styles.level}
+						numberOfLines={1}
+					>
+						{item.level ? `Nivel ${item.level}` : ' '}
 					</Text>
 				</View>
 				<Text style={styles.xp}>{item.xp} XP</Text>
@@ -57,7 +73,9 @@ export function GroupLeaderboardTab({ route }) {
 			<CardContainer>
 				<Text style={styles.title}>Clasificación</Text>
 				{loading ? (
-					<View style={styles.loading}><ActivityIndicator /></View>
+					<View style={styles.loading}>
+						<ActivityIndicator />
+					</View>
 				) : (
 					<FlatList
 						data={members}
@@ -65,7 +83,9 @@ export function GroupLeaderboardTab({ route }) {
 						renderItem={renderItem}
 						ItemSeparatorComponent={() => <View style={styles.sep} />}
 						ListEmptyComponent={() => (
-							<View style={styles.empty}><Text style={styles.helper}>No hay miembros aún</Text></View>
+							<View style={styles.empty}>
+								<Text style={styles.helper}>No hay miembros aún</Text>
+							</View>
 						)}
 					/>
 				)}
@@ -79,11 +99,30 @@ const styles = StyleSheet.create({
 	title: { fontFamily: typography.family.bold, fontSize: typography.size.md },
 	helper: { color: colors.gray500 },
 	loading: { paddingVertical: 16 },
-	row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 },
+	row: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'center',
+		gap: 12,
+		paddingVertical: 8,
+	},
 	pos: { width: 24, textAlign: 'center', color: colors.gray600 },
-	name: { fontFamily: typography.family.semibold, color: colors.black },
-	level: { color: colors.gray500, fontSize: typography.size.xs },
-	xp: { fontFamily: typography.family.bold, color: colors.black },
+	middle: { flex: 1, justifyContent: 'center' },
+	name: {
+		fontFamily: typography.family.semibold,
+		color: colors.black,
+	},
+	level: {
+		color: colors.gray500,
+		fontSize: typography.size.xs,
+		textAlign: 'center',
+	},
+	xp: {
+		fontFamily: typography.family.bold,
+		color: colors.black,
+		textAlign: 'right',
+		minWidth: 60,
+	},
 	sep: { height: 1, backgroundColor: colors.gray200, marginVertical: 4 },
 	empty: { paddingVertical: 12 },
 })
