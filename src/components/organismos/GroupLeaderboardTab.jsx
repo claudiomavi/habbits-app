@@ -45,25 +45,25 @@ export function GroupLeaderboardTab({ route }) {
 	}, [groupId])
 
 	const renderItem = ({ item, index }) => {
+		const isTop = index < 3
+		const rowStyle = [
+			styles.row,
+			isTop && (index === 0 ? styles.podium0 : index === 1 ? styles.podium1 : styles.podium2),
+		]
+		const posContent = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}`
 		return (
-			<View style={styles.row}>
-				<Text style={styles.pos}>{index + 1}</Text>
+			<View style={rowStyle}>
+				<Text style={[styles.pos, isTop && styles.posTop]}>{posContent}</Text>
 				<View style={styles.middle}>
-					<Text
-						style={styles.name}
-						numberOfLines={1}
-					>
-						{item.name}
+					<Text style={[styles.name, isTop && styles.nameTop]} numberOfLines={1}>
+						{index === 0 ? '👑 ' : ''}{item.name}
 						{item.iamOwner ? ' (owner)' : ''}
 					</Text>
-					<Text
-						style={styles.level}
-						numberOfLines={1}
-					>
+					<Text style={[styles.level, isTop && styles.levelTop]} numberOfLines={1}>
 						{item.level ? `Nivel ${item.level}` : '0'}
 					</Text>
 				</View>
-				<Text style={styles.xp}>{item.xp} XP</Text>
+				<Text style={[styles.xp, isTop && styles.xpTop]}>{item.xp} XP</Text>
 			</View>
 		)
 	}
@@ -104,9 +104,11 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		gap: 12,
-		paddingVertical: 8,
+		paddingVertical: 10,
+		borderRadius: 12,
 	},
-	pos: { width: 24, textAlign: 'center', color: colors.gray600 },
+	pos: { width: 30, textAlign: 'center', color: colors.gray600 },
+	posTop: { fontSize: typography.size.lg },
 	middle: {
 		flex: 1,
 		flexDirection: 'row',
