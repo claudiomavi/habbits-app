@@ -38,6 +38,18 @@ export async function deleteHabit(id) {
 	if (error) throw error
 }
 
+// Group habits
+export async function getHabitsByGroup(group_id) {
+	if (!group_id) return []
+	const { data, error } = await supabase
+		.from('habits')
+		.select('*')
+		.eq('group_id', group_id)
+		.order('created_at', { ascending: true })
+	if (error) throw error
+	return data || []
+}
+
 // Progress (actor = id_auth)
 export async function getProgressForDate(user_id, dateISO) {
 	if (!user_id || !dateISO) return []
@@ -67,6 +79,20 @@ export async function getProgressHistoryForHabit(
 		.lte('date', untilISO)
 		.order('date', { ascending: false })
 		.limit(limit)
+	if (error) throw error
+	return data || []
+}
+
+export async function getGroupProgressForDate(group_id, user_id, dateISO) {
+	if (!group_id || !user_id || !dateISO) return []
+	const { data, error } = await supabase
+		.from('progress_entries')
+		.select('*')
+		.eq('group_id', group_id)
+		.eq('user_id', user_id)
+		.eq('date', dateISO)
+		.order('created_at', { ascending: true })
+		.order('id', { ascending: true })
 	if (error) throw error
 	return data || []
 }
@@ -139,6 +165,62 @@ export async function upsertProgress({
 		if (ids.length) {
 			await supabase.from('progress_entries').delete().in('id', ids)
 		}
+	} catch (e) {
+		console.warn('dupe clean failed', e)
+	}
+	return updated
+}
+
+export async function upsertGroupProgress({
+	habit_id,
+	group_id,
+	user_id,
+	dateISO,
+	completed,
+	xp_awarded = 0,
+	client_awarded = null,
+}) {
+	if (!habit_id || !group_id || !user_id || !dateISO)
+		throw new Error('Missing fields for upsertGroupProgress')
+	// 1) Look for existing entry for (group, user, habit, date)
+	const { data: existing, error: findErr } = await supabase
+		.from('progress_entries')
+		.select('*')
+		.eq('group_id', group_id)
+		.eq('habit_id', habit_id)
+		.eq('user_id', user_id)
+		.eq('date', dateISO)
+		.maybeSingle()
+	if (findErr) throw findErr
+	let updated = null
+	if (existing) {
+		const { data, error } = await supabase
+			.from('progress_entries')
+			.update({ completed, xp_awarded })
+			.eq('id', existing.id)
+			.select()
+			.single()
+		if (error) throw error
+		updated = { ...data, xp_delta: Math.round((completed ? 1 : -1) * xp_awarded) }
+	} else {
+		const { data, error } = await supabase
+			.from('progress_entries')
+			.insert({ habit_id, group_id, user_id, date: dateISO, completed: true, xp_awarded })
+			.select()
+			.single()
+		if (error) throw error
+		updated = { ...data, xp_delta: Math.round(xp_awarded) }
+	}
+	try {
+		const { data: dupes } = await supabase
+			.from('progress_entries')
+			.select('id')
+			.eq('group_id', group_id)
+			.eq('habit_id', habit_id)
+			.eq('user_id', user_id)
+			.eq('date', dateISO)
+		const ids = (dupes || []).map((d) => d.id).filter((id) => id !== updated.id)
+		if (ids.length) await supabase.from('progress_entries').delete().in('id', ids)
 	} catch (e) {
 		console.warn('dupe clean failed', e)
 	}
