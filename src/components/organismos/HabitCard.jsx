@@ -8,6 +8,7 @@ import {
 	View,
 } from 'react-native'
 import { DifficultyBadge } from '../moleculas/DifficultyBadge'
+import { FrequencyBadge } from '../moleculas/FrequencyBadge'
 
 export function HabitCard({ habit, done, onToggle, streak, streakUnit }) {
 	const [titleLayout, setTitleLayout] = React.useState({ w: 0, h: 0 })
@@ -195,7 +196,10 @@ export function HabitCard({ habit, done, onToggle, streak, streakUnit }) {
 							<Text style={styles.habitMeta}>⏰ {habit.reminder_time}</Text>
 						)}
 
-						<DifficultyBadge value={habit.difficulty || 1} />
+						<View style={styles.badgesRow}>
+							<FrequencyBadge value={habit.frequency || 'daily'} />
+							<DifficultyBadge value={habit.difficulty || 1} />
+						</View>
 					</View>
 				</View>
 			</TouchableOpacity>
@@ -274,7 +278,9 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
+		marginTop: 2,
 	},
+	badgesRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
 	streakPill: {
 		backgroundColor: colors.yellowBg,
 		marginTop: 4,
