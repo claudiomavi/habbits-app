@@ -117,9 +117,7 @@ export function CooperativeTemplate() {
 			>
 				<CardContainer>
 					<Text style={styles.title}>Modo cooperativo</Text>
-					<Text style={styles.subtitle}>
-						Invitaciones y gestión básica de grupos (Día 2).
-					</Text>
+					<Text style={styles.subtitle}>Reta a tus amigos 🔥</Text>
 
 					{/* Notificaciones */}
 					<View style={styles.section}>
