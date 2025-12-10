@@ -10,9 +10,12 @@ import {
 	CardContainer,
 	GradientBackground,
 	listGroupMembers,
+	useAuthStore,
 } from '../../autoBarrell'
 
 export function GroupLeaderboardTab({ route }) {
+	const me = useAuthStore((s) => s.user)
+	const myId = me?.id
 	const { groupId } = route.params || {}
 	const [loading, setLoading] = useState(false)
 	const [members, setMembers] = useState([])
@@ -46,20 +49,41 @@ export function GroupLeaderboardTab({ route }) {
 
 	const renderItem = ({ item, index }) => {
 		const isTop = index < 3
+		const isMe = item.id === myId
 		const rowStyle = [
 			styles.row,
-			isTop && (index === 0 ? styles.podium0 : index === 1 ? styles.podium1 : styles.podium2),
+			isTop &&
+				(index === 0
+					? styles.podium0
+					: index === 1
+					? styles.podium1
+					: styles.podium2),
+			isMe && styles.meRow,
 		]
-		const posContent = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}`
+		const posContent =
+			index === 0
+				? '🥇'
+				: index === 1
+				? '🥈'
+				: index === 2
+				? '🥉'
+				: `${index + 1}`
 		return (
 			<View style={rowStyle}>
 				<Text style={[styles.pos, isTop && styles.posTop]}>{posContent}</Text>
 				<View style={styles.middle}>
-					<Text style={[styles.name, isTop && styles.nameTop]} numberOfLines={1}>
-						{index === 0 ? '👑 ' : ''}{item.name}
+					<Text
+						style={[styles.name, isTop && styles.nameTop]}
+						numberOfLines={1}
+					>
+						{index === 0 ? '👑 ' : ''}
+						{item.name}
 						{item.iamOwner ? ' (owner)' : ''}
 					</Text>
-					<Text style={[styles.level, isTop && styles.levelTop]} numberOfLines={1}>
+					<Text
+						style={[styles.level, isTop && styles.levelTop]}
+						numberOfLines={1}
+					>
 						{item.level ? `Nivel ${item.level}` : '0'}
 					</Text>
 				</View>
@@ -104,7 +128,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		gap: 12,
-		paddingVertical: 10,
+		padding: 10,
 		borderRadius: 12,
 	},
 	pos: { width: 30, textAlign: 'center', color: colors.gray600 },
@@ -112,13 +136,17 @@ const styles = StyleSheet.create({
 	middle: {
 		flex: 1,
 		flexDirection: 'row',
-
 		alignItems: 'center',
 		gap: 8,
 	},
 	name: {
 		fontFamily: typography.family.semibold,
 		color: colors.black,
+	},
+	meRow: {
+		borderWidth: 1,
+		borderColor: colors.yellow,
+		backgroundColor: colors.yellowBg,
 	},
 	level: {
 		color: colors.gray500,
