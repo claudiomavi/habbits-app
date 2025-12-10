@@ -77,6 +77,8 @@ export async function listGroupMembers(group_id) {
 					display_name: row.display_name ?? null,
 					email: row.email ?? null,
 					avatar: row.avatar ?? null,
+					xp: row.xp ?? 0,
+					level: row.level ?? null,
 				},
 			}))
 			const keyFor = (m) =>
@@ -125,7 +127,7 @@ export async function listGroupMembers(group_id) {
 	if (userIds.length) {
 		const { data: profs, error: eProfiles } = await supabase
 			.from('profiles')
-			.select('id, id_auth, display_name, email, avatar')
+			.select('id, id_auth, display_name, email, avatar, xp, level')
 			.in('id_auth', userIds)
 		if (eProfiles) throw eProfiles
 		profilesByAuth = new Map((profs || []).map((p) => [p.id_auth, p]))
