@@ -295,7 +295,14 @@ export function GroupHabitsTab({ route }) {
 	}
 
 	return (
-		<GradientBackground style={{ flex: 1, padding: 16 }}>
+		<GradientBackground
+			style={{
+				flex: 1,
+				paddingTop: 0,
+				paddingBottom: 16,
+				paddingHorizontal: 16,
+			}}
+		>
 			<CardContainer>
 				<View style={styles.headerRowCentered}>
 					<Text style={styles.title}>Hábitos del grupo (máx. 5)</Text>
