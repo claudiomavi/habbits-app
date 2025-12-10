@@ -207,7 +207,7 @@ export function HabitCard({
 							<Text style={styles.habitMeta}>⏰ {habit.reminder_time}</Text>
 						)}
 
-						<View style={styles.badgesRowWrap}>
+						<View style={styles.badgesActionsRow}>
 							<View style={styles.badgesRow}>
 								<FrequencyBadge value={habit.frequency || 'daily'} />
 								<DifficultyBadge value={habit.difficulty || 1} />
@@ -324,14 +324,16 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		flexDirection: 'row',
 		alignItems: 'center',
-		justifyContent: 'space-between',
 		marginTop: 2,
 	},
-	badgesRowWrap: {
+	badgesActionsRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
+		width: '100%',
+		marginTop: 2,
 	},
+	secondLeft: { flexDirection: 'row', alignItems: 'center' },
 	badgesRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
 	actionsRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
 	iconBtn: { paddingHorizontal: 8, paddingVertical: 6, borderRadius: radii.sm },

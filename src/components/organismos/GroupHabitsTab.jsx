@@ -40,7 +40,7 @@ export function GroupHabitsTab({ route }) {
 		day_of_month: 1,
 	})
 	const [editing, setEditing] = useState(null)
-	const [myRole, setMyRole] = useState(null)
+	const [myRole, setMyRole] = useState(false)
 
 	useEffect(() => {
 		let mounted = true
