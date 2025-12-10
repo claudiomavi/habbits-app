@@ -1,14 +1,10 @@
-import { StyleSheet, Text, View } from 'react-native'
-import { CardContainer, GradientBackground } from '../../autoBarrell'
-
-import { useEffect, useMemo, useState } from 'react'
-import { Alert, ActivityIndicator, FlatList, TouchableOpacity } from 'react-native'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
+	CardContainer,
 	createHabit,
 	deleteHabit,
-	getHabitsByGroup,
 	getGroupProgressForDate,
+	getHabitsByGroup,
+	GradientBackground,
 	HabitCard,
 	HabitModal,
 	listGroupMembers,
@@ -16,6 +12,19 @@ import {
 	useAuthStore,
 	useUsersStore,
 } from '../../autoBarrell'
+
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useEffect, useMemo, useState } from 'react'
+import {
+	ActivityIndicator,
+	Alert,
+	FlatList,
+	StyleSheet,
+	Text,
+	TouchableOpacity,
+	View,
+} from 'react-native'
+import { MaterialIcons } from '@expo/vector-icons'
 
 export function GroupHabitsTab({ route }) {
 	const { groupId } = route.params || {}
@@ -79,7 +88,13 @@ export function GroupHabitsTab({ route }) {
 
 	const openCreate = () => {
 		setEditing(null)
-		setForm({ title: '', difficulty: 1, frequency: 'daily', days_of_week: [], day_of_month: 1 })
+		setForm({
+			title: '',
+			difficulty: 1,
+			frequency: 'daily',
+			days_of_week: [],
+			day_of_month: 1,
+		})
 		if ((habits || []).length >= 5) {
 			Alert.alert('Límite alcanzado', 'Máximo 5 hábitos por grupo')
 			return
@@ -128,7 +143,9 @@ export function GroupHabitsTab({ route }) {
 					frequency: form.frequency,
 					days_of_week: form.frequency === 'weekly' ? form.days_of_week : null,
 					day_of_month:
-						form.frequency === 'monthly' ? Number(form.day_of_month) || 1 : null,
+						form.frequency === 'monthly'
+							? Number(form.day_of_month) || 1
+							: null,
 				})
 			} else {
 				if ((habits || []).length >= 5)
@@ -138,7 +155,10 @@ export function GroupHabitsTab({ route }) {
 					difficulty: Number(form.difficulty) || 1,
 					frequency: form.frequency,
 					days_of_week: form.frequency === 'weekly' ? form.days_of_week : null,
-					day_of_month: form.frequency === 'monthly' ? Number(form.day_of_month) || 1 : null,
+					day_of_month:
+						form.frequency === 'monthly'
+							? Number(form.day_of_month) || 1
+							: null,
 					group_id: groupId,
 					created_by: user?.id,
 				})
@@ -153,7 +173,9 @@ export function GroupHabitsTab({ route }) {
 
 	const toggleMutation = useMutation({
 		onMutate: async ({ habit, desired }) => {
-			await qc.cancelQueries({ queryKey: ['group_progress', groupId, user?.id, todayISO] })
+			await qc.cancelQueries({
+				queryKey: ['group_progress', groupId, user?.id, todayISO],
+			})
 			const previous =
 				qc.getQueryData(['group_progress', groupId, user?.id, todayISO]) || []
 			const cached = Array.isArray(previous) ? previous : []
@@ -162,7 +184,9 @@ export function GroupHabitsTab({ route }) {
 				typeof desired === 'boolean' ? desired : !(existing?.completed ?? false)
 			const baseXP = 10
 			const earned = baseXP * (habit.difficulty || 1)
-			const deltaXp = newCompleted ? Math.round(earned) : -(existing?.xp_awarded || 0)
+			const deltaXp = newCompleted
+				? Math.round(earned)
+				: -(existing?.xp_awarded || 0)
 			const next = (() => {
 				const copy = [...cached]
 				const idx = copy.findIndex((p) => p.habit_id === habit.id)
@@ -215,10 +239,15 @@ export function GroupHabitsTab({ route }) {
 		},
 		onError: (_e, _vars, ctx) => {
 			if (ctx?.previous)
-				qc.setQueryData(['group_progress', groupId, user?.id, todayISO], ctx.previous)
+				qc.setQueryData(
+					['group_progress', groupId, user?.id, todayISO],
+					ctx.previous
+				)
 		},
 		onSettled: () => {
-			qc.invalidateQueries({ queryKey: ['group_progress', groupId, user?.id, todayISO] })
+			qc.invalidateQueries({
+				queryKey: ['group_progress', groupId, user?.id, todayISO],
+			})
 		},
 	})
 
@@ -227,17 +256,31 @@ export function GroupHabitsTab({ route }) {
 		return (
 			<View style={styles.row}>
 				<View style={{ flex: 1 }}>
-					<HabitCard habit={item} done={done} onToggle={() => toggleMutation.mutate({ habit: item, desired: !done })} />
+					<HabitCard
+						habit={item}
+						done={done}
+						onToggle={() =>
+							toggleMutation.mutate({ habit: item, desired: !done })
+						}
+					/>
 				</View>
 				{canManage && (
-					<>
-						<TouchableOpacity style={[styles.actionBtn, styles.edit]} onPress={() => openEdit(item)}>
-							<Text style={styles.actionText}>Editar</Text>
+					<View style={styles.actionsRow}>
+						<TouchableOpacity
+							style={[styles.iconBtn, styles.edit]}
+							onPress={() => openEdit(item)}
+							accessibilityLabel="Editar hábito"
+						>
+							<MaterialIcons name="edit" size={20} color={colors.white} />
 						</TouchableOpacity>
-						<TouchableOpacity style={[styles.actionBtn, styles.delete]} onPress={() => onDelete(item)}>
-							<Text style={styles.actionText}>Borrar</Text>
+						<TouchableOpacity
+							style={[styles.iconBtn, styles.delete]}
+							onPress={() => onDelete(item)}
+							accessibilityLabel="Eliminar hábito"
+						>
+							<MaterialIcons name="delete" size={20} color={colors.white} />
 						</TouchableOpacity>
-					</>
+					</View>
 				)}
 			</View>
 		)
@@ -258,7 +301,11 @@ export function GroupHabitsTab({ route }) {
 						data={habits}
 						keyExtractor={(item) => item.id}
 						renderItem={renderRow}
-						contentContainerStyle={{ gap: 12, paddingVertical: 8, paddingHorizontal: 4 }}
+						contentContainerStyle={{
+							gap: 12,
+							paddingVertical: 8,
+							paddingHorizontal: 4,
+						}}
 					/>
 				) : (
 					<View style={[styles.center, { paddingVertical: 32 }]}>
@@ -297,8 +344,16 @@ export function GroupHabitsTab({ route }) {
 
 const { colors, typography, radii } = require('../../styles/theme')
 const styles = StyleSheet.create({
-	headerRowCentered: { alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
-	title: { fontFamily: typography.family.bold, fontSize: typography.size.xl, color: colors.gray800 },
+	headerRowCentered: {
+		alignItems: 'center',
+		justifyContent: 'center',
+		marginBottom: 8,
+	},
+	title: {
+		fontFamily: typography.family.bold,
+		fontSize: typography.size.xl,
+		color: colors.gray800,
+	},
 	helper: { color: colors.gray500 },
 	center: { alignItems: 'center', justifyContent: 'center' },
 	row: {
@@ -311,10 +366,10 @@ const styles = StyleSheet.create({
 		padding: 12,
 		gap: 12,
 	},
-	actionBtn: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: radii.sm },
+	actionsRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+	iconBtn: { paddingHorizontal: 8, paddingVertical: 6, borderRadius: radii.sm },
 	edit: { backgroundColor: colors.orange },
 	delete: { backgroundColor: colors.red },
-	actionText: { color: colors.white, fontFamily: typography.family.bold },
 	fab: {
 		position: 'absolute',
 		right: 24,
@@ -327,7 +382,15 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		elevation: 3,
 	},
-	fabText: { color: colors.white, fontSize: typography.size.h1, fontFamily: typography.family.semibold },
-	emptyTitle: { fontSize: typography.size.md, fontFamily: typography.family.bold, color: colors.black },
+	fabText: {
+		color: colors.white,
+		fontSize: typography.size.h1,
+		fontFamily: typography.family.semibold,
+	},
+	emptyTitle: {
+		fontSize: typography.size.md,
+		fontFamily: typography.family.bold,
+		color: colors.black,
+	},
 	emptyText: { fontSize: typography.size.xs, color: colors.gray500 },
 })
