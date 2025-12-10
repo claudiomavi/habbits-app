@@ -11,7 +11,7 @@
 
 - [ ] Notificaciones locales (recordatorios por hábito).
 
-- [ ] Cooperativo: grupos cerrados por invitación/enlace; lista común de hábitos para el grupo.
+- [x] Cooperativo: grupos cerrados por invitación/enlace; lista común de hábitos para el grupo.
 
 - [x] Exportar/visualizar progreso básico (pantalla de estadísticas).
 
