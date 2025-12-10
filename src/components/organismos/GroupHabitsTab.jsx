@@ -13,6 +13,7 @@ import {
 	useUsersStore,
 } from '../../autoBarrell'
 
+import { MaterialIcons } from '@expo/vector-icons'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import {
@@ -24,7 +25,6 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native'
-import { MaterialIcons } from '@expo/vector-icons'
 
 export function GroupHabitsTab({ route }) {
 	const { groupId } = route.params || {}
@@ -271,14 +271,22 @@ export function GroupHabitsTab({ route }) {
 							onPress={() => openEdit(item)}
 							accessibilityLabel="Editar hábito"
 						>
-							<MaterialIcons name="edit" size={20} color={colors.white} />
+							<MaterialIcons
+								name="edit"
+								size={20}
+								color={colors.white}
+							/>
 						</TouchableOpacity>
 						<TouchableOpacity
 							style={[styles.iconBtn, styles.delete]}
 							onPress={() => onDelete(item)}
 							accessibilityLabel="Eliminar hábito"
 						>
-							<MaterialIcons name="delete" size={20} color={colors.white} />
+							<MaterialIcons
+								name="delete"
+								size={20}
+								color={colors.white}
+							/>
 						</TouchableOpacity>
 					</View>
 				)}
@@ -359,12 +367,7 @@ const styles = StyleSheet.create({
 	row: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: colors.gray50,
-		borderWidth: 2,
-		borderColor: colors.gray200,
-		borderRadius: radii.lg,
-		padding: 12,
-		gap: 12,
+		gap: 8,
 	},
 	actionsRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
 	iconBtn: { paddingHorizontal: 8, paddingVertical: 6, borderRadius: radii.sm },
