@@ -3,11 +3,6 @@
 - [ ] Registro / Login (email+verificación + Google/Apple).
 
   - [ ] Falta Google/Apple
-  - [ ] Falta la forgotPassword
-    - [ ] Implementar una página web estática con supabase
-    - [ ] js que reciba los tokens y permita establecer la nueva contraseña.
-    - [ ] Publicarla en Netlify/Vercel y añadir la URL como Redirect en Supabase.
-    - [ ] Crear ForgotPassword para enviar a esa URL.
 
 - [x] Notificaciones locales (recordatorios por hábito).
 

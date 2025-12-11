@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { supabase } from '../autoBarrell'
 
-export const useAuthStore = create((set) => ({
+export const useAuthStore = create((set, get) => ({
 	user: null,
 	session: null,
 	loading: true,
@@ -49,5 +49,40 @@ export const useAuthStore = create((set) => ({
 	signOut: async () => {
 		await supabase?.auth.signOut()
 		set({ session: null, user: null })
+	},
+	// Forgot password: send reset link
+	resetPasswordForEmail: async (email) => {
+		const LinkingExpo = require('expo-linking')
+		const Constants = require('expo-constants').default
+		// In Expo Go use exp://..., in production builds use the custom scheme
+		const redirectTo = Constants?.appOwnership === 'expo'
+			? LinkingExpo.createURL('reset-password')
+			: 'habbitsapp://reset-password'
+		const { data, error } = await supabase?.auth.resetPasswordForEmail(email, { redirectTo })
+		if (error) throw error
+		return data
+	},
+
+	// Handle deep link code -> session
+	exchangeCodeForSession: async (code) => {
+		const { data, error } = await supabase?.auth.exchangeCodeForSession({ code })
+		if (error) throw error
+		set({ session: data?.session ?? null, user: data?.user ?? null })
+		return data
+	},
+
+	// Alternative tokens flow
+	setSessionFromTokens: async (access_token, refresh_token) => {
+		const { data, error } = await supabase?.auth.setSession({ access_token, refresh_token })
+		if (error) throw error
+		set({ session: data?.session ?? null, user: data?.user ?? null })
+		return data
+	},
+
+	// Update password after recovery
+	updatePassword: async (newPassword) => {
+		const { data, error } = await supabase?.auth.updateUser({ password: newPassword })
+		if (error) throw error
+		return data
 	},
 }))

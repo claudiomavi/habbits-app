@@ -67,6 +67,13 @@ export function LoginTemplate({
 				/>
 			</View>
 
+			{/* Enlace Olvidé mi contraseña */}
+			<View style={{ alignItems: 'flex-end', marginTop: 4 }}>
+				<TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+					<Text style={{ color: require('../../styles/theme').colors.lightBlue }}>¿Olvidaste tu contraseña?</Text>
+				</TouchableOpacity>
+			</View>
+
 			{/* Botón principal */}
 			<TouchableOpacity
 				onPress={handleSubmit(onSubmit)}

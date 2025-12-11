@@ -21,14 +21,10 @@ export function AppRouter() {
 			/>
 
 			{/* Pantallas de auth */}
-			<Stack.Screen
-				name="Login"
-				component={Login}
-			/>
-			<Stack.Screen
-				name="Register"
-				component={Register}
-			/>
+			<Stack.Screen name="Login" component={Login} />
+			<Stack.Screen name="Register" component={Register} />
+			<Stack.Screen name="ForgotPassword" component={require('../pages/ForgotPassword').ForgotPassword} />
+			<Stack.Screen name="ResetPassword" component={require('../pages/ResetPassword').ResetPassword} />
 
 			{/* Pantalla para crear perfil */}
 			<Stack.Screen

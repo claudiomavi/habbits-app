@@ -19,9 +19,18 @@ export default function App() {
 			<QueryClientProvider client={queryClient}>
 				{(() => {
 					const FontsProvider = require('./src/styles/FontsProvider').default
+					const LinkingExpo = require('expo-linking')
+					const linking = {
+						prefixes: [LinkingExpo.createURL('/'), 'habbitsapp://'],
+						config: {
+							screens: {
+								ResetPassword: 'reset-password',
+							},
+						},
+					}
 					return (
 						<FontsProvider>
-							<NavigationContainer>
+							<NavigationContainer linking={linking}>
 								<AppRouter />
 							</NavigationContainer>
 						</FontsProvider>
