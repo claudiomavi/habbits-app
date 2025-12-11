@@ -272,7 +272,7 @@ export function ProfileTemplate({
 			<CardContainer marginTop={12}>
 				<View style={{ gap: 12 }}>
 					<Text style={styles.sectionTitle}>Recordatorios diarios</Text>
-					<View style={styles.rowBetween}>
+					<View style={styles.rowNotif}>
 						<Text style={styles.label}>Activar notificaciones</Text>
 						<FancySwitch
 							value={!!notificationProps?.enabled}
@@ -281,13 +281,17 @@ export function ProfileTemplate({
 					</View>
 					<View
 						style={[
-							styles.rowBetween,
+							styles.rowHour,
 							{ opacity: notificationProps?.enabled ? 1 : 0.5 },
 						]}
 					>
-						<Text style={styles.label}>Hora del día</Text>
 						<View
-							style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
+							style={{
+								flexDirection: 'row',
+								alignItems: 'center',
+								justifyContent: 'center',
+								gap: 8,
+							}}
 						>
 							<NumberPill
 								value={pad2(notificationProps?.hour ?? 9)}
@@ -387,9 +391,14 @@ const styles = StyleSheet.create({
 		marginTop: 8,
 		fontFamily: typography.family.bold,
 	},
-	rowBetween: {
+	rowNotif: {
 		flexDirection: 'row',
-		justifyContent: 'space-between',
+		justifyContent: 'space-around',
+		alignItems: 'center',
+	},
+	rowHour: {
+		flexDirection: 'row',
+		justifyContent: 'center',
 		alignItems: 'center',
 	},
 	hourColon: {

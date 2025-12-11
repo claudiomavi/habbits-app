@@ -39,17 +39,46 @@ export function FancySwitch({
 	const maxTranslate = width - circleDiameter - offset
 
 	// Effect line geometry
-	const effectWidth = circleDiameter / 2
-	const effectHeight = circleDiameter / 4 - 1
+	// Make it a bit larger for visibility
+	const effectWidth = (circleDiameter * 2) / 3
+	const effectHeight = circleDiameter / 3
 	const effectXDelta = offset + circleDiameter / 2 - effectWidth / 2
 	const effectY = (height - effectHeight) / 2
 
 	const anim = useRef(new Animated.Value(value ? 1 : 0)).current
+	const directionRef = useRef(value ? 1 : -1)
+	// Separate opacities for two trails (ON and OFF)
+	const trailOpOn = useRef(new Animated.Value(0)).current
+	const trailOpOff = useRef(new Animated.Value(0)).current
 
 	useEffect(() => {
+		// Update direction based on target value
+		directionRef.current = value ? 1 : -1
+		// Kick the proper trail based on direction
+		if (value) {
+			// Turning ON: show left trail
+			trailOpOff.setValue(0)
+			trailOpOn.setValue(0.95)
+			Animated.timing(trailOpOn, {
+				toValue: 0,
+				duration: 350,
+				easing: Easing.out(Easing.cubic),
+				useNativeDriver: false,
+			}).start()
+		} else {
+			// Turning OFF: show right trail
+			trailOpOn.setValue(0)
+			trailOpOff.setValue(0.95)
+			Animated.timing(trailOpOff, {
+				toValue: 0,
+				duration: 350,
+				easing: Easing.out(Easing.cubic),
+				useNativeDriver: false,
+			}).start()
+		}
 		Animated.timing(anim, {
 			toValue: value ? 1 : 0,
-			duration: 200,
+			duration: 280,
 			easing: Easing.bezier(0.27, 0.2, 0.25, 1.51),
 			useNativeDriver: false,
 		}).start()
@@ -101,16 +130,29 @@ export function FancySwitch({
 					justifyContent: 'center',
 				}}
 			>
-				{/* effect line follows the knob and fades out */}
+				{/* effect line for ON (OFF→ON): left of knob */}
 				<Animated.View
 					style={{
 						position: 'absolute',
 						width: effectWidth,
 						height: effectHeight,
 						borderRadius: 1,
-						left: Animated.add(effectXDelta, translateX),
+						left: Animated.add(translateX, new Animated.Value(-(effectWidth - 2))),
 						top: effectY,
-						opacity: anim.interpolate({ inputRange: [0, 0.8, 1], outputRange: [1, 0.2, 0] }),
+						opacity: trailOpOn,
+						backgroundColor: colors.effectBg,
+					}}
+				/>
+				{/* effect line for OFF (ON→OFF): right of knob */}
+				<Animated.View
+					style={{
+						position: 'absolute',
+						width: effectWidth,
+						height: effectHeight,
+						borderRadius: 1,
+						left: Animated.add(translateX, new Animated.Value(circleDiameter - 2)),
+						top: effectY,
+						opacity: trailOpOff,
 						backgroundColor: colors.effectBg,
 					}}
 				/>
