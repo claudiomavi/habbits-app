@@ -32,3 +32,7 @@
   - [ ] Añadir fecha nacimiento
   - [ ] Ver si creamos un username o usamos email/código uuid (a lo mejor solo ultimos 6 caracteres) para que se pueda buscar en modo cooperativo
   - [ ] Preguntas de los socios...
+
+- [ ] A la espera de los avatares
+
+- [ ] A la espera del logo
