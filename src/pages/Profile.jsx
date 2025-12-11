@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Alert } from 'react-native'
 import { ProfileTemplate, useAuthStore, useUsersStore } from '../autoBarrell'
+import { loadNotificationPrefs, applyNotificationPrefs } from '../utils/notifications'
 
 export function Profile() {
 	const { user } = useAuthStore()
@@ -13,6 +14,26 @@ export function Profile() {
 	}, [user?.id])
 
 	const [saving, setSaving] = useState(false)
+
+	// Notifications state
+	const [notifEnabled, setNotifEnabled] = useState(false)
+	const [notifHour, setNotifHour] = useState(9)
+	const [notifMinute, setNotifMinute] = useState(0)
+	const [savingNotif, setSavingNotif] = useState(false)
+
+	useEffect(() => {
+		let mounted = true
+		;(async () => {
+			const prefs = await loadNotificationPrefs()
+			if (!mounted) return
+			setNotifEnabled(!!prefs.enabled)
+			setNotifHour(prefs.hour)
+			setNotifMinute(prefs.minute)
+		})()
+		return () => {
+			mounted = false
+		}
+	}, [])
 
 	const xp = profile?.xp ?? 0
 	const levelFromXp = (total) =>
@@ -51,6 +72,16 @@ export function Profile() {
 		return () => { mounted = false }
 	}, [profile?.level])
 
+	const saveNotifications = async () => {
+		try {
+			setSavingNotif(true)
+			await applyNotificationPrefs({ enabled: notifEnabled, hour: notifHour, minute: notifMinute })
+			Alert.alert('Notificaciones actualizadas')
+		} catch (e) {
+			Alert.alert('Error', e?.message || 'No se pudieron actualizar las notificaciones')
+		} finally { setSavingNotif(false) }
+	}
+
 	return (
 		<ProfileTemplate
 			profile={profile}
@@ -58,6 +89,15 @@ export function Profile() {
 			saving={saving}
 			onSave={handleSave}
 			avatarOptions={avatarOptions}
-		/>
-	)
+notificationProps={{
+enabled: notifEnabled,
+hour: notifHour,
+minute: notifMinute,
+saving: savingNotif,
+onToggle: setNotifEnabled,
+onChangeTime: (h, m) => { setNotifHour(h); setNotifMinute(m) },
+onSave: saveNotifications,
+}}
+/>
+)
 }

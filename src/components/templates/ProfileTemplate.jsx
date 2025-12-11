@@ -17,12 +17,44 @@ import {
 	XPBar,
 } from '../../autoBarrell'
 
+// Helpers and small UI primitives for notifications section
+const pad2 = (n) => String(n).padStart(2, '0')
+
+const ToggleSwitch = ({ value, onValueChange }) => {
+	return (
+		<TouchableOpacity
+			onPress={() => onValueChange?.(!value)}
+			activeOpacity={0.8}
+			style={[styles.switchBase, value ? styles.switchOn : styles.switchOff]}
+		>
+			<View
+				style={[styles.switchHandle, value ? styles.switchHandleOn : styles.switchHandleOff]}
+			/>
+		</TouchableOpacity>
+	)
+}
+
+const NumberPill = ({ value, onInc, onDec }) => {
+	return (
+		<View style={styles.numPillBase}>
+			<TouchableOpacity onPress={onDec} style={styles.numBtn}>
+				<Text style={styles.numBtnText}>-</Text>
+			</TouchableOpacity>
+			<Text style={styles.numValue}>{value}</Text>
+			<TouchableOpacity onPress={onInc} style={styles.numBtn}>
+				<Text style={styles.numBtnText}>+</Text>
+			</TouchableOpacity>
+		</View>
+	)
+}
+
 export function ProfileTemplate({
 	profile,
 	xpPercent = 0,
 	saving,
 	onSave,
 	avatarOptions = [],
+	notificationProps,
 }) {
 	const [showEditor, setShowEditor] = React.useState(false)
 	const [editing, setEditing] = React.useState(false)
@@ -238,6 +270,60 @@ export function ProfileTemplate({
 					/>
 				</View>
 			)}
+			{/* Notifications section */}
+			<CardContainer marginTop={12}>
+				<View style={{ gap: 12 }}>
+					<Text style={styles.sectionTitle}>Recordatorios diarios</Text>
+					<View style={styles.rowBetween}>
+						<Text style={styles.label}>Activar notificaciones</Text>
+						<ToggleSwitch
+							value={!!notificationProps?.enabled}
+							onValueChange={notificationProps?.onToggle}
+						/>
+					</View>
+					<View style={[styles.rowBetween, { opacity: notificationProps?.enabled ? 1 : 0.5 }]}>
+						<Text style={styles.label}>Hora del día</Text>
+						<View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+							<NumberPill
+								value={pad2(notificationProps?.hour ?? 9)}
+								onInc={() =>
+									notificationProps?.onChangeTime?.(
+										Math.min(23, (notificationProps?.hour ?? 0) + 1),
+										notificationProps?.minute ?? 0
+									)
+								}
+								onDec={() =>
+									notificationProps?.onChangeTime?.(
+										Math.max(0, (notificationProps?.hour ?? 0) - 1),
+										notificationProps?.minute ?? 0
+									)
+								}
+							/>
+							<Text style={styles.hourColon}>:</Text>
+							<NumberPill
+								value={pad2(notificationProps?.minute ?? 0)}
+								onInc={() =>
+									notificationProps?.onChangeTime?.(
+										notificationProps?.hour ?? 0,
+										Math.min(59, (notificationProps?.minute ?? 0) + 5)
+									)
+								}
+								onDec={() =>
+									notificationProps?.onChangeTime?.(
+										notificationProps?.hour ?? 0,
+										Math.max(0, (notificationProps?.minute ?? 0) - 5)
+									)
+								}
+							/>
+						</View>
+					</View>
+					<PrimaryButton
+						title={notificationProps?.saving ? 'Guardando...' : 'Guardar notificaciones'}
+						onPress={notificationProps?.onSave}
+						loading={!!notificationProps?.saving}
+					/>
+				</View>
+			</CardContainer>
 		</GradientBackground>
 	)
 }
@@ -265,6 +351,11 @@ const styles = StyleSheet.create({
 		marginTop: 6,
 		fontFamily: typography.family.light,
 	},
+	sectionTitle: {
+		fontSize: typography.size.lg,
+		color: colors.black,
+		fontFamily: typography.family.bold,
+	},
 	label: {
 		fontSize: typography.size.xs,
 		color: colors.gray700,
@@ -285,5 +376,63 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		marginTop: 8,
 		fontFamily: typography.family.bold,
+	},
+	rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+	hourColon: { fontSize: typography.size.lg, color: colors.black, fontFamily: typography.family.bold },
+	// Toggle switch styles
+	switchBase: {
+		width: 48,
+		height: 28,
+		borderRadius: 28 / 2,
+		padding: 3,
+		borderWidth: 1,
+		borderColor: colors.gray300 || colors.gray200,
+		backgroundColor: colors.gray200,
+	},
+	switchOn: { backgroundColor: '#34C759', borderColor: '#34C759' },
+	switchOff: { backgroundColor: colors.gray200 },
+	switchHandle: {
+		width: 22,
+		height: 22,
+		borderRadius: 11,
+		backgroundColor: colors.white,
+	},
+	switchHandleOn: { marginLeft: 22 },
+	switchHandleOff: { marginLeft: 0 },
+	// Number pill styles
+	numPillBase: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		gap: 8,
+		borderWidth: 1,
+		borderColor: colors.gray200,
+		backgroundColor: colors.gray100,
+		borderRadius: radii.md,
+		paddingHorizontal: 8,
+		paddingVertical: 6,
+		minWidth: 80,
+		justifyContent: 'space-between',
+	},
+	numBtn: {
+		width: 28,
+		height: 28,
+		borderRadius: 14,
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: colors.white,
+		borderWidth: 1,
+		borderColor: colors.gray200,
+	},
+	numBtnText: {
+		fontFamily: typography.family.bold,
+		color: colors.black,
+		fontSize: typography.size.md,
+	},
+	numValue: {
+		fontFamily: typography.family.bold,
+		color: colors.black,
+		fontSize: typography.size.md,
+		minWidth: 32,
+		textAlign: 'center',
 	},
 })
