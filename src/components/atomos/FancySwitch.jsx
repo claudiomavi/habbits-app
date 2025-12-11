@@ -38,6 +38,12 @@ export function FancySwitch({
 	const offset = (height - circleDiameter) / 2
 	const maxTranslate = width - circleDiameter - offset
 
+	// Effect line geometry
+	const effectWidth = circleDiameter / 2
+	const effectHeight = circleDiameter / 4 - 1
+	const effectXDelta = offset + circleDiameter / 2 - effectWidth / 2
+	const effectY = (height - effectHeight) / 2
+
 	const anim = useRef(new Animated.Value(value ? 1 : 0)).current
 
 	useEffect(() => {
@@ -95,17 +101,16 @@ export function FancySwitch({
 					justifyContent: 'center',
 				}}
 			>
-				{/* effect line */}
+				{/* effect line follows the knob and fades out */}
 				<Animated.View
 					style={{
 						position: 'absolute',
-						width: circleDiameter / 2,
-						height: circleDiameter / 4 - 1,
+						width: effectWidth,
+						height: effectHeight,
 						borderRadius: 1,
-						left: Animated.add(
-							offset,
-							new Animated.Value(circleDiameter / 2 / 2)
-						),
+						left: Animated.add(effectXDelta, translateX),
+						top: effectY,
+						opacity: anim.interpolate({ inputRange: [0, 0.8, 1], outputRange: [1, 0.2, 0] }),
 						backgroundColor: colors.effectBg,
 					}}
 				/>
