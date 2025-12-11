@@ -1,6 +1,7 @@
 export * from './components/atomos/AvatarInitials'
 export * from './components/atomos/GradientBackground'
 export * from './components/atomos/PrimaryButton'
+export * from './components/atomos/FancySwitch'
 export * from './components/moleculas/DaysOfWeekSelector'
 export * from './components/moleculas/DifficultyBadge'
 export * from './components/moleculas/DifficultySelector'

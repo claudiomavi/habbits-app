@@ -12,6 +12,7 @@ import {
 import {
 	AvatarInitials,
 	CardContainer,
+	FancySwitch,
 	GradientBackground,
 	PrimaryButton,
 	XPBar,
@@ -19,23 +20,6 @@ import {
 
 // Helpers and small UI primitives for notifications section
 const pad2 = (n) => String(n).padStart(2, '0')
-
-const ToggleSwitch = ({ value, onValueChange }) => {
-	return (
-		<TouchableOpacity
-			onPress={() => onValueChange?.(!value)}
-			activeOpacity={0.8}
-			style={[styles.switchBase, value ? styles.switchOn : styles.switchOff]}
-		>
-			<View
-				style={[
-					styles.switchHandle,
-					value ? styles.switchHandleOn : styles.switchHandleOff,
-				]}
-			/>
-		</TouchableOpacity>
-	)
-}
 
 const NumberPill = ({ value, onInc, onDec }) => {
 	return (
@@ -290,7 +274,7 @@ export function ProfileTemplate({
 					<Text style={styles.sectionTitle}>Recordatorios diarios</Text>
 					<View style={styles.rowBetween}>
 						<Text style={styles.label}>Activar notificaciones</Text>
-						<ToggleSwitch
+						<FancySwitch
 							value={!!notificationProps?.enabled}
 							onValueChange={notificationProps?.onToggle}
 						/>
@@ -413,26 +397,6 @@ const styles = StyleSheet.create({
 		color: colors.black,
 		fontFamily: typography.family.bold,
 	},
-	// Toggle switch styles
-	switchBase: {
-		width: 48,
-		height: 28,
-		borderRadius: 28 / 2,
-		padding: 2,
-		borderWidth: 1,
-		borderColor: colors.gray300 || colors.gray200,
-		backgroundColor: colors.gray200,
-	},
-	switchOn: { backgroundColor: '#34C759', borderColor: '#34C759' },
-	switchOff: { backgroundColor: colors.gray200 },
-	switchHandle: {
-		width: 22,
-		height: 22,
-		borderRadius: 11,
-		backgroundColor: colors.white,
-	},
-	switchHandleOn: { marginLeft: 22 },
-	switchHandleOff: { marginLeft: 0 },
 	// Number pill styles
 	numPillBase: {
 		flexDirection: 'row',
