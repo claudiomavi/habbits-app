@@ -28,7 +28,10 @@ const ToggleSwitch = ({ value, onValueChange }) => {
 			style={[styles.switchBase, value ? styles.switchOn : styles.switchOff]}
 		>
 			<View
-				style={[styles.switchHandle, value ? styles.switchHandleOn : styles.switchHandleOff]}
+				style={[
+					styles.switchHandle,
+					value ? styles.switchHandleOn : styles.switchHandleOff,
+				]}
 			/>
 		</TouchableOpacity>
 	)
@@ -37,11 +40,17 @@ const ToggleSwitch = ({ value, onValueChange }) => {
 const NumberPill = ({ value, onInc, onDec }) => {
 	return (
 		<View style={styles.numPillBase}>
-			<TouchableOpacity onPress={onDec} style={styles.numBtn}>
+			<TouchableOpacity
+				onPress={onDec}
+				style={styles.numBtn}
+			>
 				<Text style={styles.numBtnText}>-</Text>
 			</TouchableOpacity>
 			<Text style={styles.numValue}>{value}</Text>
-			<TouchableOpacity onPress={onInc} style={styles.numBtn}>
+			<TouchableOpacity
+				onPress={onInc}
+				style={styles.numBtn}
+			>
 				<Text style={styles.numBtnText}>+</Text>
 			</TouchableOpacity>
 		</View>
@@ -183,29 +192,41 @@ export function ProfileTemplate({
 		<GradientBackground style={styles.container}>
 			<CardContainer>
 				<View style={styles.header}>
-					{(editing ? avatar?.uri || displayUri : displayUri) ? (
-						<Image
-							source={{ uri: editing ? avatar?.uri || displayUri : displayUri }}
-							style={styles.avatar}
-						/>
-					) : (
-						<AvatarInitials
-							text={initial}
-							size={72}
-						/>
-					)}
-					<View style={{ flex: 1 }}>
-						<Text style={styles.name}>
-							{profile?.display_name || 'Sin nombre'}
-						</Text>
-						<Text style={styles.email}>{profile?.email}</Text>
-						<Text style={styles.level}>Nivel {profile?.level ?? 1}</Text>
-						<XPBar percent={xpPercent} />
+					<View style={styles.firstRow}>
+						{(editing ? avatar?.uri || displayUri : displayUri) ? (
+							<Image
+								source={{
+									uri: editing ? avatar?.uri || displayUri : displayUri,
+								}}
+								style={styles.avatar}
+							/>
+						) : (
+							<AvatarInitials
+								text={initial}
+								size={72}
+							/>
+						)}
+						<View style={{ flex: 1 }}>
+							<Text style={styles.name}>
+								{profile?.display_name || 'Sin nombre'}
+							</Text>
+							<Text style={styles.email}>{profile?.email}</Text>
+							<Text style={styles.level}>Nivel {profile?.level ?? 1}</Text>
+							<XPBar percent={xpPercent} />
+						</View>
 					</View>
+					{!editing && (
+						<View style={styles.secondRow}>
+							<PrimaryButton
+								title="Editar perfil"
+								onPress={() => setEditing(true)}
+							/>
+						</View>
+					)}
 				</View>
 			</CardContainer>
 
-			{editing ? (
+			{editing && (
 				<Animated.View
 					style={{
 						opacity: editOpacity,
@@ -262,13 +283,6 @@ export function ProfileTemplate({
 						</View>
 					</CardContainer>
 				</Animated.View>
-			) : (
-				<View style={{ marginTop: 12 }}>
-					<PrimaryButton
-						title="Editar perfil"
-						onPress={() => setEditing(true)}
-					/>
-				</View>
 			)}
 			{/* Notifications section */}
 			<CardContainer marginTop={12}>
@@ -281,9 +295,16 @@ export function ProfileTemplate({
 							onValueChange={notificationProps?.onToggle}
 						/>
 					</View>
-					<View style={[styles.rowBetween, { opacity: notificationProps?.enabled ? 1 : 0.5 }]}>
+					<View
+						style={[
+							styles.rowBetween,
+							{ opacity: notificationProps?.enabled ? 1 : 0.5 },
+						]}
+					>
 						<Text style={styles.label}>Hora del día</Text>
-						<View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+						<View
+							style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
+						>
 							<NumberPill
 								value={pad2(notificationProps?.hour ?? 9)}
 								onInc={() =>
@@ -318,7 +339,11 @@ export function ProfileTemplate({
 						</View>
 					</View>
 					<PrimaryButton
-						title={notificationProps?.saving ? 'Guardando...' : 'Guardar notificaciones'}
+						title={
+							notificationProps?.saving
+								? 'Guardando...'
+								: 'Guardar notificaciones'
+						}
 						onPress={notificationProps?.onSave}
 						loading={!!notificationProps?.saving}
 					/>
@@ -332,7 +357,8 @@ const { colors, typography, radii } = require('../../styles/theme')
 
 const styles = StyleSheet.create({
 	container: { flex: 1, padding: 16 },
-	header: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+	header: { flexDirection: 'column', gap: 12 },
+	firstRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
 	avatar: { width: 72, height: 72, borderRadius: radii.lg },
 	name: {
 		fontSize: typography.size.xl,
@@ -377,8 +403,16 @@ const styles = StyleSheet.create({
 		marginTop: 8,
 		fontFamily: typography.family.bold,
 	},
-	rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-	hourColon: { fontSize: typography.size.lg, color: colors.black, fontFamily: typography.family.bold },
+	rowBetween: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+	},
+	hourColon: {
+		fontSize: typography.size.lg,
+		color: colors.black,
+		fontFamily: typography.family.bold,
+	},
 	// Toggle switch styles
 	switchBase: {
 		width: 48,
